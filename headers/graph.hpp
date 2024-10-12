@@ -17,15 +17,18 @@ public:
     void add_edge(const T& start, const T& end);
 
     /* Method to print the graph */
-    void print_graph(void);
+    void print_graph();
 
+    /* Method which returns the vertices count*/
     int get_vertices_count();
+
+protected:   
+    /* Get adjacency list method for testing purposes */
+    auto get_adjacency_list() const;
     
 
 private:
     bool isDirected;                                // True if the graph is directed
     int countVertices;                              // Number of vertices
     std::vector<std::vector<int>> adjacencyList;    // Adjacency list (vector of vectors)
-
-
 };
