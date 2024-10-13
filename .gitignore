@@ -1,6 +1,10 @@
 # Prerequisites
 *.d
 
+# Datasets for testing
+*.fvecs
+*.ivecs
+
 # Compiled Object files
 *.slo
 *.lo
