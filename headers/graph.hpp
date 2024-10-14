@@ -1,6 +1,7 @@
-/* Graph data structure representation using STL vector */
+/* Graph data structure representation using STL vector and set*/
 #include <iostream>
 #include <bits/stdc++.h>
+#include <set>
 using namespace std;
 
 
@@ -10,11 +11,18 @@ public:
     /* Constructor */
     Graph(bool isDirected = true); // The graph is directed by default because of the nature of the project
 
-    /* Add a vertex (of type T) to the graph */
+   
+    /* Adds a vertex (of type T) to the graph */
     void add_vertex(const T& v);
 
-    /* Add edge between vertex(T) start and vertex(T) end */
+    /* Adds edge between vertex(T) start and vertex(T) end */
     void add_edge(const T& start, const T& end);
+
+    /* Removes vertex v from the graph, not needed for the project*/
+    // void remove_vertex(T& v);
+
+    /* Removes edge between node start and node end from the graph */
+    void remove_edge(const T& start, const T& end);
 
     /* Method to print the graph */
     void print_graph();
@@ -22,13 +30,21 @@ public:
     /* Method which returns the vertices count*/
     int get_vertices_count();
 
+    /* Method that returns the edge count */
+    int get_edge_count();
+
+    /* Returns true if the graph is directed */
+    bool is_directed();
+
+
 protected:   
-    /* Get adjacency list method for testing purposes */
+    /* Getter methods for testing purposes */
     auto get_adjacency_list() const;
+    set get_vertices() const;
     
 
 private:
-    bool isDirected;                                // True if the graph is directed
-    int countVertices;                              // Number of vertices
-    std::vector<std::vector<int>> adjacencyList;    // Adjacency list (vector of vectors)
+    bool isDirected;                      // True if the graph is directed
+    set vertices;                         // A set of the graphs vertices
+    vector<vector<int>> adjacencyList;    // Adjacency list (vector of vectors)
 };
