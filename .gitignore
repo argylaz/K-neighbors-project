@@ -2,6 +2,7 @@
 *.d
 
 # Datasets for testing
+*.tar.gz
 *.fvecs
 *.ivecs
 
