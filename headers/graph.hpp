@@ -40,11 +40,13 @@ public:
 protected:   
     /* Getter methods for testing purposes */
     auto get_adjacency_list() const;
-    set get_vertices() const;
+    set<T> get_vertices() const;
     
 
 private:
-    bool isDirected;                      // True if the graph is directed
-    set vertices;                         // A set of the graphs vertices
-    vector<vector<int>> adjacencyList;    // Adjacency list (vector of vectors)
+    int countEdges;
+    int countVertices;
+    bool isDirected;                        // True if the graph is directed
+    set<T> vertices;                            // A set of the graphs vertices
+    vector<vector<T>> adjacencyList;        // Adjacency list (vector of vectors)
 };
