@@ -53,6 +53,12 @@ private:
     int countEdges;
     int countVertices;
     bool isDirected;                        // True if the graph is directed
-    set<T> vertices;                            // A set of the graphs vertices
-    vector<vector<T>> adjacencyList;        // Adjacency list (vector of vectors)
+
+    
+    set<T> vertices;                        // A set of the graphs vertices
+    map<T, int> v_index;                    // Mapping from T to indices
+
+    /* Adjacency list (vector of vectors)                                                                             */
+    /* First element of each vector will be the vertex itself in order to avoid a second mapping from index to vertex */
+    vector<vector<T>> adjacencyList;
 };
