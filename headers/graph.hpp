@@ -27,14 +27,20 @@ public:
     /* Method to print the graph */
     void print_graph();
 
+    /* Method to get vertex from index */
+    const T get_vertex_from_index(int i);
+
+    /* Method to get index from vertex **/
+    const T get_index_from_vertex(const T& v);
+
     /* Method which returns the vertices count*/
-    int get_vertices_count();
+    const int get_vertices_count();
 
     /* Method that returns the edge count */
-    int get_edge_count();
+    const int get_edge_count();
 
     /* Returns true if the graph is directed */
-    bool is_directed();
+    const bool is_directed();
 
 
 protected:   
