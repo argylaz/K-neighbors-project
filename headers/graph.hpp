@@ -45,7 +45,7 @@ public:
 
 protected:   
     /* Getter methods for testing purposes */
-    auto get_adjacency_list() const;
+    vector<vector<T>> get_adjacency_list() const;
     set<T> get_vertices() const;
     
 

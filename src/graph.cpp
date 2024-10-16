@@ -139,7 +139,7 @@ const bool Graph<T>::is_directed(){
 
 // /* Get adjacency list method for testing purposes */
 template <typename T>
-auto Graph<T>::get_adjacency_list(void) const {
+vector<vector<T>> Graph<T>::get_adjacency_list(void) const {
     return adjacencyList;
 }
      
@@ -147,7 +147,7 @@ auto Graph<T>::get_adjacency_list(void) const {
 
 
 
-int main() {
+/* int main() {
     // cout << "edges " << g.get_edge_count() << endl;
     // cout << "vertices " << g.get_vertices_count() << endl;
 
@@ -223,4 +223,4 @@ int main() {
 
     
 
-}
+} */
