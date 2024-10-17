@@ -1,4 +1,71 @@
-#include "../headers/graph.hpp"
+/* Graph data structure representation using STL vector and set*/
+#include <iostream>
+#include <bits/stdc++.h>
+#include <set>
+using namespace std;
+
+/*------------------------------------- CLASS DECLARATION ----------------------------------------------------*/
+
+template <typename T>              // Template T to make the graph generic
+class Graph {
+public:
+    /* Constructor */
+    Graph(bool isDirected = true); // The graph is directed by default because of the nature of the project
+
+   
+    /* Adds a vertex (of type T) to the graph */
+    void add_vertex(const T& v);
+
+    /* Adds edge between vertex(T) start and vertex(T) end */
+    void add_edge(const T& start, const T& end);
+
+    /* Removes vertex v from the graph, not needed for the project*/
+    // void remove_vertex(T& v);
+
+    /* Removes edge between node start and node end from the graph */
+    void remove_edge(const T& start, const T& end);
+
+    /* Method to print the graph */
+    void print_graph();
+
+    /* Method to get vertex from index */
+    const T get_vertex_from_index(int i);
+
+    /* Method to get index from vertex **/
+    const T get_index_from_vertex(const T& v);
+
+    /* Method which returns the vertices count*/
+    const int get_vertices_count();
+
+    /* Method that returns the edge count */
+    const int get_edge_count();
+
+    /* Returns true if the graph is directed */
+    const bool is_directed();
+
+
+protected:   
+    /* Getter methods for testing purposes */
+    vector<vector<T>> get_adjacency_list() const;
+    set<T> get_vertices() const;
+    
+
+private:
+    int countEdges;
+    int countVertices;
+    bool isDirected;                        // True if the graph is directed
+
+    
+    set<T> vertices;                        // A set of the graphs vertices
+    map<T, int> v_index;                    // Mapping from T to indices
+
+    /* Adjacency list (vector of vectors)                                                                             */
+    /* First element of each vector will be the vertex itself in order to avoid a second mapping from index to vertex */
+    vector<vector<T>> adjacencyList;
+};
+
+
+/*------------------------------ FUNCTION DEFINITIONS (in .hpp because of the templates) -----------------------------*/
 
 template <typename T>
 Graph<T>::Graph(bool isDirected) {
@@ -7,15 +74,6 @@ Graph<T>::Graph(bool isDirected) {
     countEdges = 0;
     countVertices = 0;
     this->isDirected = isDirected; 
-    cout << this->isDirected << endl;
-    
-    for( vector<T> v : adjacencyList){
-        for( T i : v ){
-            cout << i << endl;
-        };
-    };
-
-
 }
 
 /* Add a vertex (of type T) to the graph */
@@ -73,6 +131,7 @@ void Graph<T>::add_edge(const T& start, const T& end) {
 
 }
 
+
 /* Removes edge between node start and node end from the graph */
 template <typename T>
 void Graph<T>::remove_edge(const T& start, const T& end) {
@@ -86,6 +145,7 @@ void Graph<T>::remove_edge(const T& start, const T& end) {
         i++;
     }
 
+    countEdges--;
 
 
     /* If the graph is Undirected, remove also the edge end->start */
@@ -97,6 +157,7 @@ void Graph<T>::remove_edge(const T& start, const T& end) {
                 adjacencyList[v_pos].erase(j);
             k++;
         }
+        countEdges--;
     }
 }
 
@@ -119,6 +180,18 @@ void Graph<T>::print_graph(void) {
 
 }
 
+
+template <typename T>
+const T Graph<T>::get_vertex_from_index(int i) {
+    return this->adjacencyList[i][0];                   // Returns the first element of the i-th row of the adjacency list, which is the vetrex corresponding to the row
+}
+
+
+template <typename T>
+const T Graph<T>::get_index_from_vertex(const T& v) {
+    return this->v_index[v];  // Just returning the mapping of v
+}
+
 /* Method which returns the vertices count*/
 template <typename T>
 const int Graph<T>::get_vertices_count(void) {
@@ -137,90 +210,14 @@ const bool Graph<T>::is_directed(){
     return isDirected;
 }
 
+
+template <typename T>
+set<T> Graph<T>::get_vertices() const{
+    return vertices;
+}
+
 // /* Get adjacency list method for testing purposes */
 template <typename T>
 vector<vector<T>> Graph<T>::get_adjacency_list(void) const {
     return adjacencyList;
 }
-     
-
-
-
-
-/* int main() {
-    // cout << "edges " << g.get_edge_count() << endl;
-    // cout << "vertices " << g.get_vertices_count() << endl;
-
-    // cout << "edges " << g.get_edge_count() << endl;
-    // cout << "vertices " << g.get_vertices_count() << endl;
-
-    // cout << endl;
-
-    // Testing Directed graph
-    Graph<int> g1 = Graph<int>();
-    g1.add_vertex(4);
-    g1.add_vertex(90);
-    g1.add_vertex(76);
-
-    g1.add_edge(4,90);
-    g1.add_edge(90,76);
-    g1.add_edge(76,4);
-
-    g1.print_graph();
-
-    // Testing Undirected graph
-    Graph<int> g2 = Graph<int>(false);
-    g2.add_vertex(10);
-    g2.add_vertex(20);
-    g2.add_vertex(30);
-    g2.add_vertex(40);
-
-    g2.add_edge(10,20);
-    g2.add_edge(10,30);
-    g2.add_edge(20,40);
-    g2.add_edge(30,40);
-
-    g2.print_graph();
-
-    // Testing Directed graph with characters
-    Graph<char> g3 = Graph<char>();
-    g3.add_vertex('c');
-    g3.add_vertex('s');
-    g3.add_vertex('x');
-    g3.add_vertex('e');
-
-    g3.add_edge('c','s');
-    g3.add_edge('c','x');
-    g3.add_edge('c','e');
-    g3.add_edge('e','x');
-    g3.print_graph();
-
-    g3.remove_edge('c','s');
-    g3.remove_edge('c','x');
-    g3.remove_edge('c','e');
-    g3.remove_edge('e','x');
-    g3.print_graph();
-
-    // Testing removals on an Undirected graph
-    Graph<char> g4 = Graph<char>(false);
-    g4.add_vertex('a');
-    g4.add_vertex('b');
-    g4.add_vertex('c');
-    g4.add_vertex('d');
-
-    g4.add_edge('a','b');
-    g4.add_edge('a','c');
-    g4.add_edge('a','d');
-    g4.add_edge('b','c');
-    g4.add_edge('b','d');
-    g4.add_edge('c','d');
-    g4.print_graph();
-
-    g4.remove_edge('a','b');
-    g4.remove_edge('a','c');
-    g4.remove_edge('c','d');
-    g4.print_graph();
-
-    
-
-} */
