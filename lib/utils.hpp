@@ -3,7 +3,7 @@
 #include <cmath>
 using namespace std;
 
-// Function for the calculation of the Eycledian distance
+// Function for the calculation of the Euclidean distance
 
 template<typename Type>             // Type is either integer or float
 float Euclidean_Distance( vector<Type> a, vector<Type> b) {
