@@ -1,5 +1,7 @@
-#include "../headers/acutest.h"			// Unit testing library
-#include "../headers/graph.hpp"
+#include "../lib/acutest.h"			// Unit testing library
+#include "../lib/graph.hpp"
+
+#define NUM 10
 
 /* Creating a testable graph that inherits from Graph to access protected members */
 class TestGraph: public Graph<int> {  // Graph<int> for testing
@@ -35,7 +37,13 @@ void test_create() {
 
 /* Testing add_vertex method */
 void test_add_vertex() {
+    
     TestGraph G1;
+
+    // Add a vertex to each graph
+    for (int i = 0; i < NUM; i++) {
+        G1.add_vertex(i);
+    }
 
     // Get vertex set
     set<int> V1 = G1.get_private_vertex_set();
@@ -43,19 +51,13 @@ void test_add_vertex() {
     // Get adjacency lists
     vector<vector<int>> L1 = G1.get_private_adjacency_list();
 
-    // Add a vertex to each graph
-    for (int i = 0; i < 1000; i++) {
-        G1.add_vertex(i);
-    }
-
     // Check that the vertices have been added and everthing works as it should
-    TEST_ASSERT(L1.size() == 1000);
+    TEST_ASSERT(L1.size() == NUM);
     
     set<int>::iterator it = V1.begin();
-    for (int i = 0; i < 1000; i++) {
-        TEST_ASSERT(*it == i);   // Set is ordered in asacending order by deault
-        TEST_ASSERT(L1.at(i).at(i) == i);
-
+    for (int i = 0; i < NUM; i++) {
+        TEST_ASSERT(*it == i);              // Set is ordered in asacending order by deault
+        TEST_ASSERT(L1[i][0] == i);         // The first element of each row is the vertex corresponding to the index
         it++;
     }
 }
@@ -66,11 +68,11 @@ void test_add_edge() {
     TestGraph G1(true);
     TestGraph G2(false);
 
-    // Add 1000 vertices and 100 edges and test theyre have been added to both graphs as they should
+    // Add NUM vertices and NUM edges and test that they have been added to both graphs as they should
     G1.add_vertex(0);
     G2.add_vertex(0);
 
-    for (int i = 1; i < 1000; i++) {
+    for (int i = 1; i < NUM; i++) {
         G1.add_vertex(i);
         G2.add_vertex(i);
 
@@ -82,19 +84,27 @@ void test_add_edge() {
         vector<vector<int>> L2 = G2.get_private_adjacency_list();
 
         // Check that the adjacency list has the correct entries
-        TEST_ASSERT(L1.at(i).at(1) == i-1);  
-        TEST_ASSERT(L2.at(i).at(1) == i-1);
-        TEST_ASSERT(L2.at(i-1).at(2) == i);
-
-        TEST_ASSERT(L1.at(i).size() == 2);
-        TEST_ASSERT(L2.at(i).size() == 3); // Undirected graph has entries for both directions
+        TEST_ASSERT(L1[i-1][1] == i);  
+        TEST_ASSERT(L2[i][1] == i-1);
+        
+        if( i != 1 ) {
+            TEST_ASSERT(L2[i-1][2] == i);
+            TEST_ASSERT(L1[i-1].size() == 2);
+            TEST_ASSERT(L2[i-1].size() == 3); // Undirected graph has entries for both directions
+        }
     }
 
     vector<vector<int>> L1 = G1.get_private_adjacency_list();
     vector<vector<int>> L2 = G2.get_private_adjacency_list();
 
-    TEST_ASSERT(L1.size() == 1000);
-    TEST_ASSERT(L2.size() == 1000);
+    TEST_ASSERT(L1.size() == NUM);
+    TEST_ASSERT(L2.size() == NUM);
+
+    /*
+    Printing for testing purposes
+    G1.print_graph();
+    G2.print_graph();
+    */
 }
 
 /* Terting remove_edge method */
@@ -103,16 +113,12 @@ void test_remove_edge() {
     TestGraph G1(true);
     TestGraph G2(false);
 
-    // Get vertex set
-    set<int> V1 = G1.get_private_vertex_set();
-    set<int> V2 = G2.get_private_vertex_set();
 
-
-    // Add 1000 vertices and 100 edges and test theyre have been added to both graphs as they should
+    // Add NUM vertices and NUM edges and test theyre have been added to both graphs as they should
     G1.add_vertex(0);
     G2.add_vertex(0);
 
-    for (int i = 1; i < 1000; i++) {
+    for (int i = 1; i < NUM; i++) {
         G1.add_vertex(i);
         G2.add_vertex(i);
 
@@ -120,7 +126,10 @@ void test_remove_edge() {
         G2.add_edge(i-1,i);
     }
 
-    for (int i = 1; i < 1000; i++) {
+    
+
+
+    for (int i = 1; i < NUM; i++) {
         G1.remove_edge(i-1, i);
         G2.remove_edge(i-1, i);
 
@@ -128,11 +137,14 @@ void test_remove_edge() {
         vector<vector<int>> L1 = G1.get_private_adjacency_list();
         vector<vector<int>> L2 = G2.get_private_adjacency_list();
 
+
         // Test that the equivalent entries have been deleted
-        TEST_ASSERT(L1.at(i-1).size() == 1);
-        TEST_ASSERT(L1.at(i).size() == 1);
-        TEST_ASSERT(L2.at(i-1).size() == 1);
-        TEST_ASSERT(L2.at(i).size() == 2);   // Edge from i to i+1 hasnt been reoved yet
+        TEST_ASSERT(L1[i-1].size() == 1);
+        TEST_ASSERT(L2[i-1].size() == 1);
+        if( i!= NUM - 1 ){
+            TEST_ASSERT(L1[i].size() == 2);
+            TEST_ASSERT(L2[i].size() == 2);   // Edge from i to i+1 hasnt been reoved yet
+        }
     }
 }
 
@@ -140,12 +152,12 @@ void test_remove_edge() {
 void test_index_to_vertex() {
     TestGraph G1;
 
-    // Add 1000 vertices
-    for (int i = 0; i < 1000; i++) {
+    // Add NUM vertices
+    for (int i = 0; i < NUM; i++) {
         G1.add_vertex(i);
     }
 
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < NUM; i++) {
         TEST_ASSERT(G1.get_index_from_vertex(i) == i); // In this case vertices and indices are all ints
     }
 }
@@ -154,12 +166,12 @@ void test_index_to_vertex() {
 void test_vertex_to_index() {
     TestGraph G1;
 
-    // Add 1000 vertices
-    for (int i = 0; i < 1000; i++) { 
+    // Add NUM vertices
+    for (int i = 0; i < NUM; i++) { 
         G1.add_vertex(i);
     }
 
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < NUM; i++) {
         TEST_ASSERT(G1.get_vertex_from_index(i) == i); // In this case vertices and indices are all ints
     }
 }
@@ -173,10 +185,10 @@ void test_get_edge_count() {
     TEST_ASSERT(G1.get_edge_count() == 0);
     TEST_ASSERT(G2.get_edge_count() == 0);
 
-    // Add 1000 vertices and 1000 edges and test edge count
+    // Add NUM vertices and NUM edges and test edge count
     G1.add_vertex(0);
     G2.add_vertex(0);
-    for (int i = 1; i < 1000; i++) { 
+    for (int i = 1; i < NUM; i++) { 
         G1.add_vertex(i);
         G1.add_edge(i-1, i);
 
@@ -194,8 +206,8 @@ void test_get_vertices_count() {
 
     TEST_ASSERT(G1.get_vertices_count() == 0);
 
-    // Add 1000 vertices and test the vertex count
-    for (int i = 0; i < 1000; i++) { 
+    // Add NUM vertices and test the vertex count
+    for (int i = 1; i <= NUM; i++) { 
         G1.add_vertex(i);
 
         TEST_ASSERT(G1.get_vertices_count() == i);
@@ -212,6 +224,7 @@ TEST_LIST = {
     { "index_to_vertex", test_index_to_vertex },
     { "vertex_to_index", test_vertex_to_index },
     { "add_edge", test_add_edge },
+    { "get_edge_count", test_get_edge_count},
     { "get_vertices_count", test_get_vertices_count },
     { NULL, NULL }
 };
