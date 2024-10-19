@@ -1,6 +1,7 @@
 #include <iostream>
 #include <bits/stdc++.h>
 #include <cmath>
+#include "graph.hpp"
 using namespace std;
 
 // Function for the calculation of the Euclidean distance
@@ -23,3 +24,12 @@ float Euclidean_Distance( vector<Type> a, vector<Type> b) {
     return x;
 
 }
+
+
+/* Reads an fvec file and returns a graph with all the vectors read as its vertices and no edges */
+Graph<vector<float>> fvec_to_graph(const string& filename);
+
+
+/* Reads an ivec file and returns a graph with all the vectors read as its vertices and no edges */
+Graph<vector<int>> ivec_to_graph(const string& filename);
+
