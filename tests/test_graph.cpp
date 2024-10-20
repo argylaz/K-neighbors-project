@@ -1,26 +1,12 @@
 #include "../lib/acutest.h"			// Unit testing library
-#include "../lib/graph.hpp"
+#include "../lib/utils.hpp"
 
 #define NUM 10
 
-/* Creating a testable graph that inherits from Graph to access protected members */
-class TestGraph: public Graph<int> {  // Graph<int> for testing
-public:
-    TestGraph(bool isDirected=true) : Graph<int>(isDirected) {}
-
-    vector<vector<int>> get_private_adjacency_list() const {
-        return this->get_adjacency_list();
-    }
-
-    set<int> get_private_vertex_set() const{
-        return this->get_vertices();
-    }
-};
-
 /* Testing graph construction */
 void test_create() {
-    TestGraph G1(true); // Create a directed graph
-    TestGraph G2(false); // Create an undirected graph
+    TestGraph<int> G1(true); // Create a directed graph
+    TestGraph<int> G2(false); // Create an undirected graph
 
     // Testing that the adjacency list is initialised properly
     auto L1 = G1.get_private_adjacency_list();
@@ -38,7 +24,7 @@ void test_create() {
 /* Testing add_vertex method */
 void test_add_vertex() {
     
-    TestGraph G1;
+    TestGraph<int> G1;
 
     // Add a vertex to each graph
     for (int i = 0; i < NUM; i++) {
@@ -65,8 +51,8 @@ void test_add_vertex() {
 /* Testing add_edge method */
 void test_add_edge() {
     // Testing for one directed and one undirected graph
-    TestGraph G1(true);
-    TestGraph G2(false);
+    TestGraph<int> G1(true);
+    TestGraph<int> G2(false);
 
     // Add NUM vertices and NUM edges and test that they have been added to both graphs as they should
     G1.add_vertex(0);
@@ -110,8 +96,8 @@ void test_add_edge() {
 /* Terting remove_edge method */
 void test_remove_edge() {
     // Testing for one directed and one undirected graph
-    TestGraph G1(true);
-    TestGraph G2(false);
+    TestGraph<int> G1(true);
+    TestGraph<int> G2(false);
 
 
     // Add NUM vertices and NUM edges and test theyre have been added to both graphs as they should
@@ -150,7 +136,7 @@ void test_remove_edge() {
 
 /* Testing index to vertex method */
 void test_index_to_vertex() {
-    TestGraph G1;
+    TestGraph<int> G1;
 
     // Add NUM vertices
     for (int i = 0; i < NUM; i++) {
@@ -164,7 +150,7 @@ void test_index_to_vertex() {
 
 /* Testing vertex-->index method */
 void test_vertex_to_index() {
-    TestGraph G1;
+    TestGraph<int> G1;
 
     // Add NUM vertices
     for (int i = 0; i < NUM; i++) { 
@@ -179,8 +165,8 @@ void test_vertex_to_index() {
 /* Testing get edge count method */
 void test_get_edge_count() {
     // Testing for one directed and one undirected graph
-    TestGraph G1(true);
-    TestGraph G2(false);
+    TestGraph<int> G1(true);
+    TestGraph<int> G2(false);
 
     TEST_ASSERT(G1.get_edge_count() == 0);
     TEST_ASSERT(G2.get_edge_count() == 0);
@@ -202,7 +188,7 @@ void test_get_edge_count() {
 
 /* Testing the get_vertices_count method*/
 void test_get_vertices_count() {
-    TestGraph G1;
+    TestGraph<int> G1;
 
     TEST_ASSERT(G1.get_vertices_count() == 0);
 

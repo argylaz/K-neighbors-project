@@ -44,6 +44,7 @@ public:
     const bool is_directed();
 
 
+
 protected:   
     /* Getter methods for testing purposes */
     vector<vector<T>> get_adjacency_list() const;
