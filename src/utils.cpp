@@ -23,7 +23,7 @@ void fvec_to_graph(const std::string& filename, TestGraph<vector<float>>& G) {
 
         // If there is no data following the dimension the file format is incorrect.
         if(!file) {
-            correctFormat = false; 
+            correctFormat = false;
             break;
         }
 
