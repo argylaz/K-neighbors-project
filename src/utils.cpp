@@ -1,34 +1,35 @@
 #include "../lib/utils.hpp"
 using namespace std;
 
-void fvec_to_graph(const std::string& filename, TestGraph<vector<float>>& G) {
+void fvec_to_graph(const string& filename, TestGraph<vector<float>>& G) {
     // First we open the file and check if it was opened properly
     ifstream file(filename, ios::binary);
     if (!file) {
-        std::cerr << "Error when opening file " << filename << std::endl;
+        cerr << "Error when opening file " << filename << endl;
         return;
     }
 
     // This variable will indicate that the format of the file is correct and as expected.
     bool correctFormat = true;
 
-    
-
-    // Read the contents of the file
-    while(file) {
-        // Read the dimension of the vector 
-        int d;
-        file.read(reinterpret_cast<char*>(&d), sizeof(int));
         
 
+    // Read the contents of the file
+    while( file.peek()  != EOF ) {
+        // Read the dimension of the vector
+        int d;
+        file.read(reinterpret_cast<char*>(&d), sizeof(int));
+   
         // If there is no data following the dimension the file format is incorrect.
         if(!file) {
             correctFormat = false;
             break;
         }
 
-        // Read the float vector
-        vector<float> v;
+        // Creating vector to hold the data
+        vector<float> v; v.resize(d);
+
+        // Reading data from file
         file.read(reinterpret_cast<char*>(v.data()), d*sizeof(float));
         if(!file) break;
 
@@ -41,15 +42,15 @@ void fvec_to_graph(const std::string& filename, TestGraph<vector<float>>& G) {
         G.add_vertex(v);
     }
 
-    if (!correctFormat) cerr << "Input file format incorrect! Graph might have errors.";
+    if (!correctFormat) cerr << "Input file format incorrect! Graph might have errors." << endl;
     file.close();
 }
 
-void ivec_to_graph(const std::string& filename, TestGraph<vector<int>>& G) {
+void ivec_to_graph(const string& filename, TestGraph<vector<int>>& G) {
     // First we open the file and check if it was opened properly
     ifstream file(filename, ios::binary);
     if (!file) {
-        std::cerr << "Error when opening file " << filename << std::endl;
+        cerr << "Error when opening file " << filename << endl;
         return;
     }
 
@@ -57,7 +58,7 @@ void ivec_to_graph(const std::string& filename, TestGraph<vector<int>>& G) {
     bool correctFormat = true;
 
     // Read the contents of the file
-    while(file) {
+    while(file.peek()  != EOF) {
         // Read the dimension of the vector 
         int d;
         file.read(reinterpret_cast<char*>(&d), sizeof(int));
@@ -68,8 +69,10 @@ void ivec_to_graph(const std::string& filename, TestGraph<vector<int>>& G) {
             break;
         }
 
-        // Read the float vector
-        vector<int> v;
+        // Create vector to hold the values and resize to the correct dimension
+        vector<int> v; v.resize(d);
+
+        // Read the data from file
         file.read(reinterpret_cast<char*>(v.data()), d*sizeof(int));
         if(!file) break;
 
@@ -82,14 +85,14 @@ void ivec_to_graph(const std::string& filename, TestGraph<vector<int>>& G) {
         G.add_vertex(v);
     }
 
-    if (!correctFormat) cerr << "Input file format incorrect! Graph might have errors.";
+    if (!correctFormat) cerr << "Input file format incorrect! Graph might have errors." << endl;
     file.close();
 }
 
 /*--------------------------------------------Utility functions for the tests--------------------------------------------*/
 
 /* Creates an fvec file with the given vectors for testing */
-void make_fvec(const string& filename, const std::vector<std::vector<float>>& vectors) {
+void make_fvec(const string& filename, const vector<vector<float>>& vectors) {
     // Create file and check it was created successfully
     ofstream file(filename, ios::binary);
     if (!file) {
@@ -113,7 +116,7 @@ void make_fvec(const string& filename, const std::vector<std::vector<float>>& ve
 }
 
 /* Creates an ivec file with the given vectors for testing */
-void make_ivec(const string& filename, const std::vector<std::vector<int>>& vectors) {
+void make_ivec(const string& filename, const vector<vector<int>>& vectors) {
     // Create file and check it was created successfully
     ofstream file(filename, ios::binary);
     if (!file) {

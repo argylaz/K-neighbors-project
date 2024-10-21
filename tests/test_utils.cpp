@@ -1,6 +1,7 @@
 #include "../lib/utils.hpp"			// Unit testing library
 #include "../lib/acutest.h"
 
+using namespace std;
 
 /* Testing the Euclidean Distance Function */
 
@@ -29,7 +30,7 @@ void test_Euclidean_Distance() {
 
     v3.push_back(1.23f);
     v4.push_back(2.56f);
-    cout << Euclidean_Distance(v3,v4);
+    // cout << Euclidean_Distance(v3,v4);
     TEST_ASSERT(abs(Euclidean_Distance(v3,v4) - resultsf[0]) <= error);
 
     
@@ -57,16 +58,15 @@ void test_fvec_to_graph() {
         {7.7f, 8.8f, 9.9f}
     };
 
-    string filename = "../sift/test.fvec"; // Full path to the dataset folder
+    string filename = "sift/test.fvec"; // Full path to the dataset folder
     make_fvec(filename, vectors);
 
-    cout << "File " << filename << " has been created/filled for testing.";
+    // cout << "File " << filename << " has been created/filled for testing." << endl;
 
     // Then we create the graph and test it was created properly
     TestGraph<vector<float>> G;
-    cout << "Before fvec_to_graph" << endl;
+
     fvec_to_graph(filename, G);
-    cout << "After fvec_to_graph" << endl;
 
     TEST_ASSERT(G.get_vertices_count() == 3);   // Graph must have 3 vertices (one for each vector)
     TEST_ASSERT(G.get_edge_count() == 0);       // And 0 edges 
@@ -77,14 +77,15 @@ void test_fvec_to_graph() {
     auto v = vertices.begin();
     TEST_ASSERT(v->at(0) == 1.1f && v->at(1) == 2.2f && v->at(2) == 3.3f); v++;
     TEST_ASSERT(v->at(0) == 4.4f && v->at(1) == 5.5f && v->at(2) == 6.6f); v++;
-    TEST_ASSERT(v->at(0) == 7.7f && v->at(1) == 8.8f && v->at(2) == 9.9f); v++;
-
+    TEST_ASSERT(v->at(0) == 7.7f && v->at(1) == 8.8f && v->at(2) == 9.9f); 
+    
     // Test that the adjacency list is as it should be
     vector<vector<vector<float>>> L = G.get_private_adjacency_list();
+        
     auto l = L.begin();
     TEST_ASSERT(l->at(0).at(0) == 1.1f && l->at(0).at(1) == 2.2f && l->at(0).at(2) == 3.3f && l->size() == 1); l++;
-    TEST_ASSERT(l->at(0).at(0) == 4.4f && l->at(1).at(1) == 5.5f && l->at(1).at(2) == 6.6f && l->size() == 1); l++;
-    TEST_ASSERT(l->at(0).at(0) == 7.7f && l->at(2).at(1) == 8.8f && l->at(2).at(2) == 9.9f && l->size() == 1); l++;
+    TEST_ASSERT(l->at(0).at(0) == 4.4f && l->at(0).at(1) == 5.5f && l->at(0).at(2) == 6.6f && l->size() == 1); l++;
+    TEST_ASSERT(l->at(0).at(0) == 7.7f && l->at(0).at(1) == 8.8f && l->at(0).at(2) == 9.9f && l->size() == 1);
 }
 
 /* Testing ivec_to_graph */
@@ -96,10 +97,10 @@ void test_ivec_to_graph() {
         {7, 8, 9}
     };
 
-    string filename = "../sift/test.ivec"; // Full path to the dataset folder
+    string filename = "sift/test.ivec"; // Full path to the dataset folder
     make_ivec(filename, vectors);
 
-    cout << "File " << filename << " has been created for testing.";
+    // cout << "File " << filename << " has been created for testing.";
 
     // Then we create the graph and test it was created properlys
     TestGraph<vector<int>> G;
@@ -114,14 +115,14 @@ void test_ivec_to_graph() {
     auto v = vertices.begin();
     TEST_ASSERT(v->at(0) == 1 && v->at(1) == 2 && v->at(2) == 3); v++;
     TEST_ASSERT(v->at(0) == 4 && v->at(1) == 5 && v->at(2) == 6); v++;
-    TEST_ASSERT(v->at(0) == 7 && v->at(1) == 8 && v->at(2) == 9); v++;
+    TEST_ASSERT(v->at(0) == 7 && v->at(1) == 8 && v->at(2) == 9);
 
     // Test that the adjacency list is as it should be
     vector<vector<vector<int>>> L = G.get_private_adjacency_list();
     auto l = L.begin();
     TEST_ASSERT(l->at(0).at(0) == 1 && l->at(0).at(1) == 2 && l->at(0).at(2) == 3 && l->size() == 1); l++;
-    TEST_ASSERT(l->at(0).at(0) == 4 && l->at(1).at(1) == 5 && l->at(1).at(2) == 6 && l->size() == 1); l++;
-    TEST_ASSERT(l->at(0).at(0) == 7 && l->at(2).at(1) == 8 && l->at(2).at(2) == 9 && l->size() == 1); l++;
+    TEST_ASSERT(l->at(0).at(0) == 4 && l->at(0).at(1) == 5 && l->at(0).at(2) == 6 && l->size() == 1); l++;
+    TEST_ASSERT(l->at(0).at(0) == 7 && l->at(0).at(1) == 8 && l->at(0).at(2) == 9 && l->size() == 1);
 }
 
 

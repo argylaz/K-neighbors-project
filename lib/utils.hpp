@@ -55,8 +55,11 @@ void make_ivec(const string& filename, const vector<vector<int>>& vectors);
 
 
 /* Given an empty graph, reads an fvec file and fills the graph with all the vectors read as its vertices and no edges */
+/* This functions assumes that all the vectors given in the file will be of the same dimension                         */
+/* Otherwise, the entries inside the graph will be uneven (vectors of different dimensions)                            */
 void fvec_to_graph(const std::string& filename, TestGraph<vector<float>>& G);
 
 
 /* Given an empty graph, reads an ivec file and returns a graph with all the vectors read as its vertices and no edges */
+/* Everything mentioned for the method above holds true for this one too                                               */
 void ivec_to_graph(const std::string& filename, TestGraph<vector<int>>& G);
