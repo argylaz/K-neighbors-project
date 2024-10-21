@@ -1,7 +1,7 @@
 #include "../lib/utils.hpp"
 using namespace std;
 
-void fvec_to_graph(const string& filename, TestGraph<vector<float>>& G) {
+void fvec_to_graph(const string& filename, Graph<vector<float>>& G) {
     // First we open the file and check if it was opened properly
     ifstream file(filename, ios::binary);
     if (!file) {
@@ -46,7 +46,7 @@ void fvec_to_graph(const string& filename, TestGraph<vector<float>>& G) {
     file.close();
 }
 
-void ivec_to_graph(const string& filename, TestGraph<vector<int>>& G) {
+void ivec_to_graph(const string& filename, Graph<vector<int>>& G) {
     // First we open the file and check if it was opened properly
     ifstream file(filename, ios::binary);
     if (!file) {
@@ -57,8 +57,11 @@ void ivec_to_graph(const string& filename, TestGraph<vector<int>>& G) {
     // This variable will indicate that the format of the file is correct and as expected.
     bool correctFormat = true;
 
+    int i = 0;
+
     // Read the contents of the file
     while(file.peek()  != EOF) {
+        i++;
         // Read the dimension of the vector 
         int d;
         file.read(reinterpret_cast<char*>(&d), sizeof(int));

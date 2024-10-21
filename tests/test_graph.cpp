@@ -1,7 +1,7 @@
 #include "../lib/acutest.h"			// Unit testing library
 #include "../lib/utils.hpp"
 
-#define NUM 10
+#define NUM 1000
 
 /* Testing graph construction */
 void test_create() {
@@ -28,7 +28,7 @@ void test_add_vertex() {
 
     // Add a vertex to each graph
     for (int i = 0; i < NUM; i++) {
-        G1.add_vertex(i);
+        TEST_ASSERT(G1.add_vertex(i));
     }
 
     // Get vertex set
@@ -46,6 +46,11 @@ void test_add_vertex() {
         TEST_ASSERT(L1[i][0] == i);         // The first element of each row is the vertex corresponding to the index
         it++;
     }
+
+    // Test what happens when adding duplicates
+    int countBefore = G1.get_vertices_count();
+    TEST_ASSERT(G1.add_vertex(0) == false);
+    TEST_ASSERT(G1.get_vertices_count() == countBefore);
 }
 
 /* Testing add_edge method */

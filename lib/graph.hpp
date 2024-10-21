@@ -13,8 +13,8 @@ public:
     Graph(bool isDirected = true); // The graph is directed by default because of the nature of the project
 
    
-    /* Adds a vertex (of type T) to the graph */
-    void add_vertex(const T& v);
+    /* Adds a vertex (of type T) to the graph, return false if the vertex is already in the graph*/
+    bool add_vertex(const T& v);
 
     /* Adds edge between vertex(T) start and vertex(T) end */
     void add_edge(const T& start, const T& end);
@@ -26,7 +26,7 @@ public:
     void remove_edge(const T& start, const T& end);
 
     /* Method to print the graph */
-    void print_graph();
+    // void print_graph();
 
     /* Method to get vertex from index */
     const T get_vertex_from_index(int i);
@@ -79,10 +79,14 @@ Graph<T>::Graph(bool isDirected) {
 
 /* Add a vertex (of type T) to the graph */
 template <typename T>
-void Graph<T>::add_vertex(const T& v) {
-    
-    vertices.insert(v);
-    
+bool Graph<T>::add_vertex(const T& v) {
+
+    // Try inserting and if v was a duplicate and was discarded return false
+    auto successful_insert = vertices.insert(v);
+    if( !successful_insert.second ){
+        return false;
+    }
+
     // Print vertices inside the set, for testing purposes 
     // for( auto ver = vertices.begin() ; ver!=vertices.end() ; ver++){
     //     cout << *ver << endl;
@@ -92,13 +96,15 @@ void Graph<T>::add_vertex(const T& v) {
        Index starts from 0 */
     v_index.insert({v,countVertices});
 
-    /* When vertex is added, resize the Adjacency List
-       The first element of each row of the adjacency list is the vertex in question */
-    adjacencyList.resize(vertices.size());
-    adjacencyList[v_index[v]].push_back(v);
-
     /* Increase the counter and update the map*/
     countVertices++;
+    /* When vertex is added, resize the Adjacency List
+       The first element of each row of the adjacency list is the vertex in question */
+    adjacencyList.resize(countVertices);
+    adjacencyList[v_index[v]].push_back(v);
+
+    return true;
+
 
     // cout << "Adjacency List Size is " << adjacencyList.size() << endl ;
     // cout << "Vertices Size is " << vertices.size() << endl ;
@@ -163,23 +169,23 @@ void Graph<T>::remove_edge(const T& start, const T& end) {
 }
 
 /* Method to print the graph */
-template <typename T>
-void Graph<T>::print_graph(void) {
+// template <typename T>
+// void Graph<T>::print_graph(void) {
 
 
-    for( auto ver = vertices.begin() ; ver!=vertices.end() ; ver++ ){
-        cout << "Vertex " << *ver << ":";
-        int v_pos = v_index[*ver];
-        /* The first element of each row is the is the vertex itself */
-        for( size_t j = 1 ; j < adjacencyList[v_pos].size() ; j++){
-            cout << " -> " << adjacencyList[v_pos][j];
-        } 
-        cout << endl;
-    }
+//     for( auto ver = vertices.begin() ; ver!=vertices.end() ; ver++ ){
+//         // cout << "Vertex " << *ver << ":";
+//         int v_pos = v_index[*ver];
+//         /* The first element of each row is the is the vertex itself */
+//         for( size_t j = 1 ; j < adjacencyList[v_pos].size() ; j++){
+//             // cout << " -> " << adjacencyList[v_pos][j];
+//         } 
+//         cout << endl;
+//     }
 
-    cout << endl;
+//     cout << endl;
 
-}
+// }
 
 
 template <typename T>
@@ -196,7 +202,7 @@ const T Graph<T>::get_index_from_vertex(const T& v) {
 /* Method which returns the vertices count*/
 template <typename T>
 const int Graph<T>::get_vertices_count(void) {
-    return vertices.size();
+    return countVertices;
 }
 
 /* Method that returns the edge count */
