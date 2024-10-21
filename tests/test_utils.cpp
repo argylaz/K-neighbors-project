@@ -60,11 +60,13 @@ void test_fvec_to_graph() {
     string filename = "../sift/test.fvec"; // Full path to the dataset folder
     make_fvec(filename, vectors);
 
-    cout << "File " << filename << " has been created for testing.";
+    cout << "File " << filename << " has been created/filled for testing.";
 
     // Then we create the graph and test it was created properly
     TestGraph<vector<float>> G;
+    cout << "Before fvec_to_graph" << endl;
     fvec_to_graph(filename, G);
+    cout << "After fvec_to_graph" << endl;
 
     TEST_ASSERT(G.get_vertices_count() == 3);   // Graph must have 3 vertices (one for each vector)
     TEST_ASSERT(G.get_edge_count() == 0);       // And 0 edges 
@@ -99,7 +101,7 @@ void test_ivec_to_graph() {
 
     cout << "File " << filename << " has been created for testing.";
 
-    // Then we create the graph and test it was created properly
+    // Then we create the graph and test it was created properlys
     TestGraph<vector<int>> G;
     ivec_to_graph(filename, G);
 
@@ -126,7 +128,7 @@ void test_ivec_to_graph() {
 // List of all tests to be executed
 TEST_LIST = {
     { "Euclidean Distance", test_Euclidean_Distance },
-    // { "fvec to graph", test_fvec_to_graph },
-    // { "ivec to graph", test_ivec_to_graph },
+    { "fvec to graph", test_fvec_to_graph },
+    { "ivec to graph", test_ivec_to_graph },
     { NULL, NULL }
 };
