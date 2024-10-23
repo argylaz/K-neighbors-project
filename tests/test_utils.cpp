@@ -59,14 +59,15 @@ void test_fvec_to_graph() {
     };
 
     string filename = "sift/test.fvec"; // Full path to the dataset folder
-    make_fvec(filename, vectors);
+
+    make_vec<float>(filename, vectors);
 
     // cout << "File " << filename << " has been created/filled for testing." << endl;
 
     // Then we create the graph and test it was created properly
     TestGraph<vector<float>> G;
 
-    fvec_to_graph(filename, G);
+    vec_to_graph<float>(filename, G);
 
     TEST_ASSERT(G.get_vertices_count() == 3);   // Graph must have 3 vertices (one for each vector)
     TEST_ASSERT(G.get_edge_count() == 0);       // And 0 edges 
@@ -98,13 +99,15 @@ void test_ivec_to_graph() {
     };
 
     string filename = "sift/test.ivec"; // Full path to the dataset folder
-    make_ivec(filename, vectors);
+
+    make_vec<int>(filename, vectors);
 
     // cout << "File " << filename << " has been created for testing.";
 
     // Then we create the graph and test it was created properlys
     TestGraph<vector<int>> G;
-    ivec_to_graph(filename, G);
+
+    vec_to_graph<int>(filename, G);
 
     TEST_ASSERT(G.get_vertices_count() == 3);   // Graph must have 3 vertices (one for each vector)
     TEST_ASSERT(G.get_edge_count() == 0);       // And 0 edges 
