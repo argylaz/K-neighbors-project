@@ -28,7 +28,7 @@ void test_add_vertex() {
 
     // Add a vertex to each graph
     for (int i = 0; i < NUM; i++) {
-        TEST_ASSERT(G1.add_vertex(i));
+        TEST_ASSERT(G1.add_vertex(i) == true);
     }
 
     // Get vertex set
@@ -63,12 +63,19 @@ void test_add_edge() {
     G1.add_vertex(0);
     G2.add_vertex(0);
 
+    // Check that the function returns false when trying to add edge to non existing vertices
+    // G1 and G2 don't have the vertex 1
+    TEST_ASSERT(G1.add_edge(0,1) == false && G2.add_edge(0,1) == false);
+    // G1 and G2 don't have neither vertex 1 nor vertex 2
+    TEST_ASSERT(G1.add_edge(2,1) == false && G2.add_edge(2,1) == false);
+
+
     for (int i = 1; i < NUM; i++) {
         G1.add_vertex(i);
         G2.add_vertex(i);
 
-        G1.add_edge(i-1,i);
-        G2.add_edge(i-1,i);
+        TEST_ASSERT(G1.add_edge(i-1,i) == true);
+        TEST_ASSERT(G2.add_edge(i-1,i) ==  true);
 
         // Get adjacency lists on each loop to get the new one
         vector<vector<int>> L1 = G1.get_private_adjacency_list();
@@ -109,6 +116,13 @@ void test_remove_edge() {
     G1.add_vertex(0);
     G2.add_vertex(0);
 
+    // Check that the function returns false when trying to remove edge from non existing vertices
+    // G1 and G2 don't have the vertex 1
+    TEST_ASSERT(G1.remove_edge(0,1) == false && G2.remove_edge(0,1) == false);
+    // G1 and G2 don't have neither vertex 1 nor vertex 2
+    TEST_ASSERT(G1.remove_edge(2,1) == false && G2.remove_edge(2,1) == false);
+
+
     for (int i = 1; i < NUM; i++) {
         G1.add_vertex(i);
         G2.add_vertex(i);
@@ -121,8 +135,9 @@ void test_remove_edge() {
 
 
     for (int i = 1; i < NUM; i++) {
-        G1.remove_edge(i-1, i);
-        G2.remove_edge(i-1, i);
+        TEST_ASSERT(G1.remove_edge(i-1, i) ==  true);
+        TEST_ASSERT(G2.remove_edge(i-1, i) ==  true);
+        
 
         // Get adjacency lists
         vector<vector<int>> L1 = G1.get_private_adjacency_list();

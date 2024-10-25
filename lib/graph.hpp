@@ -19,13 +19,13 @@ public:
     bool add_vertex(const T& v);
 
     /* Adds edge between vertex(T) start and vertex(T) end */
-    void add_edge(const T& start, const T& end);
+    bool add_edge(const T& start, const T& end);
 
     /* Removes vertex v from the graph, not needed for the project*/
     // void remove_vertex(T& v);
 
     /* Removes edge between node start and node end from the graph */
-    void remove_edge(const T& start, const T& end);
+    bool remove_edge(const T& start, const T& end);
 
     /* Method to print the graph */
     // void print_graph();
@@ -118,13 +118,19 @@ bool Graph<T>::add_vertex(const T& v) {
     
 }
 
-/* Add edge between vertex(T) start and vertex(T) end */
+/* Add edge between vertex(T) start and vertex(T) end, returns true if the edge added successfully*/
 template <typename T>
-void Graph<T>::add_edge(const T& start, const T& end) {
+bool Graph<T>::add_edge(const T& start, const T& end) {
 
     // Printing positions for testing 
     // cout << "Vertex " << start <<  " found at position " << v_index[start] << endl ;
     // cout << "Vertex " << end <<  " found at position " << v_index[end] << endl ;
+
+    
+    // Check if the given vertices are vertices of the graph, if they aren't return false
+    if( v_index.find(start) == v_index.end() || v_index.find(end) == v_index.end() ){
+        return false;
+    } 
 
     int pos_start = v_index[start];
 
@@ -138,14 +144,20 @@ void Graph<T>::add_edge(const T& start, const T& end) {
         countEdges++;
     }
     
+    return true;
     // cout << "Edge added: " << start << " -> " << end << endl;
 
 }
 
 
-/* Removes edge between node start and node end from the graph */
+/* Removes edge between node start and node end from the graph, returns true if the edge removed successfully */
 template <typename T>
-void Graph<T>::remove_edge(const T& start, const T& end) {
+bool Graph<T>::remove_edge(const T& start, const T& end) {
+
+    // Check if the given vertices are vertices of the graph, if they aren't return false
+    if( v_index.find(start) == v_index.end() || v_index.find(end) == v_index.end() ){
+        return false;
+    }
 
     int v_pos = v_index[start];
 
@@ -170,6 +182,8 @@ void Graph<T>::remove_edge(const T& start, const T& end) {
         }
         countEdges--;
     }
+
+    return true;
 }
 
 /* Method to print the graph */
