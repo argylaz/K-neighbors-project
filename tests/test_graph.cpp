@@ -205,6 +205,38 @@ void test_get_vertices_count() {
     }
 }
 
+/* Testing the get_neighbors method */
+void test_get_neighbors() {
+    // Create an example graph with certain neghbours
+    Graph<int> G;
+    for (int i = 0; i < 10; i++) G.add_vertex(i);
+
+    G.add_edge(1,3);
+    G.add_edge(1,7);
+    G.add_edge(1,2);
+   
+    G.add_edge(2,3);
+    G.add_edge(2,4);
+    G.add_edge(2,5);
+    G.add_edge(2,6);
+
+    G.add_edge(7,1);
+    G.add_edge(7,2);
+
+    G.add_edge(9,5);
+
+    set<int> S1 = G.get_neighbors(1);
+    TEST_ASSERT(S1.find(3) != S1.end() && S1.find(7) != S1.end() && S1.find(2) != S1.end() && S1.size() == 3);
+
+    set<int> S2 = G.get_neighbors(2);
+    TEST_ASSERT(S2.find(3) != S2.end() && S2.find(4) != S2.end() && S2.find(5) != S2.end() && S2.find(6) != S2.end() && S2.size() == 4);
+
+    set<int> S3 = G.get_neighbors(7);
+    TEST_ASSERT(S3.find(1) != S3.end() && S3.find(2) != S3.end() && S3.size() == 2);
+
+    set<int> S4 = G.get_neighbors(9);
+    TEST_ASSERT(S4.find(5) != S4.end() && S4.size() == 1);
+}
 
 // List of all tests to be executed
 TEST_LIST = {
@@ -217,5 +249,6 @@ TEST_LIST = {
     { "add_edge", test_add_edge },
     { "get_edge_count", test_get_edge_count},
     { "get_vertices_count", test_get_vertices_count },
+    { "get_neighbors", test_get_neighbors},
     { NULL, NULL }
 };

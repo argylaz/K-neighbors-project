@@ -6,6 +6,8 @@ using namespace std;
 
 /*------------------------------------- CLASS DECLARATION ----------------------------------------------------*/
 
+typedef int gIndex;
+
 template <typename T>              // Template T to make the graph generic
 class Graph {
 public:
@@ -29,10 +31,10 @@ public:
     // void print_graph();
 
     /* Method to get vertex from index */
-    const T get_vertex_from_index(int i);
+    const T get_vertex_from_index(gIndex i);
 
     /* Method to get index from vertex **/
-    const T get_index_from_vertex(const T& v);
+    gIndex get_index_from_vertex(const T& v);
 
     /* Method which returns the vertices count*/
     const int get_vertices_count();
@@ -43,6 +45,8 @@ public:
     /* Returns true if the graph is directed */
     const bool is_directed();
 
+    /* Returns a set containing all the current neighbours of the given vertex */
+    const set<T> get_neighbors(T vertex);
 
 
 protected:   
@@ -58,7 +62,7 @@ private:
 
     
     set<T> vertices;                        // A set of the graphs vertices
-    map<T, int> v_index;                    // Mapping from T to indices
+    map<T, gIndex> v_index;                    // Mapping from T to indices
 
     /* Adjacency list (vector of vectors)                                                                             */
     /* First element of each vector will be the vertex itself in order to avoid a second mapping from index to vertex */
@@ -195,7 +199,7 @@ const T Graph<T>::get_vertex_from_index(int i) {
 
 
 template <typename T>
-const T Graph<T>::get_index_from_vertex(const T& v) {
+gIndex Graph<T>::get_index_from_vertex(const T& v) {
     return this->v_index[v];  // Just returning the mapping of v
 }
 
@@ -223,8 +227,24 @@ set<T> Graph<T>::get_vertices() const{
     return vertices;
 }
 
-// /* Get adjacency list method for testing purposes */
+/* Get adjacency list method for testing purposes */
 template <typename T>
 vector<vector<T>> Graph<T>::get_adjacency_list(void) const {
     return adjacencyList;
+}
+
+/* Getting the neigbors of a given vertex */
+template <typename T>
+const set<T> Graph<T>::get_neighbors(T vertex) {
+ 
+    // getting the elements in the corresponding row of the adjacency list, i.e the vertex itself and its neighbors
+    vector<T> adj = adjacencyList[v_index[vertex]];
+
+    set<T> neighbors(adj.begin(), adj.end());
+
+    // since adj includes the vertex itself, we remove it from the set
+    neighbors.erase(vertex);
+
+    return neighbors;
+
 }
