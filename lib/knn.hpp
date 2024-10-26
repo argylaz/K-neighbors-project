@@ -11,7 +11,7 @@ typedef int index;
 // L is the search list size 
 // Returns a pair of sets, the first contains the K-approx NNs and the second contains all the visited nodes
 template <typename T>
-pair<set<T>, set<T>>& GreedySearch(Graph<T>& G, index start, index xquery, int k, int L_input) {
+pair<set<T>, set<T>>& GreedySearch(const Graph<T>& G, index start, index xquery, int k, int L_input) {
     // First we check that the input values are correct
     if (L < k) { // L>=k
         cerr << "Search list size L must be greater than or equal to k!" << endl;
