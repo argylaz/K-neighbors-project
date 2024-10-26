@@ -69,7 +69,6 @@ void test_find_min_Euclidean() {
 
 /* Testing the GreedySearch method */
 void test_GreedySearch() {
-<<<<<<< HEAD
     // Test using simple example solved by hand
     TestGraph<char> G;
     
@@ -100,9 +99,6 @@ void test_GreedySearch() {
     TEST_ASSERT(V.find('c') != V.end());
     TEST_ASSERT(V.find('d') != V.end());
     TEST_ASSERT(V.find('e') != V.end());
-=======
-    return;
->>>>>>> c9a30d5f409612348ae9f3f3f62ecdbb2e20a850
 }
 
 /* Testing the RobustPrune method */

@@ -8,23 +8,13 @@ using namespace std;
 // k is the number of approximate NNs calculated 
 // L is the search list size 
 // Returns a pair of sets, the first contains the K-approx NNs and the second contains all the visited nodes
-<<<<<<< HEAD
 template <typename T>
-pair<set<T>, set<T>>& GreedySearch(const Graph<T>& G, index start, index xquery, int k, int L_input) {
+pair<set<T>, set<T>>& GreedySearch(const Graph<T>& G, gIndex start, gIndex xquery, int k, int L_input) {
     // First we check that the input values are correct
     if (L < k) { // L>=k
         cerr << "Search list size L must be greater than or equal to k!" << endl;
         return None;
     }
-=======
-// template <typename T>
-// pair<set<T>, set<T>>& GreedySearch(Graph<T>& G, T start, T xquery, int k, int L_input) {
-//     // First we check that the input values are correct
-//     if (L_input < k) { // L>=k
-//         cerr << "Search list size L must be greater than or equal to k!" << endl;
-//         return None;
-//     }
->>>>>>> c9a30d5f409612348ae9f3f3f62ecdbb2e20a850
 
 //     // Initialize set L_output = {s} and V = { }
 //     set<T> L_output, V;
@@ -51,7 +41,7 @@ pair<set<T>, set<T>>& GreedySearch(const Graph<T>& G, index start, index xquery,
 //     }
 
 
-// }
+}
 
 /* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
 template <typename Type>
