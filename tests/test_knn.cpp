@@ -73,14 +73,14 @@ void test_GreedySearch() {
     TestGraph<char> G;
     
     // Add vertices a,b,c,d,e
-    G.add_vertex('a'); G.add_vertex('b'); G.add_vertex('c'); G.add_vertex('d'); G.add_vertex('e');
+    G.add_vertex(1); G.add_vertex(2); G.add_vertex(3); G.add_vertex(4); G.add_vertex(5);
 
     // Add some random edges
-    G.add_edge('a','b'); G.add_edge('a','c');
-    G.add_edge('b', 'c');
-    G.add_edge('c', 'a');G.add_edge('c', 'e');
-    G.add_edge('d', 'c');
-    G.add_edge('e', 'a'); G.add_edge('e', 'c'); G.add_edge('e', 'd');
+    G.add_edge(1,2); G.add_edge(1,3);
+    G.add_edge(2, 3);
+    G.add_edge(3, 1);G.add_edge(3, 5);
+    G.add_edge(4, 3);
+    G.add_edge(5, 1); G.add_edge(5, 3); G.add_edge(5, 4);
 
     // Initialising variables for the results of the algorithm
     set<char> L;
@@ -92,13 +92,13 @@ void test_GreedySearch() {
     V = result.second;
 
     // Test that the sets returned contain the correct values (L = {c,e}, V = {a,c,e,d})
-    TEST_ASSERT(L.find('c') != L.end());
-    TEST_ASSERT(L.find('e') != L.end());
+    TEST_ASSERT(L.find(3) != L.end());
+    TEST_ASSERT(L.find(5) != L.end());
 
-    TEST_ASSERT(V.find('a') != V.end());
-    TEST_ASSERT(V.find('c') != V.end());
-    TEST_ASSERT(V.find('d') != V.end());
-    TEST_ASSERT(V.find('e') != V.end());
+    TEST_ASSERT(V.find(1) != V.end());
+    TEST_ASSERT(V.find(3) != V.end());
+    TEST_ASSERT(V.find(4) != V.end());
+    TEST_ASSERT(V.find(5) != V.end());
 }
 
 /* Testing the RobustPrune method */
