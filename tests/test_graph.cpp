@@ -105,6 +105,30 @@ void test_add_edge() {
     */
 }
 
+void test_exist_edge() {
+    // Testing for one directed and one undirected graph
+    TestGraph<int> G1(true);
+    TestGraph<int> G2(false);
+    
+    G1.add_vertex(1);
+    G1.add_vertex(3);
+    G1.add_vertex(5);
+    
+    G2.add_vertex(2);
+    G2.add_vertex(4);
+    
+    // Add some random edges
+    G1.add_edge(1,3);
+    G2.add_edge(2,4);
+
+    // Test that the method finds all the edges
+    TEST_ASSERT(G1.exist_edge(1,3));
+    TEST_ASSERT(G2.exist_edge(2,4) && G2.exist_edge(4,2));
+
+    // Test that it returns false for all other edges
+    TEST_ASSERT(G1.exist_edge(1,5) == false && G1.exist_edge(1,2) == false);
+}
+
 /* Terting remove_edge method */
 void test_remove_edge() {
     // Testing for one directed and one undirected graph
@@ -258,6 +282,7 @@ TEST_LIST = {
     { "graph_create", test_create },
     { "add_vertex", test_add_vertex },
     { "add_edge", test_add_edge },
+    { "exist_edge", test_exist_edge },
     { "remove_edge", test_remove_edge },
     { "index_to_vertex", test_index_to_vertex },
     { "vertex_to_index", test_vertex_to_index },

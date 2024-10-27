@@ -48,11 +48,16 @@ public:
     /* Returns a set containing all the current neighbours of the given vertex */
     const set<T> get_neighbors(T vertex);
 
+    /* Method that returns if exists an edge from vertex_a to vertex_b*/
+    bool exist_edge(T vertex_a, T vertex_b);
 
-protected:   
-    /* Getter methods for testing purposes */
-    vector<vector<T>> get_adjacency_list() const;
+    /* Getter method for the set of vertices*/
     set<T> get_vertices() const;
+
+protected:
+  
+    vector<vector<T>> get_adjacency_list() const;
+    /* Getter methods for testing purposes */
     
 
 private:
@@ -246,6 +251,19 @@ template <typename T>
 vector<vector<T>> Graph<T>::get_adjacency_list(void) const {
     return adjacencyList;
 }
+
+/* Method that returns if exists an edge from vertex_a to vertex_b*/
+template <typename T>
+bool Graph<T>::exist_edge(T vertex_a, T vertex_b){
+    if( vertices.find(vertex_a) == vertices.end() || vertices.find(vertex_b) == vertices.end() )
+        return false;
+    if( find(adjacencyList[v_index[vertex_a]].begin(), adjacencyList[v_index[vertex_a]].end(), vertex_b) == adjacencyList[v_index[vertex_a]].end() ){
+        return false;
+    }
+    return true;
+
+}
+
 
 /* Getting the neigbors of a given vertex */
 template <typename T>

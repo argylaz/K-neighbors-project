@@ -26,6 +26,61 @@ float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 
 
 
+/* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
+template <typename Type>
+vector<Type> find_min_Euclidean(set<vector<Type>> S, vector<Type> xquery){
+    
+    auto i = S.begin();
+    float min_distance = Euclidean_Distance<Type>(xquery, *i);
+    //cout << min_distance << endl;
+    vector<Type> min_point = *i;
+
+    while( ++i != S.end()){
+        if( Euclidean_Distance<Type>(xquery, *i) < min_distance ){
+            min_distance = Euclidean_Distance<Type>(xquery, *i);
+            min_point = *i;
+        }
+    }
+
+    // cout << min_distance << " " << min_point[0] << " " << min_point[1] << " " << xquery[0] << " " << xquery[1]<< endl;
+    
+    return min_point;
+}
+
+
+template <typename Type>
+void retain_closest_points(set<vector<Type>> &output_set, vector<Type> xquery, int L){
+    
+    // Create vector with the elements of the set
+    output_set.erase(xquery);
+    vector<vector<Type>> output_vec(output_set.begin(), output_set.end());
+    
+    // Sort the vector comoaring the Euclidean Distance of each element with the xquery
+    sort(output_vec.begin(), output_vec.end(), [&xquery](const vector<Type>& a, const vector<Type>& b) {
+        return Euclidean_Distance<Type>(a, xquery) < Euclidean_Distance<Type>(b, xquery);
+    });
+
+    if( output_vec.size() >= (long unsigned int) L )
+        output_vec.resize(L);
+    else   
+        cout << "L is greater than the size of the vector/set\n";
+    
+    output_set.clear();
+    output_set.insert(output_vec.begin(), output_vec.end());
+        
+
+    // int count = 0;
+    // for( vector<Type> v : output_set ){
+    //     if( Euclidean_Distance<Type>(v, xquery) > L){
+    //         output_set.erase(v);
+    //         count++;
+    //     }
+    // }
+}
+
+
+
+
 
 /*-------------------------------------Utility functions and classes for the tests-------------------------------------*/
 

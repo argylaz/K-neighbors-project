@@ -1,5 +1,4 @@
 #include "../lib/acutest.h"
-#include "../lib/utils.hpp";
 #include "../lib/knn.hpp"
 using namespace std;
 
@@ -70,35 +69,57 @@ void test_find_min_Euclidean() {
 /* Testing the GreedySearch method */
 void test_GreedySearch() {
     // Test using simple example solved by hand
-    TestGraph<char> G;
+    // Using <vector<int>> because GreedySearch and EuclideanDistance work with vectors.
+    TestGraph<vector<int>> G;
     
-    // Add vertices a,b,c,d,e
-    G.add_vertex(1); G.add_vertex(2); G.add_vertex(3); G.add_vertex(4); G.add_vertex(5);
+    // Add vertices 1,2,3,4,5
+    G.add_vertex({1}); G.add_vertex({2}); G.add_vertex({3}); G.add_vertex({4}); G.add_vertex({5});
 
     // Add some random edges
-    G.add_edge(1,2); G.add_edge(1,3);
-    G.add_edge(2, 3);
-    G.add_edge(3, 1);G.add_edge(3, 5);
-    G.add_edge(4, 3);
-    G.add_edge(5, 1); G.add_edge(5, 3); G.add_edge(5, 4);
+    G.add_edge({1},{2}); G.add_edge({1},{3});
+    G.add_edge({2}, {3});
+    G.add_edge({3}, {1});G.add_edge({3}, {5});
+    G.add_edge({4}, {3});
+    G.add_edge({5}, {1}); G.add_edge({5}, {3}); G.add_edge({5}, {4});
 
     // Initialising variables for the results of the algorithm
-    set<char> L;
-    set<char> V;
+    set<vector<int>> L;
+    set<vector<int>> V;
 
     /* Running the algorithm with s = 'a', xq = 'd', k = 2 and L = 3*/
-    pair<set<char>, set<char>> result = GreedySearch(G, 1, 4, 2, 3);
+    pair< set<vector<int>>, set<vector<int>> > result = GreedySearch<vector<int>>(G, {1}, {4}, 2, 3);
     L = result.first;
     V = result.second;
 
-    // Test that the sets returned contain the correct values (L = {c,e}, V = {a,c,e,d})
-    TEST_ASSERT(L.find(3) != L.end());
-    TEST_ASSERT(L.find(5) != L.end());
+    // cout << "\nL contains:\n";
+    // for(auto i : L){
+    //     cout << i[0] << endl;
+    // }
+    
+    // cout << endl;
 
-    TEST_ASSERT(V.find(1) != V.end());
-    TEST_ASSERT(V.find(3) != V.end());
-    TEST_ASSERT(V.find(4) != V.end());
-    TEST_ASSERT(V.find(5) != V.end());
+    // cout << "\nV contains:\n";
+    // for(auto v : V){
+    //     cout << v[0] << endl;
+    // }
+
+    // Test that the sets returned contain the correct values (L = {3,5}, V = {1,2,3})
+    TEST_ASSERT(L.find({3}) != L.end());
+    TEST_ASSERT(L.find({5}) != L.end());
+
+    TEST_ASSERT(V.find({1}) != V.end());
+    TEST_ASSERT(V.find({2}) != V.end());
+    TEST_ASSERT(V.find({3}) != V.end());
+    TEST_ASSERT(V.find({5}) != V.end());
+    TEST_ASSERT(L.size() == 2);
+    TEST_ASSERT(V.size() == 4);
+
+    result = GreedySearch<vector<int>>(G, {1}, {4}, 2, 1);
+    L = result.first;
+    V = result.second;
+    TEST_ASSERT( L.size() ==  0 );
+    TEST_ASSERT( V.size() ==  0 );
+
 }
 
 /* Testing the RobustPrune method */
