@@ -79,7 +79,7 @@ pair<set<T>, set<T>> GreedySearch(Graph<T> G, T start, T xquery, int k, int L) {
 
 
 
-/* Prunes the graph to make it more fit for the GreedySearch algorithm */
+/* Prunes the graph to make it more fit for the GreedySearch algorithm, modified to have at most R out-neighbors for p */
 // p is the index of the given point p, which is included in the Graph
 // V is the candidate set
 // a is the distance threshold

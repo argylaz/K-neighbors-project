@@ -114,6 +114,7 @@ void test_GreedySearch() {
     TEST_ASSERT(L.size() == 2);
     TEST_ASSERT(V.size() == 4);
 
+    // Test that empty sets are returned if L < k
     result = GreedySearch<vector<int>>(G, {1}, {4}, 2, 1);
     L = result.first;
     V = result.second;
@@ -124,7 +125,42 @@ void test_GreedySearch() {
 
 /* Testing the RobustPrune method */
 void test_RobustPrune() {
-    return;
+    // Test using simple example solved by hand (same as in test_GreedySearch)
+    TestGraph<vector<int>> G;
+    
+    // Add vertices 1,2,3,4,5
+    G.add_vertex({1}); G.add_vertex({2}); G.add_vertex({3}); G.add_vertex({4}); G.add_vertex({5});
+
+    // Add some random edges
+    G.add_edge({1},{2}); G.add_edge({1},{3});
+    G.add_edge({2}, {3});
+    G.add_edge({3}, {1});G.add_edge({3}, {5});
+    G.add_edge({4}, {3});
+    G.add_edge({5}, {1}); G.add_edge({5}, {3}); G.add_edge({5}, {4});
+
+    // Run Robustprune with p = 1, V = {2,3} (out-neighbors of p), a = 1.2 and R = 2
+    set<vector<int>> V = {{2},{3}};
+    float a = 1.2;
+    int R = 2;
+    RobustPrune(G, 1, V, a, R);
+
+    // Now check that the algorithm works as intended (only edge removes is the one from 1 to 3)
+    TEST_ASSERT(G.exist_edge({1},{2}) && !G.exist_edge({1},{3}));
+    TEST_ASSERT(G.exist_edge({2},{3}));
+    TEST_ASSERT(G.exist_edge({3},{1}) && G.exist_edge({3},{5}));
+    TEST_ASSERT(G.exist_edge({4},{3}));
+    TEST_ASSERT(G.exist_edge({5},{1}) && G.exist_edge({5},{3}) && G.exist_edge({5},{4}));
+
+    // Then we rune RobustPrune one more time with p=5, V={1,3,4}, a=1.2 and R = 1
+    V.clear(); V = {{1},{3},{4}};
+    RobustPrune(G, 5, V, a, R);
+
+    // Now check that the algorithm works as intended (edges from 5 to 1 and from 5 to 3 removed)
+    TEST_ASSERT(G.exist_edge({1},{2}));
+    TEST_ASSERT(G.exist_edge({2},{3}));
+    TEST_ASSERT(G.exist_edge({3},{1}) && G.exist_edge({3},{5}));
+    TEST_ASSERT(G.exist_edge({4},{3}));
+    TEST_ASSERT(G.exist_edge({5},{1}) && !G.exist_edge({5},{3}) && !G.exist_edge({5},{4}));
 }
 
 /* Testing the Vamana method */
