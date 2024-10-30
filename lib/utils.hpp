@@ -42,8 +42,6 @@ vector<Type> find_min_Euclidean(set<vector<Type>> S, vector<Type> xquery){
         }
     }
 
-    // cout << min_distance << " " << min_point[0] << " " << min_point[1] << " " << xquery[0] << " " << xquery[1]<< endl;
-    
     return min_point;
 }
 

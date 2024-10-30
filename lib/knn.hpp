@@ -12,9 +12,8 @@ using namespace std;
 template <typename T>
 pair<set<T>, set<T>> GreedySearch(Graph<T> G, T start, T xquery, int k, int L) {
     
-
     // First we check that the input values are correct
-    if (L < k) { // L>=k
+    if (L < k) { // L >= k
         cerr << "\nSearch list size L must be greater than or equal to k!\n" << endl;
         // Returns a pair with two empty sets
         return {{},{}};
@@ -31,30 +30,16 @@ pair<set<T>, set<T>> GreedySearch(Graph<T> G, T start, T xquery, int k, int L) {
     // while L_output\V != 0
     while( !diff_set.empty() ){
 
-        // cout << "\nL contains:\n";
-        // for(auto j : L_output){
-        //     cout << j[0] << endl;
-        // }
-
-        // cout << "\nV contains:\n";
-        // for(auto k : V){
-        //     cout << k[0] << endl;
-        // }
-
-        // cout << "\n----------\n";
-
         // Find the vertex with the minimum euclidean distance from the xquery
         T min = find_min_Euclidean(diff_set, xquery);
-
-        set<T> neighbors = G.get_neighbors(min);
-
         
-        // L 
+        
+        // Updating sets L and V
+        set<T> neighbors = G.get_neighbors(min);
         set_union(L_output.begin(), L_output.end(), neighbors.begin(), neighbors.end(), inserter(L_output, L_output.end()));
+        
         V.insert(min);
 
-
-       
 
         // Upper bound check
         if( L_output.size() > (long unsigned int)L ){
@@ -83,11 +68,59 @@ pair<set<T>, set<T>> GreedySearch(Graph<T> G, T start, T xquery, int k, int L) {
 // p is the index of the given point p, which is included in the Graph
 // V is the candidate set
 // a is the distance threshold
-// R is the degreee bound
+// R is the degree bound
 template <typename T>
 void RobustPrune(Graph<T>& G, gIndex p, set<T>& V, float a, int R) {
+
+    // First we check that the input values are correct
+    if (a < 1) { // a >= 1
+        cerr << "\nDistance threshold a must be greater than or equal to 1!\n" << endl;
+        // Return
+        return;
+    }
+
+    // Finding the vertex corresponding to the index of the given point
+    T point = G.get_vertex_from_index(p);
+
+    // Calculating the union of V and the neighbors of the given point, without the point itself
+    set<T> neighbors = G.get_neighbors(point);
+    set_union(V.begin(), V.end(), neighbors.begin(), neighbors.end(), inserter(V, V.end()));
+    V.erase(point);
     
+    // Removing all edges leaving the given vertex and selectively adding up to R edges
+    for (T neighbor: neighbors) {
+        G.remove_edge(point, neighbor);
+    }
+    neighbors.clear();
+
+    vector<T> toBeRemoved;
+    while (V.size() != 0) {
+
+        // Find the vertex with the minimum euclidean distance from the given point and adding an edge to it
+        T p_min = find_min_Euclidean(V, point);
+
+        neighbors.insert(p_min);
+        G.add_edge(point, p_min);
+
+        // Stopping if R edges have been added
+        if (neighbors.size() == (long unsigned int) R) break;
+
+        // Removing from V the vertices that do not satisfy the distance threshold
+        toBeRemoved.clear();
+        for (T vertex: V) {
+            if (a * Euclidean_Distance(p_min, vertex) <= Euclidean_Distance(point, vertex)) {
+                toBeRemoved.push_back(vertex);
+            }
+        }
+        for (T vertex: toBeRemoved) {
+            V.erase(vertex);
+        }
+        
+    }
 }
+
+
+
 
 /* Implementation of the Vamana Indexing Algorithm */
 // L is the search list size

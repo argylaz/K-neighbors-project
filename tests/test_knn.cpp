@@ -128,39 +128,54 @@ void test_RobustPrune() {
     // Test using simple example solved by hand (same as in test_GreedySearch)
     TestGraph<vector<int>> G;
     
-    // Add vertices 1,2,3,4,5
-    G.add_vertex({1}); G.add_vertex({2}); G.add_vertex({3}); G.add_vertex({4}); G.add_vertex({5});
+    // Add vertices 0,1,2,3,4
+    G.add_vertex({0}); G.add_vertex({1}); G.add_vertex({2}); G.add_vertex({3}); G.add_vertex({4});
 
     // Add some random edges
-    G.add_edge({1},{2}); G.add_edge({1},{3});
-    G.add_edge({2}, {3});
-    G.add_edge({3}, {1});G.add_edge({3}, {5});
-    G.add_edge({4}, {3});
-    G.add_edge({5}, {1}); G.add_edge({5}, {3}); G.add_edge({5}, {4});
+    G.add_edge({0},{1}); G.add_edge({0},{2});
+    G.add_edge({1},{2});
+    G.add_edge({2},{0}); G.add_edge({2},{4});
+    G.add_edge({3},{2});
+    G.add_edge({4},{0}); G.add_edge({4},{2}); G.add_edge({4},{3});
 
-    // Run Robustprune with p = 1, V = {2,3} (out-neighbors of p), a = 1.2 and R = 2
-    set<vector<int>> V = {{2},{3}};
+    // Run Robustprune with p = 0, V = {1,2} (out-neighbors of p), a = 1.2 and R = 2
+    set<vector<int>> V = {{1},{2}};
     float a = 1.2;
     int R = 2;
-    RobustPrune(G, 1, V, a, R);
+    RobustPrune(G, 0, V, a, R);
+
+    // Checking
+    // cout << G.exist_edge({0},{1}) << G.exist_edge({0},{2}) << endl;
+    // cout << G.exist_edge({1},{2}) << endl;
+    // cout << G.exist_edge({2},{0}) << G.exist_edge({2},{4}) << endl;
+    // cout << G.exist_edge({3},{2}) << endl;
+    // cout << G.exist_edge({4},{0}) << G.exist_edge({4},{2}) << G.exist_edge({4},{3}) << endl;
 
     // Now check that the algorithm works as intended (only edge removes is the one from 1 to 3)
-    TEST_ASSERT(G.exist_edge({1},{2}) && !G.exist_edge({1},{3}));
-    TEST_ASSERT(G.exist_edge({2},{3}));
-    TEST_ASSERT(G.exist_edge({3},{1}) && G.exist_edge({3},{5}));
-    TEST_ASSERT(G.exist_edge({4},{3}));
-    TEST_ASSERT(G.exist_edge({5},{1}) && G.exist_edge({5},{3}) && G.exist_edge({5},{4}));
-
-    // Then we rune RobustPrune one more time with p=5, V={1,3,4}, a=1.2 and R = 1
-    V.clear(); V = {{1},{3},{4}};
-    RobustPrune(G, 5, V, a, R);
-
-    // Now check that the algorithm works as intended (edges from 5 to 1 and from 5 to 3 removed)
+    TEST_ASSERT(G.exist_edge({0},{1}) && !G.exist_edge({0},{2}));
     TEST_ASSERT(G.exist_edge({1},{2}));
-    TEST_ASSERT(G.exist_edge({2},{3}));
-    TEST_ASSERT(G.exist_edge({3},{1}) && G.exist_edge({3},{5}));
-    TEST_ASSERT(G.exist_edge({4},{3}));
-    TEST_ASSERT(G.exist_edge({5},{1}) && !G.exist_edge({5},{3}) && !G.exist_edge({5},{4}));
+    TEST_ASSERT(G.exist_edge({2},{0}) && G.exist_edge({2},{4}));
+    TEST_ASSERT(G.exist_edge({3},{2}));
+    TEST_ASSERT(G.exist_edge({4},{0}) && G.exist_edge({4},{2}) && G.exist_edge({4},{3}));
+
+    // Then we run RobustPrune one more time with p=4, V={0,2,3}, a=1.2 and R = 1
+    V.clear(); V = {{0},{2},{3}};
+    R = 1;
+    RobustPrune(G, 4, V, a, R);
+
+    // Checking
+    // cout << G.exist_edge({0},{1}) << G.exist_edge({0},{2}) << endl;
+    // cout << G.exist_edge({1},{2}) << endl;
+    // cout << G.exist_edge({2},{0}) << G.exist_edge({2},{4}) << endl;
+    // cout << G.exist_edge({3},{2}) << endl;
+    // cout << G.exist_edge({4},{0}) << G.exist_edge({4},{2}) << G.exist_edge({4},{3}) << endl;
+
+    // Now check that the algorithm works as intended (edges from 4 to 0 and from 4 to 2 removed)
+    TEST_ASSERT(G.exist_edge({0},{1}));
+    TEST_ASSERT(G.exist_edge({1},{2}));
+    TEST_ASSERT(G.exist_edge({2},{0}) && G.exist_edge({2},{4}));
+    TEST_ASSERT(G.exist_edge({3},{2}));
+    TEST_ASSERT(!G.exist_edge({4},{0}) && !G.exist_edge({4},{2}) && G.exist_edge({4},{3}));
 }
 
 /* Testing the Vamana method */
