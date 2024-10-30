@@ -170,6 +170,24 @@ void test_medoid(){
     
 }
 
+void test_rDirectional(){
+
+    int r = 3;
+
+    Graph<vector<int>>* G = new Graph<vector<int>>;
+    G->add_vertex({1});
+    G->add_vertex({2});
+    G->add_vertex({4});
+    G->add_vertex({3});
+    G->add_vertex({5});
+
+
+    rDirectional(*G, r);
+
+    // Check the number of edges
+    TEST_ASSERT( G->get_edge_count() == r * G->get_vertices_count() );
+}
+
 
 
 /* Testing fvec_to_graph */
@@ -258,6 +276,7 @@ TEST_LIST = {
     {"Find_min_Euclidean", test_find_min_Euclidean},
     {"Retain_closest_neighbors", test_retain_closest_points},
     {"Medoid", test_medoid},
+    {"rDirectional", test_rDirectional},
     { "fvec to graph", test_fvec_to_graph },
     { "ivec to graph", test_ivec_to_graph },
     { NULL, NULL }

@@ -115,6 +115,46 @@ vector<Type> medoid(Graph<vector<Type>>& G){
 
 }
 
+/* Method which adds randomly exactly R outgoing neighbors to each vertex of the graph */
+template <typename T>
+void rDirectional(Graph<T>& G,int R){
+    
+    if( R > G.get_vertices_count() ){
+        cerr << "R-Directional Graph initialization failed...\n" << endl;
+        return ;
+    }
+
+    set<T> vertices = G.get_vertices(); 
+
+    // For each vertex of the graph
+    for( T v : vertices ){
+
+        
+        // Create a vector with all the elements of the graph
+        vector<T> shuffled_vertices(vertices.begin(), vertices.end());
+
+        // To obtain a time-based seed 
+        unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+        
+        // Shuffle the vector 
+        // We may need a random generator as an argument here (for better randomness)
+        shuffle(shuffled_vertices.begin(), shuffled_vertices.end(), default_random_engine(seed));
+
+
+        // Add R random outgoing neighbors
+        int i = 0;
+        int count = 0;
+        while( count < R ){
+            if( v != shuffled_vertices[i]){
+                G.add_edge(v, shuffled_vertices[i]);  
+                count++;  
+            }
+            i++;
+        }
+
+    }
+
+}
 
 /*-------------------------------------Utility functions and classes for the tests-------------------------------------*/
 
