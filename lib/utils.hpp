@@ -46,6 +46,7 @@ vector<Type> find_min_Euclidean(set<vector<Type>> S, vector<Type> xquery){
 }
 
 
+/* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
 template <typename Type>
 void retain_closest_points(set<vector<Type>> &output_set, vector<Type> xquery, int L){
     

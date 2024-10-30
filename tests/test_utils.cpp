@@ -114,6 +114,28 @@ void test_find_min_Euclidean() {
     TEST_ASSERT(minf4[0] - 7.7f <= e && minf4[1] - 8.8f <= e); 
 }
 
+void test_retain_closest_points() {
+    // First create a set of vectors
+    set<vector<int>> s1 = {{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}};
+
+    // Then check that retain_closest_neighbors only keeps the closest neighbors
+    vector<int> xquery = {0};
+    retain_closest_points(s1, xquery, 3);
+
+    TEST_ASSERT(s1.find({1}) != s1.end());
+    TEST_ASSERT(s1.find({2}) != s1.end());
+    TEST_ASSERT(s1.find({3}) != s1.end());
+
+    // Now run a second test for a vector that exists in the set
+    set<vector<int>> s2 = {{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}};
+
+    xquery = {5};
+    retain_closest_points(s1, xquery, 3);
+
+    TEST_ASSERT(s2.find({4}) != s2.end());
+    TEST_ASSERT(s2.find({5}) != s2.end());
+    TEST_ASSERT(s2.find({6}) != s2.end());
+}
 
 void test_medoid(){
     
@@ -234,6 +256,7 @@ void test_ivec_to_graph() {
 TEST_LIST = {
     { "Euclidean Distance", test_Euclidean_Distance },
     {"Find_min_Euclidean", test_find_min_Euclidean},
+    {"Retain_closest_neighbors", test_retain_closest_points},
     {"Medoid", test_medoid},
     { "fvec to graph", test_fvec_to_graph },
     { "ivec to graph", test_ivec_to_graph },
