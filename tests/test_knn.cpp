@@ -121,6 +121,116 @@ void test_GreedySearch() {
     TEST_ASSERT( L.size() ==  0 );
     TEST_ASSERT( V.size() ==  0 );
 
+    // Testing for floats
+
+    TestGraph<vector<float>> G1;
+    
+    // Add vertices 1,2,3,4,5
+    G1.add_vertex({1.1}); G1.add_vertex({2.1}); G1.add_vertex({3.1}); G1.add_vertex({4.0}); G1.add_vertex({5.1});
+
+    // Add some random edges
+    G1.add_edge({1.1},{2.1}); G1.add_edge({1.1},{3.1});
+    G1.add_edge({2.1}, {3.1});
+    G1.add_edge({3.1}, {1.1});G1.add_edge({3.1}, {5.1});
+    G1.add_edge({4.1}, {3.1});
+    G1.add_edge({5.1}, {1.1}); G1.add_edge({5.1}, {3.1}); G1.add_edge({5.1}, {4.1});
+
+    // Initialising variables for the results of the algorithm
+    set<vector<float>> L1;
+    set<vector<float>> V1;
+
+    /* Running the algorithm with s = 'a', xq = 'd', k = 2 and L = 3*/
+    pair< set<vector<float>>, set<vector<float>> > result1 = GreedySearch<vector<float>>(G1, {1.1}, {4.1}, 2, 3);
+    L1 = result1.first;
+    V1 = result1.second;
+
+    // cout << "\nL contains:\n";
+    // for(auto i : L){
+    //     cout << i[0] << endl;
+    // }
+    
+    // cout << endl;
+
+    // cout << "\nV contains:\n";
+    // for(auto v : V){
+    //     cout << v[0] << endl;
+    // }
+
+    // Test that the sets returned contain the correct values (L = {3,5}, V = {1,2,3})
+    TEST_ASSERT(L1.find({3.1}) != L1.end());
+    TEST_ASSERT(L1.find({5.1}) != L1.end());
+
+    TEST_ASSERT(V1.find({1.1}) != V1.end());
+    TEST_ASSERT(V1.find({2.1}) != V1.end());
+    TEST_ASSERT(V1.find({3.1}) != V1.end());
+    TEST_ASSERT(V1.find({5.1}) != V1.end());
+    TEST_ASSERT(L1.size() == 2);
+    TEST_ASSERT(V1.size() == 4);
+
+    // Test that empty sets are returned if L < k
+    result1 = GreedySearch<vector<float>>(G1, {1.1}, {4.1}, 2, 1);
+    L1 = result1.first;
+    V1 = result1.second;
+    TEST_ASSERT( L1.size() ==  0 );
+    TEST_ASSERT( V1.size() ==  0 );
+
+
+    // Testing for 2D vectors
+
+    TestGraph<vector<int>> G2;
+    
+    // Add vertices 1,2,3,4,5
+    G2.add_vertex({1,0}); G2.add_vertex({2,0}); G2.add_vertex({3,0}); G2.add_vertex({4,0}); G2.add_vertex({5,0});
+
+    // Add some random edges
+    G2.add_edge({1,0},{2,0}); G2.add_edge({1,0},{3,0});
+    G2.add_edge({2,0}, {3,0});
+    G2.add_edge({3,0}, {1,0});G2.add_edge({3,0}, {5,0});
+    G2.add_edge({4,0}, {3,0});
+    G2.add_edge({5,0}, {1,0}); G2.add_edge({5,0}, {3,0}); G2.add_edge({5,0}, {4,0});
+
+    // Initialising variables for the results of the algorithm
+    set<vector<int>> L2;
+    set<vector<int>> V2;
+
+    /* Running the algorithm with s = 'a', xq = 'd', k = 2 and L = 3*/
+    pair< set<vector<int>>, set<vector<int>> > result2 = GreedySearch<vector<int>>(G2, {1,0}, {4,0}, 2, 3);
+    L2 = result2.first;
+    V2 = result2.second;
+
+    // cout << "\nL contains:\n";
+    // for(auto i : L){
+    //     cout << i[0] << endl;
+    // }
+    
+    // cout << endl;
+
+    // cout << "\nV contains:\n";
+    // for(auto v : V){
+    //     cout << v[0] << endl;
+    // }
+
+    // Test that the sets returned contain the correct values (L = {3,5}, V = {1,2,3})
+    TEST_ASSERT(L2.find({3,0}) != L2.end());
+    TEST_ASSERT(L2.find({5,0}) != L2.end());
+
+    TEST_ASSERT(V2.find({1,0}) != V2.end());
+    TEST_ASSERT(V2.find({2,0}) != V2.end());
+    TEST_ASSERT(V2.find({3,0}) != V2.end());
+    TEST_ASSERT(V2.find({5,0}) != V2.end());
+    TEST_ASSERT(L2.size() == 2);
+    TEST_ASSERT(V2.size() == 4);
+
+    // Test that empty sets are returned if L < k
+    result2 = GreedySearch<vector<int>>(G2, {1,0}, {4,0}, 2, 1);
+    L2 = result2.first;
+    V2 = result2.second;
+    TEST_ASSERT( L2.size() ==  0 );
+    TEST_ASSERT( V2.size() ==  0 );
+
+
+
+
 }
 
 /* Testing the RobustPrune method */
