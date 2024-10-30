@@ -78,6 +78,41 @@ void retain_closest_points(set<vector<Type>> &output_set, vector<Type> xquery, i
 
 
 
+/* Method which finds the medoid of a given graph */
+template <typename Type>
+vector<Type> medoid(Graph<vector<Type>>& G){
+
+    
+    float min = numeric_limits<float>::max();
+    vector<Type> medoid_vertice; 
+
+    // Check if the graph is empty
+    if ( G.get_vertices_count() == 0  ) { 
+        cerr << "\nThe Graph is empty. The Medoid can't be calculated\n" << endl;
+        // Returns an empty vector
+        return {};
+    }
+
+
+    for( vector<Type> vertice : G.get_vertices() ){
+        float sum = 0;
+
+        // Calculate the sum of the Euclidean Distances of this vertice with all the others 
+        for( vector<Type> x : G.get_vertices() ){
+            sum += Euclidean_Distance<Type>(vertice, x);
+        }
+
+        // Check if this sum is the minimum
+        if ( sum < min ){
+            min = sum;
+            medoid_vertice = vertice;
+        }
+
+    }
+
+    return medoid_vertice;
+
+}
 
 
 /*-------------------------------------Utility functions and classes for the tests-------------------------------------*/

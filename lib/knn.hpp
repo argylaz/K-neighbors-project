@@ -1,5 +1,6 @@
 /* This file contains all the algorithms relevant to the KNN project such as vamana indexing algorithm */
 #include "utils.hpp"
+#include <limits.h>
 using namespace std;
 
 /* Traverses the graph and finds k-approx NNs */
@@ -118,7 +119,6 @@ void RobustPrune(Graph<T>& G, gIndex p, set<T>& V, float a, int R) {
         
     }
 }
-
 
 
 
