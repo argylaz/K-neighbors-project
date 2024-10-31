@@ -124,10 +124,34 @@ void RobustPrune(Graph<T>& G, T point, set<T>& V, float a, int R) {
 // R is the degree bound
 template <typename T>
 void vamana(Graph<T>& G, int L, int R) {
+    
     rDirectional(G, R);
-    T s = medoid<T>(G);
+    T s = medoid(G); //!!!
     
     set<T> shuffled_vertices = G.get_vertices();
-    // shuffle();
+    shuffle(shuffled_vertices.begin(), shuffled_vertices.end(), default_random_engine(chrono::system_clock::now().time_since_epoch().count()));
 
+    for (T vertex: shuffled_vertices) {  // vertex is used in place of sigma(i) interchangeably
+
+        pair<set<T>, set<T>> result = GreedySearch<T>(G, s, vertex, 1, L);
+        set<T> L_output = result.first;
+        set<T> V = result.second;
+
+        float a = 1.2; /////////
+        RobustPrune(G, vertex, V, a, R);
+
+        set<T> neighbors = G.get_neighbors(vertex);
+        for (T j: neighbors) {
+            set<T> neighbor_union = G.get_neighbors(j);
+            neighbor_union.insert(vertex);
+            
+            if (neighbor_union.size() > R) {
+                RobustPrune(G, j, neighbor_union, a, R);
+            } else {
+                G.add_edge(j, vertex);
+            }     
+        }
+
+    }
+    
 }
