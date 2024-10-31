@@ -12,9 +12,9 @@ void test_GreedySearch() {
     G.add_vertex({1}); G.add_vertex({2}); G.add_vertex({3}); G.add_vertex({4}); G.add_vertex({5});
 
     // Add some random edges
-    G.add_edge({1},{2}); G.add_edge({1},{3});
+    G.add_edge({1}, {2}); G.add_edge({1}, {3});
     G.add_edge({2}, {3});
-    G.add_edge({3}, {1});G.add_edge({3}, {5});
+    G.add_edge({3}, {1}); G.add_edge({3}, {5});
     G.add_edge({4}, {3});
     G.add_edge({5}, {1}); G.add_edge({5}, {3}); G.add_edge({5}, {4});
 
@@ -51,10 +51,10 @@ void test_GreedySearch() {
     TestGraph<vector<float>> G1;
     
     // Add vertices 1,2,3,4,5
-    G1.add_vertex({1.1}); G1.add_vertex({2.1}); G1.add_vertex({3.1}); G1.add_vertex({4.0}); G1.add_vertex({5.1});
+    G1.add_vertex({1.1}); G1.add_vertex({2.1}); G1.add_vertex({3.1}); G1.add_vertex({4.1}); G1.add_vertex({5.1});
 
     // Add some random edges
-    G1.add_edge({1.1}, {2.1}); G1.add_edge({1.1},{3.1});
+    G1.add_edge({1.1}, {2.1}); G1.add_edge({1.1}, {3.1});
     G1.add_edge({2.1}, {3.1});
     G1.add_edge({3.1}, {1.1}); G1.add_edge({3.1}, {5.1});
     G1.add_edge({4.1}, {3.1});
@@ -182,6 +182,7 @@ void test_RobustPrune() {
     TEST_ASSERT(G1.exist_edge({2}, {0}) && G1.exist_edge({2}, {4}));
     TEST_ASSERT(G1.exist_edge({3}, {2}));
     TEST_ASSERT(!G1.exist_edge({4}, {0}) && !G1.exist_edge({4}, {2}) && G1.exist_edge({4}, {3}));
+
 
 
     // Testing for floats, shortened version of the int test, same data with {x.1} form

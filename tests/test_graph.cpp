@@ -65,17 +65,17 @@ void test_add_edge() {
 
     // Check that the function returns false when trying to add edge to non existing vertices
     // G1 and G2 don't have the vertex 1
-    TEST_ASSERT(G1.add_edge(0,1) == false && G2.add_edge(0,1) == false);
+    TEST_ASSERT(G1.add_edge(0, 1) == false && G2.add_edge(0, 1) == false);
     // G1 and G2 don't have neither vertex 1 nor vertex 2
-    TEST_ASSERT(G1.add_edge(2,1) == false && G2.add_edge(2,1) == false);
+    TEST_ASSERT(G1.add_edge(2, 1) == false && G2.add_edge(2, 1) == false);
 
 
     for (int i = 1; i < NUM; i++) {
         G1.add_vertex(i);
         G2.add_vertex(i);
 
-        TEST_ASSERT(G1.add_edge(i-1,i) == true);
-        TEST_ASSERT(G2.add_edge(i-1,i) ==  true);
+        TEST_ASSERT(G1.add_edge(i-1, i) == true);
+        TEST_ASSERT(G2.add_edge(i-1, i) == true);
 
         // Get adjacency lists on each loop to get the new one
         vector<vector<int>> L1 = G1.get_private_adjacency_list();
@@ -97,6 +97,17 @@ void test_add_edge() {
 
     TEST_ASSERT(L1.size() == NUM);
     TEST_ASSERT(L2.size() == NUM);
+
+    
+    // Testing the addition of existing edge. add_edge() should return true, but edge count should remain the same
+    TestGraph<int> G;
+    G.add_vertex(0); G.add_vertex(1);
+    
+    TEST_ASSERT(G.add_edge(0, 1) == true);
+    int edge_count_1 = G.get_edge_count();
+    bool ok = G.add_edge(0, 1);
+    int edge_count_2 = G.get_edge_count();
+    TEST_ASSERT(ok && edge_count_1 == edge_count_2);
 
     /*
     Printing for testing purposes
@@ -151,11 +162,9 @@ void test_remove_edge() {
         G1.add_vertex(i);
         G2.add_vertex(i);
 
-        G1.add_edge(i-1,i);
-        G2.add_edge(i-1,i);
+        G1.add_edge(i-1, i);
+        G2.add_edge(i-1, i);
     }
-
-    
 
 
     for (int i = 1; i < NUM; i++) {
@@ -226,7 +235,7 @@ void test_get_edge_count() {
         G2.add_edge(i-1, i);
 
         TEST_ASSERT(G1.get_edge_count() == i);
-        TEST_ASSERT(G2.get_edge_count() == 2*i);  // An undirected edge counts as 2 (???)
+        TEST_ASSERT(G2.get_edge_count() == 2 * i);  // An undirected edge counts as 2 (???)
     }
 }
 
@@ -275,6 +284,7 @@ void test_get_neighbors() {
 
     set<int> S4 = G.get_neighbors(9);
     TEST_ASSERT(S4.find(5) != S4.end() && S4.size() == 1);
+
 }
 
 // List of all tests to be executed
