@@ -82,7 +82,6 @@ void retain_closest_points(set<vector<Type>> &output_set, vector<Type> xquery, i
 /* Method which finds the medoid of a given graph */
 template <typename Type>
 vector<Type> medoid(Graph<vector<Type>>& G){
-
     
     float min = numeric_limits<float>::max();
     vector<Type> medoid_vertice; 
@@ -96,9 +95,9 @@ vector<Type> medoid(Graph<vector<Type>>& G){
 
 
     for( vector<Type> vertice : G.get_vertices() ){
-        float sum = 0;
 
         // Calculate the sum of the Euclidean Distances of this vertice with all the others 
+        float sum = 0;
         for( vector<Type> x : G.get_vertices() ){
             sum += Euclidean_Distance<Type>(vertice, x);
         }
@@ -117,18 +116,30 @@ vector<Type> medoid(Graph<vector<Type>>& G){
 
 /* Method which adds randomly exactly R outgoing neighbors to each vertex of the graph */
 template <typename T>
-void rDirectional(Graph<T>& G,int R){
+void rDirectional(Graph<T>& G, int R) {
     
-    if( R > G.get_vertices_count() ){
+    if ( R > G.get_vertices_count() ) {
         cerr << "R-Directional Graph initialization failed...\n" << endl;
         return ;
     }
 
-    set<T> vertices = G.get_vertices(); 
+    set<T> vertices = G.get_vertices();
+
+    // If the graph already has edges, we remove them and construct the graph from the beginning 
+    if (G.get_edge_count() > 0) {
+        cerr << "\nGraph already has edges\n" << endl;
+        
+        for (T vertex: vertices) {
+            set<T> neighbors = G.get_neighbors(vertex);
+            for (T neighbor: neighbors) {
+                G.remove_edge(vertex, neighbor);
+            }
+        }
+        
+    }
 
     // For each vertex of the graph
-    for( T v : vertices ){
-
+    for ( T v : vertices ) {
         
         // Create a vector with all the elements of the graph
         vector<T> shuffled_vertices(vertices.begin(), vertices.end());
@@ -144,8 +155,8 @@ void rDirectional(Graph<T>& G,int R){
         // Add R random outgoing neighbors
         int i = 0;
         int count = 0;
-        while( count < R ){
-            if( v != shuffled_vertices[i]){
+        while ( count < R ){
+            if ( v != shuffled_vertices[i]){
                 G.add_edge(v, shuffled_vertices[i]);  
                 count++;  
             }
@@ -178,7 +189,7 @@ public:
 /* This functions assumes that all the vectors given in the file will be of the same dimension                                    */
 /* Otherwise, the entries inside the graph will be uneven (vectors of different dimensions)                                       */
 template <typename type>
-void vec_to_graph(const std::string& filename, Graph<vector<type>>& G) {
+void vec_to_graph(const string& filename, Graph<vector<type>>& G) {
     // First we open the file and check if it was opened properly
     ifstream file(filename, ios::binary);
     if (!file) {
@@ -190,13 +201,13 @@ void vec_to_graph(const std::string& filename, Graph<vector<type>>& G) {
     bool correctFormat = true;
 
     // Read the contents of the file
-    while(file.peek() != EOF) {
+    while (file.peek() != EOF) {
         // Read the dimension of the vector 
         int d;
         file.read(reinterpret_cast<char*>(&d), sizeof(int));
 
         // If there is no data following the dimension the file format is incorrect.
-        if(!file) {
+        if (!file) {
             correctFormat = false; 
             break;
         }
@@ -206,10 +217,10 @@ void vec_to_graph(const std::string& filename, Graph<vector<type>>& G) {
 
         // Read the data from file
         file.read(reinterpret_cast<char*>(v.data()), d * sizeof(type));
-        if(!file) break;
+        if (!file) break;
 
         // If the number of floats read and the dimension read don't match, the format is incorrect
-        if(v.size() != (size_t) d) {
+        if (v.size() != (size_t) d) {
             correctFormat = false;
             break;
         }
