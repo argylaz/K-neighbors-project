@@ -71,7 +71,7 @@ pair<set<T>, set<T>> GreedySearch(Graph<T> G, T start, T xquery, int k, int L) {
 // a is the distance threshold
 // R is the degree bound
 template <typename T>
-void RobustPrune(Graph<T>& G, gIndex p, set<T>& V, float a, int R) {
+void RobustPrune(Graph<T>& G, T point, set<T>& V, float a, int R) {
 
     // First we check that the input values are correct
     if (a < 1) { // a >= 1
@@ -79,9 +79,6 @@ void RobustPrune(Graph<T>& G, gIndex p, set<T>& V, float a, int R) {
         // Return
         return;
     }
-
-    // Finding the vertex corresponding to the index of the given point
-    T point = G.get_vertex_from_index(p);
 
     // Calculating the union of V and the neighbors of the given point, without the point itself
     set<T> neighbors = G.get_neighbors(point);
@@ -127,5 +124,10 @@ void RobustPrune(Graph<T>& G, gIndex p, set<T>& V, float a, int R) {
 // R is the degree bound
 template <typename T>
 void vamana(Graph<T>& G, int L, int R) {
+    rDirectional(G, R);
+    T s = medoid<T>(G);
     
+    set<T> shuffled_vertices = G.get_vertices();
+    // shuffle();
+
 }

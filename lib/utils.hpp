@@ -156,7 +156,7 @@ void rDirectional(Graph<T>& G, int R) {
         int i = 0;
         int count = 0;
         while ( count < R ){
-            if ( v != shuffled_vertices[i]){
+            if ( shuffled_vertices[i] != v ){
                 G.add_edge(v, shuffled_vertices[i]);  
                 count++;  
             }
