@@ -186,6 +186,10 @@ void test_rDirectional(){
 
     // Check the number of edges
     TEST_ASSERT( G->get_edge_count() == r * G->get_vertices_count() );
+
+    // Checking if rDirectional works if given a non-empty Graph
+    rDirectional(*G, r);
+    TEST_ASSERT( G->get_edge_count() == r * G->get_vertices_count() );
 }
 
 
@@ -273,10 +277,10 @@ void test_ivec_to_graph() {
 // List of all tests to be executed
 TEST_LIST = {
     { "Euclidean Distance", test_Euclidean_Distance },
-    {"Find_min_Euclidean", test_find_min_Euclidean},
-    {"Retain_closest_neighbors", test_retain_closest_points},
-    {"Medoid", test_medoid},
-    {"rDirectional", test_rDirectional},
+    { "Find_min_Euclidean", test_find_min_Euclidean},
+    { "Retain_closest_neighbors", test_retain_closest_points},
+    { "Medoid", test_medoid},
+    { "rDirectional", test_rDirectional},
     { "fvec to graph", test_fvec_to_graph },
     { "ivec to graph", test_ivec_to_graph },
     { NULL, NULL }

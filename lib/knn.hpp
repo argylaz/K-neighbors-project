@@ -71,7 +71,7 @@ pair<set<T>, set<T>> GreedySearch(Graph<T> G, T start, T xquery, int k, int L) {
 // a is the distance threshold
 // R is the degree bound
 template <typename T>
-void RobustPrune(Graph<T>& G, gIndex p, set<T>& V, float a, int R) {
+void RobustPrune(Graph<T>& G, T point, set<T>& V, float a, int R) {
 
     // First we check that the input values are correct
     if (a < 1) { // a >= 1
@@ -79,9 +79,6 @@ void RobustPrune(Graph<T>& G, gIndex p, set<T>& V, float a, int R) {
         // Return
         return;
     }
-
-    // Finding the vertex corresponding to the index of the given point
-    T point = G.get_vertex_from_index(p);
 
     // Calculating the union of V and the neighbors of the given point, without the point itself
     set<T> neighbors = G.get_neighbors(point);
@@ -126,6 +123,46 @@ void RobustPrune(Graph<T>& G, gIndex p, set<T>& V, float a, int R) {
 // L is the search list size
 // R is the degree bound
 template <typename T>
-void vamana(Graph<T>& G, int L, int R) {
+void Vamana(Graph<T>& G, int L, int R) {
+    // Initializing G to a random graph with out-degree = R
+    rDirectional(G, R);
+
+    // Calculating the medoid of the points given
+    T s = medoid(G); // !!!
+    
+    // Getting the vertices in a random order
+    set<T> shuffled_vertices = G.get_vertices();
+    shuffle(shuffled_vertices.begin(), shuffled_vertices.end(), default_random_engine(chrono::system_clock::now().time_since_epoch().count()));
+
+    // For each vertex
+    for (T vertex: shuffled_vertices) {  // "vertex" is used in place of sigma(i) or x_{sigma(i)} interchangeably
+
+        // Calling GreadySearch() from the medoid to the vertex to get the appropriate sets [L_output,V]
+        pair<set<T>, set<T>> result = GreedySearch<T>(G, s, vertex, 1, L);
+        set<T> L_output = result.first;
+        set<T> V = result.second;
+
+        // First calling RobustPrune for the vertex
+        float a = 1.2; // !!!
+        RobustPrune(G, vertex, V, a, R);
+
+        // For each neighbor j of the vertex
+        set<T> neighbors = G.get_neighbors(vertex);
+        for (T j: neighbors) {
+            // We calculate a candidate set with the neighbor's neightbors and the vertex itself
+            set<T> neighbor_union = G.get_neighbors(j);
+            neighbor_union.insert(vertex);
+            
+
+            if (neighbor_union.size() > R) {
+                // If the candidate set for the neighbor j is too big (size>R) we call RobustPrune for j
+                RobustPrune(G, j, neighbor_union, a, R);
+            } else {
+                // Else we add an edge from the neighbor j to the vertex itself
+                G.add_edge(j, vertex);
+            }     
+        }
+
+    }
     
 }

@@ -133,9 +133,13 @@ bool Graph<T>::add_edge(const T& start, const T& end) {
 
     
     // Check if the given vertices are vertices of the graph, if they aren't return false
-    if( v_index.find(start) == v_index.end() || v_index.find(end) == v_index.end() ){
+    if ( v_index.find(start) == v_index.end() || v_index.find(end) == v_index.end() ) {
         return false;
-    } 
+    }
+
+    // If edge already exists, we just return true
+    if (exist_edge(start, end))
+        return true;
 
     int pos_start = v_index[start];
 
@@ -242,7 +246,7 @@ const bool Graph<T>::is_directed(){
 
 
 template <typename T>
-set<T> Graph<T>::get_vertices() const{
+set<T> Graph<T>::get_vertices() const {
     return vertices;
 }
 
@@ -254,12 +258,13 @@ vector<vector<T>> Graph<T>::get_adjacency_list(void) const {
 
 /* Method that returns if exists an edge from vertex_a to vertex_b*/
 template <typename T>
-bool Graph<T>::exist_edge(T vertex_a, T vertex_b){
-    if( vertices.find(vertex_a) == vertices.end() || vertices.find(vertex_b) == vertices.end() )
+bool Graph<T>::exist_edge(T vertex_a, T vertex_b) {
+    if ( vertices.find(vertex_a) == vertices.end() || vertices.find(vertex_b) == vertices.end() )
         return false;
-    if( find(adjacencyList[v_index[vertex_a]].begin(), adjacencyList[v_index[vertex_a]].end(), vertex_b) == adjacencyList[v_index[vertex_a]].end() ){
+
+    if ( find(adjacencyList[v_index[vertex_a]].begin(), adjacencyList[v_index[vertex_a]].end(), vertex_b) == adjacencyList[v_index[vertex_a]].end() )
         return false;
-    }
+
     return true;
 
 }
