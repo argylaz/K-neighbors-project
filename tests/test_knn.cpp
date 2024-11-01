@@ -281,7 +281,7 @@ void test_Vamana() {
     G.add_edge({3},{0}); G.add_edge({3},{1});
 
     // Run vamana indexing algorithm with L = 2 and R = 2
-    vamana(G, 2, 2);
+    Vamana(G, 2, 2);
 
     // Test that the new form of the graph is the one one expected
     // 0->1, 1->0, 1->2, 2->1, 2->3, 3->2 are the exact edges the graph should have
