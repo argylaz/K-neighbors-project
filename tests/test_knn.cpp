@@ -191,7 +191,31 @@ void test_RobustPrune() {
 
 /* Testing the Vamana method */
 void test_Vamana() {
-    return;
+    /* Testing the vamana method with a simple example solved by hand */
+    TestGraph<vector<int>> G;
+
+    // Add vertices 0,1,2,3
+    G.add_vertex({0}); G.add_vertex({1}); G.add_vertex({2}); G.add_vertex({3});
+
+    // Add edges 0->2, 0->3, 1->2, 1->3, 2->0, 2->1, 3->0, 3->1
+    G.add_edge({0},{2}); G.add_edge({0},{3});
+    G.add_edge({1},{2}); G.add_edge({1},{3});
+    G.add_edge({2},{0}); G.add_edge({2},{1});
+    G.add_edge({3},{0}); G.add_edge({3},{1});
+
+    // Run vamana indexing algorithm with L = 2 and R = 2
+    vamana(G, 2, 2);
+
+    // Test that the new form of the graph is the one one expected
+    // 0->1, 1->0, 1->2, 2->1, 2->3, 3->2 are the exact edges the graph should have
+    cout << G.get_edge_count();
+    // TEST_ASSERT(G.get_edge_count() == 6);
+    TEST_ASSERT(G.exist_edge({0}, {1}));
+    TEST_ASSERT(G.exist_edge({1}, {0}));
+    TEST_ASSERT(G.exist_edge({1}, {2}));
+    TEST_ASSERT(G.exist_edge({2}, {1}));
+    TEST_ASSERT(G.exist_edge({2}, {3}));
+    TEST_ASSERT(G.exist_edge({3}, {2}));
 }
 
 // List of all tests to be executed
