@@ -61,6 +61,8 @@ int main(int argc, char* argv[]) {
     auto n = queries.begin();
 
     // Calculate and print recall for given queries
+    float total_recall = 0.0f;
+    int count = 0;
     while ( m != groundtruth.end() && n != queries.end() ) {
         // For each query
         vector<float> q = *n;
@@ -88,15 +90,20 @@ int main(int argc, char* argv[]) {
         set<int> V_intersec;
         set_intersection(X.begin(), X.end(), T.begin(), T.end(), inserter(V_intersec, V_intersec.begin()));
 
-        // Calculate recall
         cout << "Intersection size is:" << V_intersec.size() << endl;
         cout << "T size is:" << T.size() << endl;
+        
+        // Calculate recall and add to total
         float recall = V_intersec.size() / ((float) X.size());
         cout << "Recall is: " << recall << endl;
+        total_recall += recall;
+        count++;
 
         m++;
         n++;
     }
     
+    total_recall = total_recall / count;
+    cout << "Total Recall is " << total_recall*100 <<"%\n";
     return 0;
 }
