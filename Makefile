@@ -41,6 +41,9 @@ $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
 $(BIN_DIR)/%: $(BUILD_DIR)/%.o
 	$(CC) $(CFLAGS) -o $@ $< $(BUILD_DIR)/utils.o
 
+run:
+	$(CC) -o main main.cpp
+	time ./main 1 15 10 1.2
 
 
 # Run the test executable

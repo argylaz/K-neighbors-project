@@ -28,7 +28,7 @@ float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 
 /* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
 template <typename Type>
-vector<Type> find_min_Euclidean(set<vector<Type>> S, vector<Type> xquery){
+vector<Type> find_min_Euclidean(set<vector<Type>> S, vector<Type> xquery) {
     
     auto i = S.begin();
     float min_distance = Euclidean_Distance<Type>(xquery, *i);
@@ -36,8 +36,9 @@ vector<Type> find_min_Euclidean(set<vector<Type>> S, vector<Type> xquery){
     vector<Type> min_point = *i;
 
     while( ++i != S.end()){
-        if( Euclidean_Distance<Type>(xquery, *i) < min_distance ){
-            min_distance = Euclidean_Distance<Type>(xquery, *i);
+        float eucl = Euclidean_Distance<Type>(xquery, *i);
+        if( eucl < min_distance ){
+            min_distance = eucl;
             min_point = *i;
         }
     }
@@ -48,7 +49,7 @@ vector<Type> find_min_Euclidean(set<vector<Type>> S, vector<Type> xquery){
 
 /* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
 template <typename Type>
-void retain_closest_points(set<vector<Type>> &output_set, vector<Type> xquery, int L){
+void retain_closest_points(set<vector<Type>> &output_set, vector<Type> xquery, int L) {
     
     // Create vector with the elements of the set
     output_set.erase(xquery);
@@ -93,19 +94,19 @@ vector<Type> medoid(Graph<vector<Type>>& G){
         return {};
     }
 
-
-    for( vector<Type> vertice : G.get_vertices() ){
+    set<vector<Type>> vertices = G.get_vertices();
+    for (vector<Type> vertex : vertices) {
 
         // Calculate the sum of the Euclidean Distances of this vertice with all the others 
         float sum = 0;
-        for( vector<Type> x : G.get_vertices() ){
-            sum += Euclidean_Distance<Type>(vertice, x);
+        for (vector<Type> x : vertices) {
+            sum += Euclidean_Distance<Type>(vertex, x);
         }
 
         // Check if this sum is the minimum
-        if ( sum < min ){
+        if ( sum < min ) {
             min = sum;
-            medoid_vertice = vertice;
+            medoid_vertice = vertex;
         }
 
     }
@@ -240,6 +241,55 @@ template <typename Type>
 vector<vector<Type>> read_vecs(string& filename) {
     
     vector<vector<Type>> result;
+    
+    // First we open the file and check if it was opened properly
+    ifstream file(filename, ios::binary);
+    if (!file) {
+        cerr << "Error when opening file " << filename << endl;
+        return result;
+    }
+
+    // This variable will indicate that the format of the file is correct and as expected.
+    bool correctFormat = true;
+
+    // Read the contents of the file
+    while (file.peek() != EOF) {
+        // Read the dimension of the vector 
+        int d;
+        file.read(reinterpret_cast<char*>(&d), sizeof(int));
+
+        // If there is no data following the dimension the file format is incorrect.
+        if (!file) {
+            correctFormat = false; 
+            break;
+        }
+
+        // Create vector to hold the values and resize to the correct dimension
+        vector<Type> v; v.resize(d);
+
+        // Read the data from file
+        file.read(reinterpret_cast<char*>(v.data()), d * sizeof(Type));
+        if (!file) break;
+
+        // If the number of floats read and the dimension read don't match, the format is incorrect
+        if (v.size() != (size_t) d) {
+            correctFormat = false;
+            break;
+        }
+
+        result.push_back(v);
+    }
+
+    if (!correctFormat) cerr << "Input file format incorrect! Graph might have errors." << endl;
+    file.close();
+
+    return result;
+}
+
+template <typename Type>
+set<vector<Type>> read_sets(string& filename) {
+    
+    set<vector<Type>> result;
     
     // First we open the file and check if it was opened properly
     ifstream file(filename, ios::binary);

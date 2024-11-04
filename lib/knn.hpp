@@ -152,7 +152,7 @@ void Vamana(Graph<T>& G, int L, int R, float a=1.2) {
 
         // First calling RobustPrune for the vertex
         // float a = 1.2; // !!!
-        RobustPrune(G, vertex, V, a, R);
+        RobustPrune<T>(G, vertex, V, a, R);
 
         // For each neighbor j of the vertex
         set<T> neighbors = G.get_neighbors(vertex);
@@ -164,7 +164,7 @@ void Vamana(Graph<T>& G, int L, int R, float a=1.2) {
 
             if (neighbor_union.size() > (long unsigned int) R) {
                 // If the candidate set for the neighbor j is too big (size>R) we call RobustPrune for j
-                RobustPrune(G, j, neighbor_union, a, R);
+                RobustPrune<T>(G, j, neighbor_union, a, R);
             } else {
                 // Else we add an edge from the neighbor j to the vertex itself
                 G.add_edge(j, vertex);
