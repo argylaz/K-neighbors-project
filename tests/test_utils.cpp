@@ -137,7 +137,7 @@ void test_retain_closest_points() {
     TEST_ASSERT(s2.find({6}) != s2.end());
 }
 
-void test_medoid(){
+void test_medoid() {
     
     Graph<vector<int>>* G1 = new Graph<vector<int>>;
     TEST_ASSERT( medoid<int>(*G1).size() == 0);
@@ -170,7 +170,7 @@ void test_medoid(){
     
 }
 
-void test_rDirectional(){
+void test_rDirectional() {
 
     int r = 3;
 

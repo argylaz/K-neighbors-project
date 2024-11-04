@@ -1,6 +1,7 @@
 /* This file contains all the algorithms relevant to the KNN project such as vamana indexing algorithm */
 #include "utils.hpp"
 #include <limits.h>
+#include <numeric>
 using namespace std;
 
 /* Traverses the graph and finds k-approx NNs */
@@ -124,18 +125,25 @@ void RobustPrune(Graph<T>& G, T point, set<T>& V, float a, int R) {
 // R is the degree bound
 template <typename T>
 void Vamana(Graph<T>& G, int L, int R) {
+    
+    int n = G.get_vertices_count();
+
     // Initializing G to a random graph with out-degree = R
     rDirectional(G, R);
 
     // Calculating the medoid of the points given
-    T s = medoid(G); // !!!
+    T s = medoid(G);
     
-    // Getting the vertices in a random order
-    set<T> shuffled_vertices = G.get_vertices();
-    shuffle(shuffled_vertices.begin(), shuffled_vertices.end(), default_random_engine(chrono::system_clock::now().time_since_epoch().count()));
+    // Getting the vertex indices in a random order. Vector sigma will be the random permutation.
+    vector<gIndex> sigma(n);
+    iota(sigma.begin(), sigma.end(), 0);
+    shuffle(sigma.begin(), sigma.end(), default_random_engine(chrono::system_clock::now().time_since_epoch().count()));
 
-    // For each vertex
-    for (T vertex: shuffled_vertices) {  // "vertex" is used in place of sigma(i) or x_{sigma(i)} interchangeably
+    // For all vertices
+    for (int i = 0; i < n; i++) { 
+
+        // Getting the random vertex
+        T vertex = G.get_vertex_from_index(sigma[i]);
 
         // Calling GreadySearch() from the medoid to the vertex to get the appropriate sets [L_output,V]
         pair<set<T>, set<T>> result = GreedySearch<T>(G, s, vertex, 1, L);
@@ -154,7 +162,7 @@ void Vamana(Graph<T>& G, int L, int R) {
             neighbor_union.insert(vertex);
             
 
-            if (neighbor_union.size() > R) {
+            if (neighbor_union.size() > (long unsigned int) R) {
                 // If the candidate set for the neighbor j is too big (size>R) we call RobustPrune for j
                 RobustPrune(G, j, neighbor_union, a, R);
             } else {

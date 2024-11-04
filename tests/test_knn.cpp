@@ -275,10 +275,10 @@ void test_Vamana() {
     G.add_vertex({0}); G.add_vertex({1}); G.add_vertex({2}); G.add_vertex({3});
 
     // Add edges 0->2, 0->3, 1->2, 1->3, 2->0, 2->1, 3->0, 3->1
-    G.add_edge({0},{2}); G.add_edge({0},{3});
-    G.add_edge({1},{2}); G.add_edge({1},{3});
-    G.add_edge({2},{0}); G.add_edge({2},{1});
-    G.add_edge({3},{0}); G.add_edge({3},{1});
+    G.add_edge({0}, {2}); G.add_edge({0}, {3});
+    G.add_edge({1}, {2}); G.add_edge({1}, {3});
+    G.add_edge({2}, {0}); G.add_edge({2}, {1});
+    G.add_edge({3}, {0}); G.add_edge({3}, {1});
 
     // Run vamana indexing algorithm with L = 2 and R = 2
     Vamana(G, 2, 2);
@@ -293,6 +293,15 @@ void test_Vamana() {
     TEST_ASSERT(G.exist_edge({2}, {1}));
     TEST_ASSERT(G.exist_edge({2}, {3}));
     TEST_ASSERT(G.exist_edge({3}, {2}));
+
+    TEST_ASSERT(!G.exist_edge({0}, {2}));
+    TEST_ASSERT(!G.exist_edge({0}, {3}));
+    TEST_ASSERT(!G.exist_edge({1}, {3}));
+    TEST_ASSERT(!G.exist_edge({2}, {0}));
+    TEST_ASSERT(!G.exist_edge({3}, {0}));
+    TEST_ASSERT(!G.exist_edge({3}, {1}));
+
+    
 }
 
 // List of all tests to be executed
