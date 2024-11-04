@@ -285,7 +285,7 @@ void test_Vamana() {
 
     // Test that the new form of the graph is the one one expected
     // 0->1, 1->0, 1->2, 2->1, 2->3, 3->2 are the exact edges the graph should have
-    cout << G.get_edge_count();
+    // cout << G.get_edge_count();
     // TEST_ASSERT(G.get_edge_count() == 6);
     TEST_ASSERT(G.exist_edge({0}, {1}));
     TEST_ASSERT(G.exist_edge({1}, {0}));

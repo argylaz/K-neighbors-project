@@ -124,7 +124,7 @@ void RobustPrune(Graph<T>& G, T point, set<T>& V, float a, int R) {
 // L is the search list size
 // R is the degree bound
 template <typename T>
-void Vamana(Graph<T>& G, int L, int R) {
+void Vamana(Graph<T>& G, int L, int R, float a=1.2) {
     
     int n = G.get_vertices_count();
 
@@ -151,7 +151,7 @@ void Vamana(Graph<T>& G, int L, int R) {
         set<T> V = result.second;
 
         // First calling RobustPrune for the vertex
-        float a = 1.2; // !!!
+        // float a = 1.2; // !!!
         RobustPrune(G, vertex, V, a, R);
 
         // For each neighbor j of the vertex

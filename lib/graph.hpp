@@ -28,7 +28,7 @@ public:
     bool remove_edge(const T& start, const T& end);
 
     /* Method to print the graph */
-    // void print_graph();
+    void print_graph();
 
     /* Method to get vertex from index */
     const T get_vertex_from_index(gIndex i);
@@ -55,11 +55,8 @@ public:
     set<T> get_vertices() const;
 
 protected:
-  
     vector<vector<T>> get_adjacency_list() const;
-    /* Getter methods for testing purposes */
     
-
 private:
     int countEdges;
     int countVertices;
@@ -195,24 +192,41 @@ bool Graph<T>::remove_edge(const T& start, const T& end) {
     return true;
 }
 
+template <typename type>
+void print_vector(vector<type> vec){
+    int size = vec.size();
+    cout << "{";
+    for( int i = 0 ; i < size ; i++){
+        cout << vec[i];
+        if( i != size - 1 &&  size != 1 )
+            cout << ",";
+    }
+    cout << "}";
+}
+
 /* Method to print the graph */
-// template <typename T>
-// void Graph<T>::print_graph(void) {
+template <typename T>
+void Graph<T>::print_graph(void) {
 
 
-//     for( auto ver = vertices.begin() ; ver!=vertices.end() ; ver++ ){
-//         // cout << "Vertex " << *ver << ":";
-//         int v_pos = v_index[*ver];
-//         /* The first element of each row is the is the vertex itself */
-//         for( size_t j = 1 ; j < adjacencyList[v_pos].size() ; j++){
-//             // cout << " -> " << adjacencyList[v_pos][j];
-//         } 
-//         cout << endl;
-//     }
+    for( auto ver = vertices.begin() ; ver!=vertices.end() ; ver++ ){
+        cout << "Vertex ";
+        print_vector(*ver);
+        cout << ": ";
+        int v_pos = v_index[*ver];
+        /* The first element of each row is the is the vertex itself */
+        for( size_t j = 1 ; j < adjacencyList[v_pos].size() ; j++){
+            // cout << " -> " << adjacencyList[v_pos][j];
+            if( j != 1)
+                cout << " -> ";
+            print_vector(adjacencyList[v_pos][j]);
+        } 
+        cout << endl;
+    }
 
-//     cout << endl;
+    cout << endl;
 
-// }
+}
 
 
 template <typename T>
