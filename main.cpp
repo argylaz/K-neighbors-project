@@ -44,19 +44,6 @@ void zoo(Graph<vector<Type>>& G, int k, int L, int R, float a=1.2){
 
 int main(int argc, char* argv[]) {
 
-
-
-    // // The first argument is the name file
-    // string filename = argv[1];
-
-    // // Get the name and the extention of the file
-    // string name, ext;
-    // size_t pos = filename.rfind('.');
-    // name = filename.substr(0, pos);
-    // ext = filename.substr(pos + 1);
-
-
-
     // Check that all the arguements needed have been given
     if( argc < 4 ){
         cerr << "k, L and R arguments are needed\n";
@@ -90,7 +77,6 @@ int main(int argc, char* argv[]) {
     Graph<vector<float>>* G2 = new Graph<vector<float>>;
     vector<vector<float>> queries = read_vecs<float>(filename);
     
-
     // Reading Base
     filename = "sift/siftsmall_base.fvecs";
     Graph<vector<float>>* G = new Graph<vector<float>>;
@@ -110,24 +96,6 @@ int main(int argc, char* argv[]) {
     //     // pair<set< vector<float>> , set<vector<float>>> res = GreedySearch(*G, G->get_vertex_from_index(0), q, k, L);
     //     // set<vector<float>> X = res.first;
     //     // set<vector<float>> T = groundtuth[i][0:100];
-    // }
-
-
-
-    // // Depending on the extention of the file create a graph for the data and call vamana
-    // if( ext == "ivecs" ){
-    //     Graph<vector<int>>* G = new Graph<vector<int>>;
-    //     vec_to_graph<int>(filename, *G);
-    //     zoo<int>(*G,k,L,R);
-    // }
-    // else if (ext == "fvecs") {
-    //     Graph<vector<float>>* G = new Graph<vector<float>>;
-    //     vec_to_graph<float>(filename, *G);
-    //     zoo<float>(*G,k,L,R);
-    // }
-    // else {
-    //     cerr << "File extention not supported!";
-    //     return 0;
     // }
     
     return 0;

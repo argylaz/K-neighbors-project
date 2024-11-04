@@ -245,7 +245,7 @@ vector<vector<Type>> read_vecs(string& filename) {
     ifstream file(filename, ios::binary);
     if (!file) {
         cerr << "Error when opening file " << filename << endl;
-        return NULL;
+        return result;
     }
 
     // This variable will indicate that the format of the file is correct and as expected.
@@ -281,6 +281,8 @@ vector<vector<Type>> read_vecs(string& filename) {
 
     if (!correctFormat) cerr << "Input file format incorrect! Graph might have errors." << endl;
     file.close();
+
+    return result;
 }
 
 /*--------------------------------------------Utility functions for the tests--------------------------------------------*/
