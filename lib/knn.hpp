@@ -132,8 +132,7 @@ T Vamana(Graph<T>& G, int L, int R, float a=1.2) {
     rDirectional(G, R);
 
     // Calculating the medoid of the points given
-    // T s = medoid(G);
-    T s = G.get_vertex_from_index(8736);
+    T s = medoid(G);
     
     // Getting the vertex indices in a random order. Vector sigma will be the random permutation.
     vector<gIndex> sigma(n);
