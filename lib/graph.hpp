@@ -21,19 +21,16 @@ public:
     /* Adds edge between vertex(T) start and vertex(T) end */
     bool add_edge(const T& start, const T& end);
 
-    /* Removes vertex v from the graph, not needed for the project*/
-    // void remove_vertex(T& v);
-
     /* Removes edge between node start and node end from the graph */
     bool remove_edge(const T& start, const T& end);
 
-    /* Method to print the graph */
+    /* Method to print the graph (mainly for debugging purposes)*/
     void print_graph();
 
     /* Method to get vertex from index */
     const T get_vertex_from_index(gIndex i);
 
-    /* Method to get index from vertex **/
+    /* Method to get index from vertex */
     gIndex get_index_from_vertex(const T& v);
 
     /* Method which returns the vertices count*/
@@ -64,16 +61,19 @@ private:
 
     
     set<T> vertices;                        // A set of the graphs vertices
-    map<T, gIndex> v_index;                    // Mapping from T to indices
+    map<T, gIndex> v_index;                 // Mapping from T to indices
 
-    /* Adjacency list (vector of vectors)                                                                             */
-    /* First element of each vector will be the vertex itself in order to avoid a second mapping from index to vertex */
+    /* Adjacency list (vector of vectors)                      */
+    /* First element of each vector will be the vertex corresponding to that index
+       in order to avoid a second mapping from index to vertex */
     vector<vector<T>> adjacencyList;
 };
 
 
 /*------------------------------ FUNCTION DEFINITIONS (in .hpp because of the templates) -----------------------------*/
 
+
+/* Default constructor */
 template <typename T>
 Graph<T>::Graph(bool isDirected) {
     
@@ -82,6 +82,7 @@ Graph<T>::Graph(bool isDirected) {
     countVertices = 0;
     this->isDirected = isDirected; 
 }
+
 
 /* Add a vertex (of type T) to the graph */
 template <typename T>
@@ -93,42 +94,24 @@ bool Graph<T>::add_vertex(const T& v) {
         return false;
     }
 
-    // Print vertices inside the set, for testing purposes 
-    // for( auto ver = vertices.begin() ; ver!=vertices.end() ; ver++){
-    //     cout << *ver << endl;
-    // }
-
-    /* Insert the vertex with its index to the map
-       Index starts from 0 */
+    /* Increase counter and then insert the vertex with its index to the map 
+       because indexing starts from 0 */
     v_index.insert({v,countVertices});
+    countVertices++;                   
 
-    /* Increase the counter and update the map*/
-    countVertices++;
     /* When vertex is added, resize the Adjacency List
        The first element of each row of the adjacency list is the vertex in question */
     adjacencyList.resize(countVertices);
     adjacencyList[v_index[v]].push_back(v);
 
     return true;
-
-
-    // cout << "Adjacency List Size is " << adjacencyList.size() << endl ;
-    // cout << "Vertices Size is " << vertices.size() << endl ;
-    // cout << "v-index map Size is " << v_index.size() << endl;
-    // cout << "v-index position of the vertex is " << v_index[v] << endl;
-    // cout << "I just pushed vertex " << adjacencyList[v_index[v]][0] << " in position " << v_index[v] << " of the adjList" << endl;
-    
 }
+
 
 /* Add edge between vertex(T) start and vertex(T) end, returns true if the edge added successfully*/
 template <typename T>
 bool Graph<T>::add_edge(const T& start, const T& end) {
 
-    // Printing positions for testing 
-    // cout << "Vertex " << start <<  " found at position " << v_index[start] << endl ;
-    // cout << "Vertex " << end <<  " found at position " << v_index[end] << endl ;
-
-    
     // Check if the given vertices are vertices of the graph, if they aren't return false
     if ( v_index.find(start) == v_index.end() || v_index.find(end) == v_index.end() ) {
         return false;
@@ -138,12 +121,12 @@ bool Graph<T>::add_edge(const T& start, const T& end) {
     if (exist_edge(start, end))
         return true;
 
+    // Get the index of vertex start and add entry (vertex end) to adjacency list
     int pos_start = v_index[start];
-
     adjacencyList[pos_start].push_back(end);
     countEdges++;
 
-    /* If the graph is directed, add also the end->start edge*/
+    /* If the graph is undirected, add also the end->start edge*/
     if( isDirected == false ){
         auto pos_end = v_index[end];
         adjacencyList[pos_end].push_back(start);
@@ -151,8 +134,6 @@ bool Graph<T>::add_edge(const T& start, const T& end) {
     }
     
     return true;
-    // cout << "Edge added: " << start << " -> " << end << endl;
-
 }
 
 
@@ -167,6 +148,7 @@ bool Graph<T>::remove_edge(const T& start, const T& end) {
 
     int v_pos = v_index[start];
 
+    // Find and remove the entry (vertex end) from adjacency list
     int i = 0;
     for( auto j = adjacencyList[v_pos].begin() ; j < adjacencyList[v_pos].end() ; j++){
         if( end == adjacencyList[v_pos][i] )
@@ -174,10 +156,10 @@ bool Graph<T>::remove_edge(const T& start, const T& end) {
         i++;
     }
 
+    // Reducecounter
     countEdges--;
 
-
-    /* If the graph is Undirected, remove also the edge end->start */
+    /* If the graph is Undirected, also remove the edge end->start */
     if( isDirected == false ){
         v_pos = v_index[end];
         int k = 0;
@@ -192,22 +174,10 @@ bool Graph<T>::remove_edge(const T& start, const T& end) {
     return true;
 }
 
-template <typename type>
-void print_vector(vector<type> vec){
-    int size = vec.size();
-    cout << "{";
-    for( int i = 0 ; i < size ; i++){
-        cout << vec[i];
-        if( i != size - 1 &&  size != 1 )
-            cout << ",";
-    }
-    cout << "}";
-}
 
 /* Method to print the graph */
 template <typename T>
 void Graph<T>::print_graph(void) {
-
 
     for( auto ver = vertices.begin() ; ver!=vertices.end() ; ver++ ){
         cout << "Vertex ";
@@ -221,17 +191,18 @@ void Graph<T>::print_graph(void) {
                 cout << " -> ";
             print_vector(adjacencyList[v_pos][j]);
         } 
+
         cout << endl;
     }
 
     cout << endl;
-
 }
 
 
 template <typename T>
 const T Graph<T>::get_vertex_from_index(int i) {
-    return this->adjacencyList[i][0];                   // Returns the first element of the i-th row of the adjacency list, which is the vetrex corresponding to the row
+    // Returns the first element of the i-th row of the adjacency list, which is the vetrex corresponding to the row
+    return this->adjacencyList[i][0];          
 }
 
 
@@ -240,15 +211,17 @@ gIndex Graph<T>::get_index_from_vertex(const T& v) {
     return this->v_index[v];  // Just returning the mapping of v
 }
 
-/* Method which returns the vertices count*/
+
 template <typename T>
 const int Graph<T>::get_vertices_count(void) {
+    // Just returns the private attribute
     return countVertices;
 }
 
-/* Method that returns the edge count */
+
 template <typename T>
 const int Graph<T>::get_edge_count(){
+    // Just returns the private attribute
     return countEdges;
 }
 
@@ -261,26 +234,31 @@ const bool Graph<T>::is_directed(){
 
 template <typename T>
 set<T> Graph<T>::get_vertices() const {
+    // Just returns the private attribute
     return vertices;
 }
+
 
 /* Get adjacency list method for testing purposes */
 template <typename T>
 vector<vector<T>> Graph<T>::get_adjacency_list(void) const {
+    // Just returns the private attribute
     return adjacencyList;
 }
 
-/* Method that returns if exists an edge from vertex_a to vertex_b*/
+
+/* Method that returns true if an edge from vertex_a to vertex_b exists*/
 template <typename T>
 bool Graph<T>::exist_edge(T vertex_a, T vertex_b) {
+    // First we check whether the nodes themselves exist in the graph
     if ( vertices.find(vertex_a) == vertices.end() || vertices.find(vertex_b) == vertices.end() )
         return false;
-
+        
+    // Then we check whether the entry for the edge exists in the adjacency list
     if ( find(adjacencyList[v_index[vertex_a]].begin(), adjacencyList[v_index[vertex_a]].end(), vertex_b) == adjacencyList[v_index[vertex_a]].end() )
         return false;
 
     return true;
-
 }
 
 
@@ -288,7 +266,7 @@ bool Graph<T>::exist_edge(T vertex_a, T vertex_b) {
 template <typename T>
 const set<T> Graph<T>::get_neighbors(T vertex) {
  
-    // getting the elements in the corresponding row of the adjacency list, i.e the vertex itself and its neighbors
+    // Getting the elements in the corresponding row of the adjacency list, i.e the vertex itself and its neighbors
     vector<T> adj = adjacencyList[v_index[vertex]];
 
     set<T> neighbors(adj.begin(), adj.end());
@@ -297,5 +275,4 @@ const set<T> Graph<T>::get_neighbors(T vertex) {
     neighbors.erase(vertex);
 
     return neighbors;
-
 }

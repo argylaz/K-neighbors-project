@@ -4,24 +4,40 @@
 using namespace std;
 
 
+
+/* Method to for printing vectors (mainly used for debugging) */
+template <typename type>
+void print_vector(vector<type> vec) {
+    int size = vec.size();
+    cout << "{";
+    for( int i = 0 ; i < size ; i++){
+        cout << vec[i];
+        if( i != size - 1 &&  size != 1 )
+            cout << ",";
+    }
+    cout << "}";
+}
+
+
 // Function for the calculation of the Euclidean distance
 template<typename Type>             // Type is either integer or float
 float Euclidean_Distance(vector<Type> a, vector<Type> b) {
-    
-    float sum = 0;
 
-    // Iterators of the vectors
+    // Initialise sum and iterators for the vectors
+    float sum = 0;
     auto i = a.begin();
     auto j = b.begin();
     
+    // Calculate sum
     while( i != a.end() || j != b.end() ){
         sum += pow(*j-*i,2);           // sum = (i1 -j1)^2 + ... + (i_n-j_n)^2  
         i++;
         j++;
     }
-    float x = sqrt(sum);                        // [(i1 -j1)^2 + ... + (i_n-j_n)^2] ^ 1/2
-    return x;
 
+    // Get the square root of the sum
+    float x = sqrt(sum);               // [(i1 -j1)^2 + ... + (i_n-j_n)^2] ^ 1/2
+    return x;
 }
 
 
@@ -30,11 +46,12 @@ float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 template <typename Type>
 vector<Type> find_min_Euclidean(set<vector<Type>> S, vector<Type> xquery) {
     
+    // Initialise iterator and min_distance/min_point variables
     auto i = S.begin();
     float min_distance = Euclidean_Distance<Type>(xquery, *i);
-    //cout << min_distance << endl;
     vector<Type> min_point = *i;
 
+    // Iterate through the set to find min
     while( ++i != S.end()){
         float eucl = Euclidean_Distance<Type>(xquery, *i);
         if( eucl < min_distance ){
@@ -50,54 +67,49 @@ vector<Type> find_min_Euclidean(set<vector<Type>> S, vector<Type> xquery) {
 /* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
 template <typename Type>
 void retain_closest_points(set<vector<Type>> &output_set, vector<Type> xquery, int L) {
+
+    // Erasing the vertex itself from the set in order to avoid mistaking it for a neighbor
+    output_set.erase(xquery); 
     
     // Create vector with the elements of the set
-    output_set.erase(xquery);
     vector<vector<Type>> output_vec(output_set.begin(), output_set.end());
     
-    // Sort the vector comoaring the Euclidean Distance of each element with the xquery
+    // Sort the vector by comparing the Euclidean Distance of each element with xquery
     sort(output_vec.begin(), output_vec.end(), [&xquery](const vector<Type>& a, const vector<Type>& b) {
         return Euclidean_Distance<Type>(a, xquery) < Euclidean_Distance<Type>(b, xquery);
     });
 
+    // Resize the output to size L to only keep the L closest neighbors
     if( output_vec.size() >= (long unsigned int) L )
         output_vec.resize(L);
     else   
-        cout << "L is greater than the size of the vector/set\n";
+        cout << "L is greater than the size of the vector/set\n"; 
     
+    // Throw the neighbors retained back into the set
     output_set.clear();
     output_set.insert(output_vec.begin(), output_vec.end());
-        
-
-    // int count = 0;
-    // for( vector<Type> v : output_set ){
-    //     if( Euclidean_Distance<Type>(v, xquery) > L){
-    //         output_set.erase(v);
-    //         count++;
-    //     }
-    // }
 }
-
 
 
 /* Method which finds the medoid of a given graph */
 template <typename Type>
 vector<Type> medoid(Graph<vector<Type>>& G){
     
+    // Initialise variables
     float min = numeric_limits<float>::max();
     vector<Type> medoid_vertice; 
 
     // Check if the graph is empty
     if ( G.get_vertices_count() == 0  ) { 
         cerr << "\nThe Graph is empty. The Medoid can't be calculated\n" << endl;
-        // Returns an empty vector
-        return {};
+        return {};  // Returns an empty vector
     }
 
+    // Iterate through all the vertices of the graph(dataset)
     set<vector<Type>> vertices = G.get_vertices();
     for (vector<Type> vertex : vertices) {
 
-        // Calculate the sum of the Euclidean Distances of this vertice with all the others 
+        // Calculate the sum of the Euclidean Distances of this vertex with all the others 
         float sum = 0;
         for (vector<Type> x : vertices) {
             sum += Euclidean_Distance<Type>(vertex, x);
@@ -111,26 +123,29 @@ vector<Type> medoid(Graph<vector<Type>>& G){
 
     }
 
+    // Print the medoid
     cout << "Medoid point ";  
     print_vector(medoid_vertice);
     cout << "\nFound at index " << G.get_index_from_vertex(medoid_vertice) << endl;
 
     return medoid_vertice;
-
 }
+
 
 /* Method which adds randomly exactly R outgoing neighbors to each vertex of the graph */
 template <typename T>
 void rDirectional(Graph<T>& G, int R) {
     
+    // Check if R is larger than the number of vertices (task impossible)
     if ( R > G.get_vertices_count() ) {
         cerr << "R-Directional Graph initialization failed...\n" << endl;
-        return ;
+        return;
     }
 
+    // Get vertices
     set<T> vertices = G.get_vertices();
 
-    // If the graph already has edges, we remove them and construct the graph from the beginning 
+    // If the graph already has edges, remove them and construct the graph from the beginning 
     if (G.get_edge_count() > 0) {
         cerr << "\nGraph already has edges\n" << endl;
         
@@ -153,7 +168,6 @@ void rDirectional(Graph<T>& G, int R) {
         unsigned seed = chrono::system_clock::now().time_since_epoch().count();
         
         // Shuffle the vector 
-        // We may need a random generator as an argument here (for better randomness)
         shuffle(shuffled_vertices.begin(), shuffled_vertices.end(), default_random_engine(seed));
 
 
@@ -172,27 +186,10 @@ void rDirectional(Graph<T>& G, int R) {
 
 }
 
-/*-------------------------------------Utility functions and classes for the tests-------------------------------------*/
 
-/* Creating a testable graph that inherits from Graph to access protected attributes */
-template<typename T>
-class TestGraph: public Graph<T> {  // Graph<int> for testing
-public:
-    TestGraph(bool isDirected=true) : Graph<T>(isDirected) {}
-
-    vector<vector<T>> get_private_adjacency_list() const {
-        return this->get_adjacency_list();
-    }
-
-    set<T> get_private_vertex_set() const{
-        return this->get_vertices();
-    }
-};
-
-
-/* Given an empty graph, reads an fvec or an ivec file and fills the graph with all the vectors read as its vertices and no edges */
-/* This functions assumes that all the vectors given in the file will be of the same dimension                                    */
-/* Otherwise, the entries inside the graph will be uneven (vectors of different dimensions)                                       */
+/* Given an empty graph, reads an fvec file and fills the graph with all the vectors read as its vertices and no edges */
+/* This functions assumes that all the vectors given in the file will be of the same dimension                         */
+/* Otherwise, the entries inside the graph will be uneven (vectors of different dimensions)                            */
 template <typename type>
 void vec_to_graph(const string& filename, Graph<vector<type>>& G) {
     // First we open the file and check if it was opened properly
@@ -237,6 +234,13 @@ void vec_to_graph(const string& filename, Graph<vector<type>>& G) {
     file.close();
 }
 
+
+
+/*--------------------------------------Methods used in main.cpp-------------------------------------*/
+
+
+
+/* Method that reads vectors from an fvec or ivec and returns a vector containing all of them */
 template <typename Type>
 vector<vector<Type>> read_vecs(string& filename) {
     
@@ -280,12 +284,15 @@ vector<vector<Type>> read_vecs(string& filename) {
         result.push_back(v);
     }
 
+    // Throw error if the format of the file was not as expected
     if (!correctFormat) cerr << "Input file format incorrect! Graph might have errors." << endl;
     file.close();
 
     return result;
 }
 
+
+/* Same as the above but returns a set containing all the vectors instead */
 template <typename Type>
 set<vector<Type>> read_sets(string& filename) {
     
@@ -329,15 +336,33 @@ set<vector<Type>> read_sets(string& filename) {
         result.push_back(v);
     }
 
+    // Throw error if the format of the file was not as expected
     if (!correctFormat) cerr << "Input file format incorrect! Graph might have errors." << endl;
     file.close();
 
     return result;
 }
 
-/*--------------------------------------------Utility functions for the tests--------------------------------------------*/
 
-/* Creates an fvec or ivec file with the given vectors for testing */
+
+/*---------------------------Utility functions and classes for the tests-----------------------------------*/
+
+
+
+/* Creating a testable graph that inherits from Graph to access protected attributes */
+template<typename T>
+class TestGraph: public Graph<T> {  // Graph<int> for testing
+public:
+    TestGraph(bool isDirected=true) : Graph<T>(isDirected) {}
+
+    vector<vector<T>> get_private_adjacency_list() const {
+        // Just returns the protected element
+        return this->get_adjacency_list();
+    }
+};
+
+
+/* Creates an fvec file with the given vectors for testing */
 template <typename type>
 void make_vec(const string& filename, const vector<vector<type>>& vectors) {
     // Create file and check it was created successfully

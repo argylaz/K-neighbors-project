@@ -219,7 +219,7 @@ void test_fvec_to_graph() {
     TEST_ASSERT(G.is_directed() == true);       // All the graphs for our prject are directed
     
     // Test that the deata is in the graph the way it should be
-    set<vector<float>> vertices = G.get_private_vertex_set();
+    set<vector<float>> vertices = G.get_vertices();
     auto v = vertices.begin();
     TEST_ASSERT(v->at(0) == 1.1f && v->at(1) == 2.2f && v->at(2) == 3.3f); v++;
     TEST_ASSERT(v->at(0) == 4.4f && v->at(1) == 5.5f && v->at(2) == 6.6f); v++;
@@ -259,7 +259,7 @@ void test_ivec_to_graph() {
     TEST_ASSERT(G.is_directed() == true);       // All the graphs for our prject are directed
     
     // Test that the deata is in the graph the way it should be
-    set<vector<int>> vertices = G.get_private_vertex_set();
+    set<vector<int>> vertices = G.get_vertices();
     auto v = vertices.begin();
     TEST_ASSERT(v->at(0) == 1 && v->at(1) == 2 && v->at(2) == 3); v++;
     TEST_ASSERT(v->at(0) == 4 && v->at(1) == 5 && v->at(2) == 6); v++;

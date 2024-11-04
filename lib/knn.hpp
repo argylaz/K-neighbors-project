@@ -124,7 +124,7 @@ void RobustPrune(Graph<T>& G, T point, set<T>& V, float a, int R) {
 // L is the search list size
 // R is the degree bound
 template <typename T>
-void Vamana(Graph<T>& G, int L, int R, float a=1.2) {
+T Vamana(Graph<T>& G, int L, int R, float a=1.2) {
     
     int n = G.get_vertices_count();
 
@@ -132,7 +132,8 @@ void Vamana(Graph<T>& G, int L, int R, float a=1.2) {
     rDirectional(G, R);
 
     // Calculating the medoid of the points given
-    T s = medoid(G);
+    // T s = medoid(G);
+    T s = G.get_vertex_from_index(8736);
     
     // Getting the vertex indices in a random order. Vector sigma will be the random permutation.
     vector<gIndex> sigma(n);
@@ -170,7 +171,7 @@ void Vamana(Graph<T>& G, int L, int R, float a=1.2) {
                 G.add_edge(j, vertex);
             }     
         }
-
     }
-    
+
+    return s;
 }

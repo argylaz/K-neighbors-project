@@ -15,8 +15,8 @@ void test_create() {
     TEST_ASSERT(L2.size() == 0);
 
     // Testing that the set is empty
-    auto V1 = G1.get_private_vertex_set();
-    auto V2 = G2.get_private_vertex_set();
+    auto V1 = G1.get_vertices();
+    auto V2 = G2.get_vertices();
     TEST_ASSERT(V1.empty() == true);
     TEST_ASSERT(V1.empty() == true); set<int> A;
 }
@@ -32,7 +32,7 @@ void test_add_vertex() {
     }
 
     // Get vertex set
-    set<int> V1 = G1.get_private_vertex_set();
+    set<int> V1 = G1.get_vertices();
 
     // Get adjacency lists
     vector<vector<int>> L1 = G1.get_private_adjacency_list();
