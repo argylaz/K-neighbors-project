@@ -34,12 +34,10 @@ create:
 $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
-	g++ -c src/utils.cpp -o build/utils.o
-
 
 # Rule to build each test executable
 $(BIN_DIR)/%: $(BUILD_DIR)/%.o
-	$(CC) $(CFLAGS) -o $@ $< $(BUILD_DIR)/utils.o
+	$(CC) $(CFLAGS) -o $@ $<
 
 run:
 	$(CC) -o main main.cpp
