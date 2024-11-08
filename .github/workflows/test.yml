@@ -1,0 +1,29 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2  # Checks out the repository's code
+
+      - name: Set up C++ environment
+        uses: actions/setup-cpp@v1  # Optional if your project requires specific C++ versions
+        with:
+          compiler: gcc  # Specify compiler (gcc, clang)
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y make  # Install dependencies (e.g., make)
+
+      - name: Build project
+        run: make  # Builds the project
+
+      - name: Run tests
+        run: make test  # Runs tests as defined in your Makefile
