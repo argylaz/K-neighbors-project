@@ -33,18 +33,19 @@ float Euclidean_Distance(vector<Type> a, vector<Type> b) {
     }
 
     // This vector will hold a^2 - b^2
-    // vector<Type> temp;
-    // temp.resize(a.size());
+    vector<Type> temp;
+    temp.resize(a.size());
 
-    // // Calculate vector a^2 - b^2
-    // for(size_t i = 0; i < a.size(); i++) {
-    //     temp[i] = (a[i] * a[i]) - (b[i] * b[i]);
-    // }
+    // Calculate vector a - b
+    for(size_t i = 0; i < a.size(); i++) {
+        temp[i] = a[i] - b[i];
+        temp[i] = temp[i] * temp[i];
+    }
 
-    // Find vector (a - b)^2
+    // Find vector (a - b)^2 in different loop for vectorization.
     float sum = 0.0f;
     for(size_t i = 0; i < a.size(); i++) {
-        sum += (a[i] - b[i]) * (a[i] - b[i]);
+        sum += temp[i];
     }
 
     // Get the square root of the sum
