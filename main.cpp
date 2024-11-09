@@ -7,46 +7,26 @@ using namespace std;
    created from the databases given in fvec files */
 int main(int argc, char* argv[]) {
 
-    // Check that all the arguements needed have been given
-    if ( argc < 4 ) {
-        cerr << "k, L and R arguments are needed\n";
-        return 0;
+    int k, L, R;
+    float a = 2;    // Default value 
+    string base_name, query_name, groundtruth_name;
+    if( get_arguments(argc, argv, k, L, a, R, base_name, query_name, groundtruth_name) == -1){
+        return -1;
     }
-
-    // Take input arguments a, k, L, maybe a
-    cout << "\nParameters";
-
-    int k = atoi(argv[1]);
-    cout << "\nk: " << k;
-    int L = atoi(argv[2]);
-    cout << "\nL: " << L;
-    int R = atoi(argv[3]);
-    cout << "\nR: " << R;
-
-    float a;
-    if ( argc > 4 ) {
-        a = atof(argv[4]);
-        cout << "\na: " << a ;
-    } 
-    else a = 1.2f;             // a is optional and set to 1.2 by default
-    cout << endl;
-
+    
 
     // Reading Groundtruth
-    string filename = "sift/siftsmall_groundtruth.ivecs";
-    vector<vector<int>> groundtruth = read_vecs<int>(filename);
+    vector<vector<int>> groundtruth = read_vecs<int>(groundtruth_name);
     cout << groundtruth.size() << endl;
 
 
     // Reading Queries 
-    filename = "sift/siftsmall_query.fvecs";
-    vector<vector<float>> queries = read_vecs<float>(filename);
+    vector<vector<float>> queries = read_vecs<float>(query_name);
     
 
     // Reading Base and creating Graph
-    filename = "sift/siftsmall_base.fvecs";
     Graph<vector<float>>* G = new Graph<vector<float>>;
-    vec_to_graph<float>(filename, *G);
+    vec_to_graph<float>(base_name, *G);
     set<vector<float>> base = G->get_vertices();
 
 
