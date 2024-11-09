@@ -1,6 +1,8 @@
 #include <bits/stdc++.h>
 #include <cmath>
 #include "graph.hpp"
+#include <ctype.h>
+#include <string.h>
 using namespace std;
 
 
@@ -348,6 +350,132 @@ set<vector<Type>> read_sets(string& filename) {
     return result;
 }
 
+
+// Function that checks if a string is a positive integer (for checking the command line arguments)
+int isPositiveInteger(char *str) {
+    int sz = strlen(str);
+    for (int i = 0; i < sz; i++) {
+        if (!isdigit(str[i])) return 0;
+    }
+    return 1;
+}
+
+
+
+// Function that reads the command line input arguments. Returns 1 or -1
+int get_arguments(int argc, char* argv[], int& k, int& L, float& a, int& R,string& base_name, string& query_name, string& groundtruth_name){
+    // We need at least 8 arguments (Filename, k, L, R and maybe a)
+    if (!(argc == 9 || argc == 11)) {     
+        cerr << "ERROR: Malformed input at command line\n";
+        return -1;
+    }
+
+    
+    // Get the filename
+    char* flag_small;      // Flag for siftsmall
+    if (!strcmp(argv[1], "-f")) flag_small = argv[2];
+    else if (!strcmp(argv[3], "-f")) flag_small = argv[4];
+    else if (!strcmp(argv[5], "-f")) flag_small = argv[6];
+    else if (!strcmp(argv[7], "-f")) flag_small = argv[8];
+    else if (argc == 11 && !strcmp(argv[9], "-f")) flag_small = argv[10];
+    else {
+        cerr << "ERROR: Should include the file name as command line argument like \"-f filename\"\n";
+        return -1;
+    }
+
+    // string base_name;
+    // string groundtruth_name;
+    // string query_name;
+    if( !strcmp(flag_small, "small") ){
+        base_name =  "sift/siftsmall_base.fvecs";
+        query_name = "sift/siftsmall_query.fvecs";
+        groundtruth_name = "sift/siftsmall_groundtruth.ivecs";
+    }
+    else if( !strcmp(flag_small, "large") ){
+        base_name =  "sift/sift_base.fvecs";
+        query_name = "sift/sift_query.fvecs";
+        groundtruth_name = "sift/sift_groundtruth.ivecs";
+    }
+    else{
+        cerr << "ERROR: Should include the file name as command line argument like \"-f small\" or \"-f large\"\n";
+        return -1;
+    }
+
+    // Get K argument
+    // int k;
+    char *tempk;
+    if (!strcmp(argv[1], "-k")) tempk = argv[2];
+    else if (!strcmp(argv[3], "-k")) tempk = argv[4];
+    else if (!strcmp(argv[5], "-k")) tempk = argv[6];
+    else if (!strcmp(argv[7], "-k")) tempk = argv[8];
+    else if (argc == 11 && !strcmp(argv[9], "-k")) tempk = argv[10];
+    else {
+        cerr << "ERROR: Should include the k command line argument like \"-k k_neighbors\"\n";
+        return -1;
+    }
+    k = atoi(tempk);
+    if (k <= 0 || !isPositiveInteger(tempk)) {
+        cerr << "ERROR: Bucket capacity b should be a positive integer number\n";
+        return -1;
+    }
+
+    // Get L argument
+    // int L;
+    char *tempL;
+    if (!strcmp(argv[1], "-l")) tempL = argv[2];
+    else if (!strcmp(argv[3], "-l")) tempL = argv[4];
+    else if (!strcmp(argv[5], "-l")) tempL = argv[6];
+    else if (!strcmp(argv[7], "-l")) tempL = argv[8];
+    else if (argc == 11 && !strcmp(argv[9], "-l")) tempL = argv[10];
+    else {
+        cerr << "ERROR: Should include the l command line argument like \"-l l_argument\"\n";
+        return -1;
+    }
+    L = atoi(tempL);
+    if (L <= 0 || !isPositiveInteger(tempL)) {
+        cerr << "ERROR: L argument should be a positive integer number\n";
+        return -1;
+    }
+
+
+    // Get L argument
+    // int R;
+    char *tempR;
+    if (!strcmp(argv[1], "-r")) tempR = argv[2];
+    else if (!strcmp(argv[3], "-r")) tempR = argv[4];
+    else if (!strcmp(argv[5], "-r")) tempR = argv[6];
+    else if (!strcmp(argv[7], "-r")) tempR = argv[8];
+    else if (argc == 11 && !strcmp(argv[9], "-r")) tempR = argv[10];
+    else {
+        cerr << "ERROR: Should include the r command line argument like \"-r r_argument\"\n";
+        return -1;
+    }
+    R = atoi(tempR);
+    if (R <= 0 || !isPositiveInteger(tempR)) {
+        cerr << "ERROR: R argument should be a positive integer number\n";
+        return -1;
+    }
+
+    // Get L argument
+    // float a;
+    char *tempA;
+    if (!strcmp(argv[1], "-a")) tempA = argv[2];
+    else if (!strcmp(argv[3], "-a")) tempA = argv[4];
+    else if (!strcmp(argv[5], "-a")) tempA = argv[6];
+    else if (!strcmp(argv[7], "-a")) tempA = argv[8];
+    else if (argc == 11 && !strcmp(argv[9], "-a")) tempA = argv[10];
+    else {
+        cerr << "ERROR: Should include the a command line argument like \"-a a_argument\"\n";
+        return -1;
+    }
+    a = atof(tempA);
+    if (a <= 0 ) {
+        cerr << "ERROR: a argument should be a positive integer number\n";
+        return -1;
+    }
+
+    return 1;
+}
 
 
 /*---------------------------Utility functions and classes for the tests-----------------------------------*/
