@@ -21,20 +21,33 @@ void print_vector(vector<type> vec) {
 }
 
 
-// Function for the calculation of the Euclidean distance
-template<typename Type>             // Type is either integer or float
-float Euclidean_Distance(vector<Type> a, vector<Type> b) {
-
-    // Initialise sum and iterators for the vectors
-    float sum = 0;
-    auto i = a.begin();
-    auto j = b.begin();
+/* Function for the calculation of the Euclidean distance             */
+/* Returns INFINITY as error value indicating problems in calculation */
+template<typename Type>
+inline float Euclidean_Distance(vector<Type> a, vector<Type> b) {
+    /* Implemented with separate for loops instead of iterators so that the compiler can vectorise the operations */
+    /* Vectorized operation: d = sqrt(sum(a^2 - b^2))                                                             */
     
-    // Calculate sum
-    while( i != a.end() || j != b.end() ){
-        sum += pow(*j-*i,2);           // sum = (i1 -j1)^2 + ... + (i_n-j_n)^2  
-        i++;
-        j++;
+    // If the sizes of the vectors don't match throw error and return INFINITY
+    if(a.size() != b.size()) {
+        cerr << "Vector sizes for Euclidean don't match!" << endl;
+        return INFINITY;
+    }
+
+    // This vector will hold a^2 - b^2
+    vector<Type> temp;
+    temp.resize(a.size());
+
+    // Calculate vector (a - b)^2
+    for(size_t i = 0; i < a.size(); i++) {
+        temp[i] = a[i] - b[i];
+        temp[i] = temp[i] * temp[i];
+    }
+
+    // Find the sum of the calculated vector
+    float sum = 0.0f;
+    for(size_t i = 0; i < a.size(); i++) {
+        sum += temp[i];
     }
 
     // Get the square root of the sum
@@ -46,23 +59,15 @@ float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 
 /* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
 template <typename Type>
-vector<Type> find_min_Euclidean(set<vector<Type>> S, vector<Type> xquery) {
+vector<Type> find_min_Euclidean(set<vector<Type>> &S, vector<Type> xquery) {
     
-    // Initialise iterator and min_distance/min_point variables
-    auto i = S.begin();
-    float min_distance = Euclidean_Distance<Type>(xquery, *i);
-    vector<Type> min_point = *i;
+    // Find the element with the minimum Euclidean distance from xquery
+    vector<Type> min = *min_element(S.begin(), S.end(), 
+                        [&xquery](const vector<Type>& a, const vector<Type>& b) {
+                            return Euclidean_Distance<Type>(a, xquery) < Euclidean_Distance<Type>(b, xquery);
+    });
 
-    // Iterate through the set to find min
-    while( ++i != S.end()){
-        float eucl = Euclidean_Distance<Type>(xquery, *i);
-        if( eucl < min_distance ){
-            min_distance = eucl;
-            min_point = *i;
-        }
-    }
-
-    return min_point;
+    return min;
 }
 
 

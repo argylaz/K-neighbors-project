@@ -7,10 +7,16 @@ using namespace std;
 
 void test_Euclidean_Distance() {
 
-    /* Testing Integers*/
+    /* Testing for vectors with different sizes */
+    vector<int> V1, V2;
+    float error = 1.23e-4;
+    V1.resize(3);
+    V2.resize(4);
+    TEST_ASSERT(Euclidean_Distance(V1, V2) == INFINITY);
+
+    /* Testing Integers */
 
     vector<int> v1,v2;
-    float error = 1.23e-4;
 
     // Euclidian distances of the examples calculated on an online calculator (https://www.omnicalculator.com/math/euclidean-distance)
     float results[] = {1, 1.414214, 1.73205, 2};
