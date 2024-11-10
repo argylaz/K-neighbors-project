@@ -40,7 +40,7 @@ $(BIN_DIR)/%: $(BUILD_DIR)/%.o
 	$(CC) $(CFLAGS) -o $@ $<
 
 run:
-	$(CC) -o bin/main main.cpp
+	$(CC) $(CFLAGS) -o bin/main main.cpp
 	time ./bin/main  -f small -k 2 -r 10 -l 10 -a 2
 
 
