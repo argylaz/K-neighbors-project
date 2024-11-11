@@ -22,13 +22,13 @@ void test_GreedySearch() {
     set<gIndex> L;
     vector<gIndex> V;
 
-    cout<<1<< endl;
+
     /* Running the algorithm with s = 'a', xq = 'd', k = 2 and L = 3*/
     pair< set<gIndex>, vector<gIndex> > result = GreedySearch<vector<int>>(G, {0}, {3}, 2, 3);
     L = result.first;
     V = result.second;
 
-    cout<<2<< endl;
+
     // Test that the sets returned contain the correct values (L = {2,4}, V = {0,1,2,4})
     TEST_ASSERT(find(L.begin(), L.end(), 2) != L.end());
     TEST_ASSERT(find(L.begin(), L.end(), 4) != L.end());
@@ -40,14 +40,13 @@ void test_GreedySearch() {
     TEST_ASSERT(L.size() == 2);
     TEST_ASSERT(V.size() == 4);
 
-    cout<<3<< endl;
+
     // Test that empty sets are returned if L < k
     result = GreedySearch<vector<int>>(G, {0}, {3}, 2, 1);
     L = result.first;
     V = result.second;
     TEST_ASSERT( L.size() ==  0 );
     TEST_ASSERT( V.size() ==  0 );
-
 
     // Testing for floats
 
@@ -68,18 +67,18 @@ void test_GreedySearch() {
     vector<gIndex> V1;
 
     /* Running the algorithm with s = 'a', xq = 'd', k = 2 and L = 3*/
-    pair< set<gIndex>, vector<gIndex> > result1 = GreedySearch<vector<float>>(G1, {0.1}, {3}, 2, 3);
+    pair< set<gIndex>, vector<gIndex> > result1 = GreedySearch<vector<float>>(G1, {0.1}, {3.1}, 2, 3);
     L1 = result1.first;
     V1 = result1.second;
 
     // Test that the sets returned contain the correct values (L = {2,4}, V = {0,1,2,4})
-    TEST_ASSERT(find(L1.begin(), L1.end(), 2) != L1.end());
-    TEST_ASSERT(find(L1.begin(), L1.end(), 4) != L1.end());
+    TEST_ASSERT(find(L1.begin(), L1.end(), G1.get_index_from_vertex({2.1})) != L1.end());
+    TEST_ASSERT(find(L1.begin(), L1.end(), G1.get_index_from_vertex({4.1})) != L1.end());
 
-    TEST_ASSERT(find(V1.begin(), V1.end(), 0) != V1.end());
-    TEST_ASSERT(find(V1.begin(), V1.end(), 1) != V1.end());
-    TEST_ASSERT(find(V1.begin(), V1.end(), 2) != V1.end());
-    TEST_ASSERT(find(V1.begin(), V1.end(), 4) != V1.end());
+    TEST_ASSERT(find(V1.begin(), V1.end(), G1.get_index_from_vertex({0.1})) != V1.end());
+    TEST_ASSERT(find(V1.begin(), V1.end(), G1.get_index_from_vertex({1.1})) != V1.end());
+    TEST_ASSERT(find(V1.begin(), V1.end(), G1.get_index_from_vertex({2.1})) != V1.end());
+    TEST_ASSERT(find(V1.begin(), V1.end(), G1.get_index_from_vertex({4.1})) != V1.end());
     TEST_ASSERT(L1.size() == 2);
     TEST_ASSERT(V1.size() == 4);
 
@@ -90,13 +89,14 @@ void test_GreedySearch() {
     TEST_ASSERT( L1.size() ==  0 );
     TEST_ASSERT( V1.size() ==  0 );
 
+    
 
     // Testing for 2D vectors
 
     TestGraph<vector<int>> G2;
     
     // Add vertices 1,2,3,4,5
-    G2.add_vertex({5,0}); G2.add_vertex({1,0}); G2.add_vertex({2,0}); G2.add_vertex({3,0}); G2.add_vertex({4,0});
+    G2.add_vertex({0,0}); G2.add_vertex({1,0}); G2.add_vertex({2,0}); G2.add_vertex({3,0}); G2.add_vertex({4,0});
 
     // Add some random edges
 
@@ -111,12 +111,12 @@ void test_GreedySearch() {
     vector<gIndex> V2;
 
     /* Running the algorithm with s = 'a', xq = 'd', k = 2 and L = 3*/
-    pair< set<gIndex>, vector<gIndex> > result2 = GreedySearch<vector<int>>(G2, {0,0}, {3}, 2, 3);
+    pair< set<gIndex>, vector<gIndex> > result2 = GreedySearch<vector<int>>(G2, {0,0}, {3,0}, 2, 3);
     L2 = result2.first;
     V2 = result2.second;
 
 
-    // Test that the sets returned contain the correct values (L = {3,5}, V = {1,2,3})
+    // Test that the sets returned contain the correct values (L = {2,4}, V = {1,2,3})
     TEST_ASSERT(find(L2.begin(), L2.end(), 2) != L2.end());
     TEST_ASSERT(find(L2.begin(), L2.end(), 4) != L2.end());
 
@@ -141,7 +141,7 @@ void test_GreedySearch() {
 /* Testing the RobustPrune method */
 void test_RobustPrune() {
     
-    // Testing for ints
+    /* Testing for ints */
 
     TestGraph<vector<int>> G1;
     
@@ -159,6 +159,7 @@ void test_RobustPrune() {
     vector<gIndex> V1 = {1, 2};
     float a = 1.2;
     int R = 2;
+
     RobustPrune(G1, {0}, V1, a, R);
 
     // Now check that the algorithm works as intended (only edge removes is the one from 1 to 3)
@@ -168,10 +169,15 @@ void test_RobustPrune() {
     TEST_ASSERT(G1.exist_edge({3}, {2}));
     TEST_ASSERT(G1.exist_edge({4}, {0}) && G1.exist_edge({4}, {2}) && G1.exist_edge({4}, {3}));
 
+
+
     // Then we run RobustPrune one more time with p = {4}, V = {{0},{2},{3}}, a=1.2 and R = 1
     V1.clear(); V1 = {0, 2, 3};
+    V1.clear();
+
     R = 1;
     RobustPrune(G1, {4}, V1, a, R);
+    
 
     // Checking
     // cout << G1.exist_edge({0}, {1}) << G1.exist_edge({0}, {2}) << endl;
@@ -186,6 +192,8 @@ void test_RobustPrune() {
     TEST_ASSERT(G1.exist_edge({2}, {0}) && G1.exist_edge({2}, {4}));
     TEST_ASSERT(G1.exist_edge({3}, {2}));
     TEST_ASSERT(!G1.exist_edge({4}, {0}) && !G1.exist_edge({4}, {2}) && G1.exist_edge({4}, {3}));
+
+
 
 
 
@@ -286,7 +294,9 @@ void test_Vamana() {
     G1.add_edge({3}, {0}); G1.add_edge({3}, {1});
 
     // Run vamana indexing algorithm with L = 2 and R = 2
+    cout << "TEST\n";
     Vamana(G1, 2, 2);
+
 
     // Test that the new form of the graph is the one one expected
     // 0->1, 1->0, 1->2, 2->1, 2->3, 3->2 are the exact edges the graph should have

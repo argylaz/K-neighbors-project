@@ -5,20 +5,6 @@ using namespace std;
 
 
 
-/* Method to for printing vectors (mainly used for debugging) */
-template <typename type>
-void print_vector(vector<type> vec) {
-    int size = vec.size();
-    cout << "{";
-    for( int i = 0 ; i < size ; i++){
-        cout << vec[i];
-        if( i != size - 1 &&  size != 1 )
-            cout << ",";
-    }
-    cout << "}";
-}
-
-
 // Function for the calculation of the Euclidean distance
 template<typename Type>             // Type is either integer or float
 float Euclidean_Distance(vector<Type> a, vector<Type> b) {
@@ -70,7 +56,7 @@ vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, vector<gIndex> S, vector
 template <typename Type>
 void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_set, vector<Type> xquery, int L) {
 
-    cout <<"I"<< endl;
+    // cout <<"I"<< endl;
     // // Erasing the vertex itself from the set in order to avoid mistaking it for a neighbor
     // gIndex xquery_index = G.get_index_from_vertex(xquery);
     // output_vec.erase(find(output_vec.begin(), output_vec.end(), xquery_index)); 
@@ -79,17 +65,17 @@ void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_set, vec
     
     // Create vector with the elements of the set
     vector<gIndex> output_vec(output_set.begin(), output_set.end());
-    for (gIndex g: output_vec) { cout << g<< " ";}
-    cout <<endl;
+    // for (gIndex g: output_vec) { cout << g<< " ";}
+    // cout <<endl;
 
-    cout<<"II"<< endl;
+    // cout<<"II"<< endl;
 
     // Sort the vector by comparing the Euclidean Distance of each element with xquery
     sort(output_vec.begin(), output_vec.end(), [&xquery, &G](const gIndex a, const gIndex b) {
         return Euclidean_Distance<Type>(G.get_vertex_from_index(a), xquery) < Euclidean_Distance<Type>(G.get_vertex_from_index(b), xquery);
     });
 
-    cout<<"III"<< endl;
+    // cout<<"III"<< endl;
     // Resize the output to size L to only keep the L closest neighbors
     if( output_vec.size() >= (long unsigned int) L )
         output_vec.resize(L);
@@ -98,9 +84,9 @@ void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_set, vec
 
     output_set.clear();
     output_set.insert(output_vec.begin(), output_vec.end());
-    for (gIndex g: output_vec) { cout << g<< " ";}
-    cout <<endl;
-    cout<<"IV"<< endl;
+    // for (gIndex g: output_vec) { cout << g<< " ";}
+    // cout <<endl;
+    // cout<<"IV"<< endl;
 }
 
 

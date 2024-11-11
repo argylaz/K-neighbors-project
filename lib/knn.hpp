@@ -20,7 +20,7 @@ pair<set<gIndex>, vector<gIndex>> GreedySearch(Graph<T> G, T start, T xquery, in
         // Returns a pair with two empty sets
         return {{},{}};
     }
-    cout<<"a"<< endl;
+    // cout<<"a"<< endl;
 
     // Initialize set L_output = {s} and V = { }
     set<gIndex> L_output;
@@ -31,36 +31,36 @@ pair<set<gIndex>, vector<gIndex>> GreedySearch(Graph<T> G, T start, T xquery, in
     vector<gIndex> diff_set;
     set_difference(L_output.begin(), L_output.end(), V.begin(), V.end(), inserter(diff_set, diff_set.begin()));
     
-    cout<<"b"<< endl;
+    // cout<<"b"<< endl;
     // while L_output\V != 0
     while ( !diff_set.empty() ) {
-        cout<<"c"<< endl;
+        // cout<<"c"<< endl;
 
         // Find the vertex with the minimum euclidean distance from the xquery
         T min = find_min_Euclidean(G, diff_set, xquery);
-        cout<<"d"<< endl;
+        // cout<<"d"<< endl;
         
         // Updating L and V
         vector<gIndex> neighbors = G.get_neighbors(min);
         set_union(L_output.begin(), L_output.end(), neighbors.begin(), neighbors.end(), inserter(L_output, L_output.begin()));
-        cout<<"e"<< endl;
+        // cout<<"e"<< endl;
         // V.insert(G.get_index_from_vertex[min]);
         G.insert_sorted(V, min);
-        cout<<"f"<< endl;
+        // cout<<"f"<< endl;
 
 
         // Upper bound check
         if ( L_output.size() > (long unsigned int) L ) {
             retain_closest_points(G, L_output, xquery, L);          
         }
-        cout<<"g"<< endl;
+        // cout<<"g"<< endl;
 
         diff_set.clear();
         // Recalculate the difference of the sets for the next loop
         set_difference(L_output.begin(), L_output.end(), V.begin(), V.end(), inserter(diff_set, diff_set.begin()));
         // diff_set.erase(min);
     }
-    cout<<"h"<< endl;
+    // cout<<"h"<< endl;
     // return only the k closests vertices
     retain_closest_points(G, L_output, xquery, k);
 
@@ -89,8 +89,13 @@ void RobustPrune(Graph<T>& G, T point, vector<gIndex>& V, float a, int R) {
 
     // Calculating the union of V and the neighbors of the given point, without the point itself
     vector<gIndex> neighbors = G.get_neighbors(point);
+
+    // V <- {V U Nout(p)} \ {p}
     set_union(V.begin(), V.end(), neighbors.begin(), neighbors.end(), inserter(V, V.begin()));
-    V.erase(find(V.begin(), V.end(), G.get_index_from_vertex(point)));
+    auto k = find(V.begin(), V.end(), G.get_index_from_vertex(point)); 
+    if( k != V.end() ){   // Only remove if it was found within V
+        V.erase(k);
+    }
     
     // Removing all edges leaving the given vertex and selectively adding up to R edges
     for (gIndex j: neighbors) {
@@ -140,6 +145,7 @@ T Vamana(Graph<T>& G, int L, int R, float a=1.2) {
     // Initializing G to a random graph with out-degree = R
     rDirectional(G, R);
 
+
     // Calculating the medoid of the points given
     T s = medoid(G);
     
@@ -147,12 +153,14 @@ T Vamana(Graph<T>& G, int L, int R, float a=1.2) {
     vector<gIndex> sigma(n);
     iota(sigma.begin(), sigma.end(), 0);
     shuffle(sigma.begin(), sigma.end(), default_random_engine(chrono::system_clock::now().time_since_epoch().count()));
+   
 
     // For all vertices
     for (int i = 0; i < n; i++) { 
 
         // Getting the random vertex
         T vertex = G.get_vertex_from_index(sigma[i]);
+        print_vector(vertex);
 
         // Calling GreadySearch() from the medoid to the vertex to get the appropriate sets [L_output,V]
         pair<set<gIndex>, vector<gIndex>> result = GreedySearch<T>(G, s, vertex, 1, L);
@@ -161,7 +169,10 @@ T Vamana(Graph<T>& G, int L, int R, float a=1.2) {
 
         // First calling RobustPrune for the vertex
         // float a = 1.2; // !!!
+        
         RobustPrune<T>(G, vertex, V, a, R);
+        cout << "H\n";
+
 
         // For each neighbor j of the vertex
         vector<gIndex> neighbors = G.get_neighbors(vertex);

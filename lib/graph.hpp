@@ -218,6 +218,19 @@ bool Graph<T>::remove_edge(const T& start, const T& end) {
     return true;
 }
 
+/* Method to for printing vectors (mainly used for debugging) */
+template <typename type>
+void print_vector(vector<type> vec) {
+    int size = vec.size();
+    cout << "{";
+    for( int i = 0 ; i < size ; i++){
+        cout << vec[i];
+        if( i != size - 1 &&  size != 1 )
+            cout << ",";
+    }
+    cout << "}";
+}
+
 
 /* Method to print the graph */
 template <typename T>
@@ -314,6 +327,7 @@ const vector<gIndex> Graph<T>::get_neighbors(T vertex) {
     vector<gIndex> neighbors;
     neighbors.reserve(adjacencyList[v_index[vertex]].size() - 1);
 
+    // Inserting neighbors into vector in the order they exist within the adjacency list.
     for (auto ver = adjacencyList[v_index[vertex]].begin() + 1; ver < adjacencyList[v_index[vertex]].end(); ver++) {
         neighbors.push_back(v_index[*ver]);
     }
