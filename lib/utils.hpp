@@ -59,7 +59,7 @@ inline float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 
 /* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
 template <typename Type>
-vector<Type> find_min_Euclidean(set<vector<Type>> &S, vector<Type> xquery) {
+inline vector<Type> find_min_Euclidean(set<vector<Type>> &S, vector<Type> xquery) {
     
     // Find the element with the minimum Euclidean distance from xquery
     vector<Type> min = *min_element(S.begin(), S.end(), 
