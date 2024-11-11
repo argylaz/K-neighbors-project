@@ -20,11 +20,11 @@ void test_GreedySearch() {
 
     // Initialising variables for the results of the algorithm
     set<gIndex> L;
-    vector<gIndex> V;
+    set<gIndex> V;
 
 
     /* Running the algorithm with s = 'a', xq = 'd', k = 2 and L = 3*/
-    pair< set<gIndex>, vector<gIndex> > result = GreedySearch<vector<int>>(G, {0}, {3}, 2, 3);
+    pair< set<gIndex>, set<gIndex> > result = GreedySearch<vector<int>>(G, {0}, {3}, 2, 3);
     L = result.first;
     V = result.second;
 
@@ -64,10 +64,10 @@ void test_GreedySearch() {
 
     // Initialising variables for the results of the algorithm
     set<gIndex> L1;
-    vector<gIndex> V1;
+    set<gIndex> V1;
 
     /* Running the algorithm with s = 'a', xq = 'd', k = 2 and L = 3*/
-    pair< set<gIndex>, vector<gIndex> > result1 = GreedySearch<vector<float>>(G1, {0.1}, {3.1}, 2, 3);
+    pair< set<gIndex>, set<gIndex> > result1 = GreedySearch<vector<float>>(G1, {0.1}, {3.1}, 2, 3);
     L1 = result1.first;
     V1 = result1.second;
 
@@ -108,10 +108,10 @@ void test_GreedySearch() {
 
     // Initialising variables for the results of the algorithm
     set<gIndex> L2;
-    vector<gIndex> V2;
+    set<gIndex> V2;
 
     /* Running the algorithm with s = 'a', xq = 'd', k = 2 and L = 3*/
-    pair< set<gIndex>, vector<gIndex> > result2 = GreedySearch<vector<int>>(G2, {0,0}, {3,0}, 2, 3);
+    pair< set<gIndex>, set<gIndex> > result2 = GreedySearch<vector<int>>(G2, {0,0}, {3,0}, 2, 3);
     L2 = result2.first;
     V2 = result2.second;
 
@@ -156,7 +156,7 @@ void test_RobustPrune() {
     G1.add_edge({4}, {0}); G1.add_edge({4}, {2}); G1.add_edge({4}, {3});
 
     // Run Robustprune with p = {0}, V = {{1},{2}} (out-neighbors of p), a = 1.2 and R = 2
-    vector<gIndex> V1 = {1, 2};
+    set<gIndex> V1 = {1, 2};
     float a = 1.2;
     int R = 2;
 
@@ -170,7 +170,6 @@ void test_RobustPrune() {
     TEST_ASSERT(G1.exist_edge({4}, {0}) && G1.exist_edge({4}, {2}) && G1.exist_edge({4}, {3}));
 
 
-
     // Then we run RobustPrune one more time with p = {4}, V = {{0},{2},{3}}, a=1.2 and R = 1
     V1.clear(); V1 = {0, 2, 3};
     V1.clear();
@@ -178,13 +177,6 @@ void test_RobustPrune() {
     R = 1;
     RobustPrune(G1, {4}, V1, a, R);
     
-
-    // Checking
-    // cout << G1.exist_edge({0}, {1}) << G1.exist_edge({0}, {2}) << endl;
-    // cout << G1.exist_edge({1}, {2}) << endl;
-    // cout << G1.exist_edge({2}, {0}) << G1.exist_edge({2}, {4}) << endl;
-    // cout << G1.exist_edge({3}, {2}) << endl;
-    // cout << G1.exist_edge({4}, {0}) << G1.exist_edge({4}, {2}) << G1.exist_edge({4}, {3}) << endl;
 
     // Now check that the algorithm works as intended (edges from 4 to 0 and from 4 to 2 removed)
     TEST_ASSERT(G1.exist_edge({0}, {1}));
@@ -211,7 +203,7 @@ void test_RobustPrune() {
     G2.add_edge({4.1}, {0.1}); G2.add_edge({4.1}, {2.1}); G2.add_edge({4.1}, {3.1});
 
     // Run Robustprune with p = {0.1}, V = {{1.1},{2.1}} (out-neighbors of p), a = 1.2 and R = 2
-    vector<gIndex> V2 = {1, 2};
+    set<gIndex> V2 = {1, 2};
     a = 1.2;
     R = 2;
     RobustPrune(G2, {0.1}, V2, a, R);
@@ -221,13 +213,6 @@ void test_RobustPrune() {
     R = 1;
     RobustPrune(G2, {4.1}, V2, a, R);
 
-    // Checking
-    // cout << G2.exist_edge({0.1}, {1.1}) << G2.exist_edge({0.1}, {2.1}) << endl;
-    // cout << G2.exist_edge({1.1}, {2.1}) << endl;
-    // cout << G2.exist_edge({2.1}, {0.1}) << G2.exist_edge({2.1}, {4.1}) << endl;
-    // cout << G2.exist_edge({3.1}, {2.1}) << endl;
-    // cout << G2.exist_edge({4.1}, {0.1}) << G2.exist_edge({4.1}, {2.1}) << G2.exist_edge({4.1}, {3.1}) << endl;
-
     // Now check that the algorithm works as intended (edges from 4 to 0 and from 4 to 2 removed)
     TEST_ASSERT(G2.exist_edge({0.1}, {1.1}) && !G2.exist_edge({0.1}, {2.1}));
     TEST_ASSERT(G2.exist_edge({1.1}, {2.1}));
@@ -235,7 +220,9 @@ void test_RobustPrune() {
     TEST_ASSERT(G2.exist_edge({3.1}, {2.1}));
     TEST_ASSERT(!G2.exist_edge({4.1}, {0.1}) && !G2.exist_edge({4.1}, {2.1}) && G2.exist_edge({4.1}, {3.1}));
     
-    
+
+
+
     
     // Testing for 2D float vectors, shortened version of the int test, same data with {x.1,9.9} form
 
@@ -251,7 +238,7 @@ void test_RobustPrune() {
     G3.add_edge({4.1, 9.9}, {0.1, 9.9}); G3.add_edge({4.1, 9.9}, {2.1, 9.9}); G3.add_edge({4.1, 9.9}, {3.1, 9.9});
 
     // Run Robustprune with p = {0.1,9.9}, V = {{1.1,9.9},{2.1,9.9}} (out-neighbors of p), a = 1.2 and R = 2
-    vector<gIndex> V3 = {1, 2};
+    set<gIndex> V3 = {1, 2};
     a = 1.2;
     R = 2;
     RobustPrune(G3, {0.1, 9.9}, V3, a, R);
@@ -260,13 +247,6 @@ void test_RobustPrune() {
     V3.clear(); V3 = {0, 2, 3};
     R = 1;
     RobustPrune(G3, {4.1, 9.9}, V3, a, R);
-
-    // Checking
-    // cout << G3.exist_edge({0.1, 9.9}, {1.1, 9.9}) << G3.exist_edge({0.1, 9.9}, {2.1, 9.9}) << endl;
-    // cout << G3.exist_edge({1.1, 9.9}, {2.1, 9.9}) << endl;
-    // cout << G3.exist_edge({2.1, 9.9}, {0.1, 9.9}) << G3.exist_edge({2.1, 9.9}, {4.1, 9.9}) << endl;
-    // cout << G3.exist_edge({3.1, 9.9}, {2.1, 9.9}) << endl;
-    // cout << G3.exist_edge({4.1, 9.9}, {0.1, 9.9}) << G3.exist_edge({4.1, 9.9}, {2.1, 9.9}) << G3.exist_edge({4.1, 9.9}, {3.1, 9.9}) << endl;
 
     // Now check that the algorithm works as intended (edges from 4 to 0 and from 4 to 2 removed)
     TEST_ASSERT(G3.exist_edge({0.1, 9.9}, {1.1, 9.9}) && !G3.exist_edge({0.1, 9.9}, {2.1, 9.9}));
@@ -294,14 +274,12 @@ void test_Vamana() {
     G1.add_edge({3}, {0}); G1.add_edge({3}, {1});
 
     // Run vamana indexing algorithm with L = 2 and R = 2
-    cout << "TEST\n";
     Vamana(G1, 2, 2);
 
 
     // Test that the new form of the graph is the one one expected
     // 0->1, 1->0, 1->2, 2->1, 2->3, 3->2 are the exact edges the graph should have
-    // cout << G.get_edge_count();
-    // TEST_ASSERT(G.get_edge_count() == 6);
+    TEST_ASSERT(G1.get_edge_count() == 6);
     TEST_ASSERT(G1.exist_edge({0}, {1}));
     TEST_ASSERT(G1.exist_edge({1}, {0}));
     TEST_ASSERT(G1.exist_edge({1}, {2}));

@@ -30,7 +30,7 @@ float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 
 /* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
 template <typename Type>
-vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, vector<gIndex> S, vector<Type> xquery) {
+vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<gIndex>& S, vector<Type> xquery) {
     
     // Initialise iterator and min_distance/min_point variables
     auto i = S.begin();

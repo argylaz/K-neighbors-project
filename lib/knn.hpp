@@ -12,7 +12,7 @@ using namespace std;
 // Returns a pair of sets, the first contains the K-approx NNs and the second contains all the visited nodes
 // if L < k the method returns a pair of empty sets
 template <typename T>
-pair<set<gIndex>, vector<gIndex>> GreedySearch(Graph<T> G, T start, T xquery, int k, int L) {
+pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T> G, T start, T xquery, int k, int L) {
     
     // First we check that the input values are correct
     if (L < k) { // L >= k
@@ -20,47 +20,41 @@ pair<set<gIndex>, vector<gIndex>> GreedySearch(Graph<T> G, T start, T xquery, in
         // Returns a pair with two empty sets
         return {{},{}};
     }
-    // cout<<"a"<< endl;
 
     // Initialize set L_output = {s} and V = { }
     set<gIndex> L_output;
     L_output.insert(G.get_index_from_vertex(start));
-    vector<gIndex> V;
+    set<gIndex> V;
     
     // Subtraction of sets L_output \ V
-    vector<gIndex> diff_set;
+    set<gIndex> diff_set;
     set_difference(L_output.begin(), L_output.end(), V.begin(), V.end(), inserter(diff_set, diff_set.begin()));
-    
-    // cout<<"b"<< endl;
+
     // while L_output\V != 0
     while ( !diff_set.empty() ) {
         // cout<<"c"<< endl;
 
         // Find the vertex with the minimum euclidean distance from the xquery
         T min = find_min_Euclidean(G, diff_set, xquery);
-        // cout<<"d"<< endl;
         
         // Updating L and V
         vector<gIndex> neighbors = G.get_neighbors(min);
         set_union(L_output.begin(), L_output.end(), neighbors.begin(), neighbors.end(), inserter(L_output, L_output.begin()));
-        // cout<<"e"<< endl;
-        // V.insert(G.get_index_from_vertex[min]);
-        G.insert_sorted(V, min);
-        // cout<<"f"<< endl;
 
+        V.insert(G.get_index_from_vertex(min));
+        // G.insert_sorted(V, min);
 
         // Upper bound check
         if ( L_output.size() > (long unsigned int) L ) {
             retain_closest_points(G, L_output, xquery, L);          
         }
-        // cout<<"g"<< endl;
 
         diff_set.clear();
         // Recalculate the difference of the sets for the next loop
         set_difference(L_output.begin(), L_output.end(), V.begin(), V.end(), inserter(diff_set, diff_set.begin()));
         // diff_set.erase(min);
     }
-    // cout<<"h"<< endl;
+
     // return only the k closests vertices
     retain_closest_points(G, L_output, xquery, k);
 
@@ -78,7 +72,7 @@ pair<set<gIndex>, vector<gIndex>> GreedySearch(Graph<T> G, T start, T xquery, in
 // a is the distance threshold
 // R is the degree bound
 template <typename T>
-void RobustPrune(Graph<T>& G, T point, vector<gIndex>& V, float a, int R) {
+void RobustPrune(Graph<T>& G, T point, set<gIndex>& V, float a, int R) {
 
     // First we check that the input values are correct
     if (a < 1) { // a >= 1
@@ -128,7 +122,6 @@ void RobustPrune(Graph<T>& G, T point, vector<gIndex>& V, float a, int R) {
         for (gIndex vertex_index: toBeRemoved) {
             V.erase(find(V.begin(), V.end(), vertex_index));
         }
-        
     }
 }
 
@@ -138,7 +131,7 @@ void RobustPrune(Graph<T>& G, T point, vector<gIndex>& V, float a, int R) {
 // L is the search list size
 // R is the degree bound
 template <typename T>
-T Vamana(Graph<T>& G, int L, int R, float a=1.2) {
+T Vamana(Graph<T>& G, int L, int R, float a =1.2) {
     
     int n = G.get_vertices_count();
 
@@ -153,30 +146,27 @@ T Vamana(Graph<T>& G, int L, int R, float a=1.2) {
     vector<gIndex> sigma(n);
     iota(sigma.begin(), sigma.end(), 0);
     shuffle(sigma.begin(), sigma.end(), default_random_engine(chrono::system_clock::now().time_since_epoch().count()));
-   
 
     // For all vertices
     for (int i = 0; i < n; i++) { 
 
         // Getting the random vertex
         T vertex = G.get_vertex_from_index(sigma[i]);
-        print_vector(vertex);
 
         // Calling GreadySearch() from the medoid to the vertex to get the appropriate sets [L_output,V]
-        pair<set<gIndex>, vector<gIndex>> result = GreedySearch<T>(G, s, vertex, 1, L);
+        pair<set<gIndex>, set<gIndex>> result = GreedySearch<T>(G, s, vertex, 1, L);
+
         set<gIndex> L_output = result.first;
-        vector<gIndex> V = result.second;
-
-        // First calling RobustPrune for the vertex
-        // float a = 1.2; // !!!
+        set<gIndex> V = result.second;
         
+        // First calling RobustPrune for the vertex
+        // float a = 1.2; // !!!        
         RobustPrune<T>(G, vertex, V, a, R);
-        cout << "H\n";
-
 
         // For each neighbor j of the vertex
         vector<gIndex> neighbors = G.get_neighbors(vertex);
         for (gIndex j: neighbors) {
+            
             T neighbor = G.get_vertex_from_index(j);
 
             // We calculate a candidate set with the neighbor's neighbors and the vertex itself
@@ -185,8 +175,9 @@ T Vamana(Graph<T>& G, int L, int R, float a=1.2) {
             
 
             if (neighbor_union.size() > (long unsigned int) R) {
+                set<gIndex> neighbor_union_set(neighbor_union.begin(), neighbor_union.end());
                 // If the candidate set for the neighbor j is too big (size>R) we call RobustPrune for j
-                RobustPrune<T>(G, neighbor, neighbor_union, a, R);
+                RobustPrune<T>(G, neighbor, neighbor_union_set, a, R);
             } else {
                 // Else we add an edge from the neighbor j to the vertex itself
                 G.add_edge(neighbor, vertex);
