@@ -56,17 +56,17 @@ void test_Euclidean_Distance() {
 }
 
 
-/* Testing the find_min_Euclidean method */
+// /* Testing the find_min_Euclidean method */
 void test_find_min_Euclidean() {
-    // Test the method for vector<int>
-    vector<vector<int>> v1 = {
-        {1,2},
-        {3,4},
-        {5,6},
-        {7,8},
-    };
-    set<vector<int>> S1(v1.begin(), v1.end());
-    
+
+    Graph <vector<int>> G1;
+    G1.add_vertex({1,2});
+    G1.add_vertex({3,4});
+    G1.add_vertex({5,6});
+    G1.add_vertex({7,8});
+
+    set<int> S1 = {0,1,2,3};
+
     vector<vector<int>> v1c = {
         {1,1},
         {3,3},
@@ -74,128 +74,142 @@ void test_find_min_Euclidean() {
         {7,7},
     };
 
+
     // Test that the returned element is correct
-    vector<int> min1 = find_min_Euclidean<int>(S1, v1c[0]);
+
+    vector<int> min1 = find_min_Euclidean<int>(G1, S1, v1c[0]);
     TEST_ASSERT(min1[0] == 1 && min1[1] == 2);
     
-    vector<int> min2 = find_min_Euclidean<int>(S1, v1c[1]);
+    vector<int> min2 = find_min_Euclidean<int>(G1, S1, v1c[1]);
     TEST_ASSERT(min2[0] == 3 && min2[1] == 4);
 
-    vector<int> min3 = find_min_Euclidean<int>(S1, v1c[2]);
+    vector<int> min3 = find_min_Euclidean<int>(G1, S1, v1c[2]);
     TEST_ASSERT(min3[0] == 5 && min3[1] == 6);
        
-    vector<int> min4 = find_min_Euclidean<int>(S1, v1c[3]);
+    vector<int> min4 = find_min_Euclidean<int>(G1, S1, v1c[3]);
     TEST_ASSERT(min4[0] == 7 && min4[1] == 8);
 
 
+
     // Now do the same for vector<float>
-    vector<vector<float>> v2 = {
-        {1.1f,2.2f},
-        {3.3f,4.4f},
-        {5.5f,6.6f},
-        {7.7f,8.8f},
-    };
-    set<vector<float>> S2(v2.begin(), v2.end());
+    Graph <vector<float>> G2;
+    G2.add_vertex({1.1f, 2.2f});
+    G2.add_vertex({3.3f, 4.4f});
+    G2.add_vertex({5.5f, 6.6f});
+    G2.add_vertex({7.7f, 8.8f});
+
+    set<int> S2 = {0,1,2,3};
 
     vector<vector<float>> v2c = {
-        {1.1f,1.1f},
-        {3.3f,3.3f},
-        {5.5f,5.5f},
-        {7.7f,7.7f},
+        {1.1f, 1.1f},
+        {3.3f, 3.3f},
+        {5.5f, 5.5f},
+        {7.7f, 7.7f},
     };
 
     float e = 1.23e-4;
 
     // Test that the returned element is correct
-    vector<float> minf1 = find_min_Euclidean<float>(S2, v2c[0]);
+    vector<float> minf1 = find_min_Euclidean<float>(G2, S2, v2c[0]);
     TEST_ASSERT(minf1[0] - 1.1f <= e && minf1[1] - 2.2 <= e);
-    
-    vector<float> minf2 = find_min_Euclidean<float>(S2, v2c[1]);
+
+    vector<float> minf2 = find_min_Euclidean<float>(G2, S2, v2c[1]);
     TEST_ASSERT(minf2[0] - 3.3f <= e && minf2[1] - 4.4f <= e);
 
-    vector<float> minf3 = find_min_Euclidean<float>(S2, v2c[2]);
+    vector<float> minf3 = find_min_Euclidean<float>(G2, S2, v2c[2]);
     TEST_ASSERT(minf3[0] - 5.5f <= e && minf3[1] - 6.6 <= e);
 
-    vector<float> minf4 = find_min_Euclidean<float>(S2, v2c[3]);
+    vector<float> minf4 = find_min_Euclidean<float>(G2, S2, v2c[3]);
     TEST_ASSERT(minf4[0] - 7.7f <= e && minf4[1] - 8.8f <= e); 
 }
 
+
+
+
+
 void test_retain_closest_points() {
-    // First create a set of vectors
-    set<vector<int>> s1 = {{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}};
+    TestGraph<vector<int>> G;
+    for (int i = 0; i < 10; i++) {
+        G.add_vertex({i});
+    }
+    
+    set<gIndex> indices1 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
     // Then check that retain_closest_neighbors only keeps the closest neighbors
-    vector<int> xquery = {0};
-    retain_closest_points(s1, xquery, 3);
+    vector<int> xquery = {10};
+    retain_closest_points(G, indices1, xquery, 3);
 
-    TEST_ASSERT(s1.find({1}) != s1.end());
-    TEST_ASSERT(s1.find({2}) != s1.end());
-    TEST_ASSERT(s1.find({3}) != s1.end());
+    TEST_ASSERT(indices1.size() == 3);
+    TEST_ASSERT(find(indices1.begin(), indices1.end(), 7) != indices1.end());
+    TEST_ASSERT(find(indices1.begin(), indices1.end(), 8) != indices1.end());
+    TEST_ASSERT(find(indices1.begin(), indices1.end(), 9) != indices1.end());
+
 
     // Now run a second test for a vector that exists in the set
-    set<vector<int>> s2 = {{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}};
+    set<gIndex> indices2 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-    xquery = {5};
-    retain_closest_points(s1, xquery, 3);
+    xquery = {9};
+    retain_closest_points(G, indices2, xquery, 3);
 
-    TEST_ASSERT(s2.find({4}) != s2.end());
-    TEST_ASSERT(s2.find({5}) != s2.end());
-    TEST_ASSERT(s2.find({6}) != s2.end());
+    TEST_ASSERT(indices2.size() == 3);
+    TEST_ASSERT(find(indices2.begin(), indices2.end(), 6) != indices2.end());
+    TEST_ASSERT(find(indices2.begin(), indices2.end(), 7) != indices2.end());
+    TEST_ASSERT(find(indices2.begin(), indices2.end(), 8) != indices2.end());
 }
 
 void test_medoid() {
     
-    Graph<vector<int>>* G1 = new Graph<vector<int>>;
-    TEST_ASSERT( medoid<int>(*G1).size() == 0);
+    Graph<vector<int>> G1;
+    TEST_ASSERT( medoid<int>(G1).size() == 0);
 
-    G1->add_vertex({1,2});
-    G1->add_vertex({2,1});
-    G1->add_vertex({4,5});
-    G1->add_vertex({3,3});
-    G1->add_vertex({5,4});
+    G1.add_vertex({1,2});
+    G1.add_vertex({2,1});
+    G1.add_vertex({4,5});
+    G1.add_vertex({3,3});
+    G1.add_vertex({5,4});
 
 
-    vector<int> med1 = medoid<int>(*G1);
+    vector<int> med1 = medoid<int>(G1);
 
     /* The medoid is {3,3}*/
     TEST_ASSERT( med1[0] == 3 && med1[1] == 3 );
 
 
-    Graph<vector<int>>* G2 = new Graph<vector<int>>;
+    Graph<vector<int>> G2;
 
-    G2->add_vertex({2,3});
-    G2->add_vertex({3,4});
-    G2->add_vertex({5,1});
-    G2->add_vertex({4,5});
-    G2->add_vertex({1,2});
+    G2.add_vertex({2,3});
+    G2.add_vertex({3,4});
+    G2.add_vertex({5,1});
+    G2.add_vertex({4,5});
+    G2.add_vertex({1,2});
 
     /* There are two possible medoids in the graph {2,3} and {3,4} */
-    vector<int> med2 = medoid<int>(*G2);
+    vector<int> med2 = medoid<int>(G2);
     TEST_ASSERT( (med2[0] == 3 && med2[1] == 4) || (med2[0] == 2 && med2[1] == 3) );
-    
-    
+
 }
 
 void test_rDirectional() {
 
     int r = 3;
 
-    Graph<vector<int>>* G = new Graph<vector<int>>;
-    G->add_vertex({1});
-    G->add_vertex({2});
-    G->add_vertex({4});
-    G->add_vertex({3});
-    G->add_vertex({5});
+    Graph<vector<int>> G;
+    G.add_vertex({1});
+    G.add_vertex({2});
+    G.add_vertex({4});
+    G.add_vertex({3});
+    G.add_vertex({5});
 
 
-    rDirectional(*G, r);
+    rDirectional(G, r);
 
     // Check the number of edges
-    TEST_ASSERT( G->get_edge_count() == r * G->get_vertices_count() );
+    TEST_ASSERT( G.get_edge_count() == r * G.get_vertices_count() );
 
     // Checking if rDirectional works if given a non-empty Graph
-    rDirectional(*G, r);
-    TEST_ASSERT( G->get_edge_count() == r * G->get_vertices_count() );
+    rDirectional(G, r);
+    TEST_ASSERT( G.get_edge_count() == r * G.get_vertices_count() );
+
 }
 
 

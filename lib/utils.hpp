@@ -7,6 +7,7 @@ using namespace std;
 
 
 
+
 /* Method to for printing vectors (mainly used for debugging) */
 template <typename type>
 void print_vector(vector<type> vec) {
@@ -59,7 +60,7 @@ inline float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 
 /* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
 template <typename Type>
-vector<Type> find_min_Euclidean(set<vector<Type>> &S, vector<Type> xquery) {
+vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<vector<Type>> &S, vector<Type> xquery) {
     
     // Find the element with the minimum Euclidean distance from xquery
     vector<Type> min = *min_element(S.begin(), S.end(), 
@@ -73,28 +74,39 @@ vector<Type> find_min_Euclidean(set<vector<Type>> &S, vector<Type> xquery) {
 
 /* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
 template <typename Type>
-void retain_closest_points(set<vector<Type>> &output_set, vector<Type> xquery, int L) {
+void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_set, vector<Type> xquery, int L) {
 
-    // Erasing the vertex itself from the set in order to avoid mistaking it for a neighbor
-    output_set.erase(xquery); 
+    // cout <<"I"<< endl;
+    // // Erasing the vertex itself from the set in order to avoid mistaking it for a neighbor
+    // gIndex xquery_index = G.get_index_from_vertex(xquery);
+    // output_vec.erase(find(output_vec.begin(), output_vec.end(), xquery_index)); 
+
+    output_set.erase(G.get_index_from_vertex(xquery)); 
     
     // Create vector with the elements of the set
-    vector<vector<Type>> output_vec(output_set.begin(), output_set.end());
-    
+    vector<gIndex> output_vec(output_set.begin(), output_set.end());
+    // for (gIndex g: output_vec) { cout << g<< " ";}
+    // cout <<endl;
+
+    // cout<<"II"<< endl;
+
     // Sort the vector by comparing the Euclidean Distance of each element with xquery
-    sort(output_vec.begin(), output_vec.end(), [&xquery](const vector<Type>& a, const vector<Type>& b) {
-        return Euclidean_Distance<Type>(a, xquery) < Euclidean_Distance<Type>(b, xquery);
+    sort(output_vec.begin(), output_vec.end(), [&xquery, &G](const gIndex a, const gIndex b) {
+        return Euclidean_Distance<Type>(G.get_vertex_from_index(a), xquery) < Euclidean_Distance<Type>(G.get_vertex_from_index(b), xquery);
     });
 
+    // cout<<"III"<< endl;
     // Resize the output to size L to only keep the L closest neighbors
     if( output_vec.size() >= (long unsigned int) L )
         output_vec.resize(L);
     else   
-        cout << "L is greater than the size of the vector/set\n"; 
-    
-    // Throw the neighbors retained back into the set
+        cout << "L is greater than the size of the vector/set\n";
+
     output_set.clear();
     output_set.insert(output_vec.begin(), output_vec.end());
+    // for (gIndex g: output_vec) { cout << g<< " ";}
+    // cout <<endl;
+    // cout<<"IV"<< endl;
 }
 
 
@@ -157,9 +169,9 @@ void rDirectional(Graph<T>& G, int R) {
         cerr << "\nGraph already has edges\n" << endl;
         
         for (T vertex: vertices) {
-            set<T> neighbors = G.get_neighbors(vertex);
-            for (T neighbor: neighbors) {
-                G.remove_edge(vertex, neighbor);
+            vector<gIndex> neighbors = G.get_neighbors(vertex);
+            for (gIndex neighborIndex: neighbors) {
+                G.remove_edge(vertex, G.get_vertex_from_index(neighborIndex));
             }
         }
         
