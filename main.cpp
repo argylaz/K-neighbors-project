@@ -53,15 +53,15 @@ int main(int argc, char* argv[]) {
 
 
         // Run GreedySearch to get the k nearest neighbors
-        pair<set< vector<float>> , set<vector<float>>> res = GreedySearch(*G, medoid, q, k, L);
-        set<vector<float>> temp = res.first;
+        pair<set<gIndex> , set<gIndex>> res = GreedySearch(*G, medoid, q, k, L);
+        set<gIndex> X = res.first;
 
-        // Convert to set of indices
-        set<int> X;
-        for(vector<float> l : temp) {
-            int index = G->get_index_from_vertex(l);
-            X.insert(index);
-        }
+        // // Convert to set of indices
+        // set<int> X;
+        // for(vector<float> l : temp) {
+        //     int index = G->get_index_from_vertex(l);
+        //     X.insert(index);
+        // }
 
         // Get ground truth
         set<int> T( (*m).begin(), (*m).begin() + k);
