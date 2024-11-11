@@ -153,59 +153,57 @@ void test_retain_closest_points() {
 
 void test_medoid() {
     
-    Graph<vector<int>>* G1 = new Graph<vector<int>>;
-    TEST_ASSERT( medoid<int>(*G1).size() == 0);
+    Graph<vector<int>> G1;
+    TEST_ASSERT( medoid<int>(G1).size() == 0);
 
-    G1->add_vertex({1,2});
-    G1->add_vertex({2,1});
-    G1->add_vertex({4,5});
-    G1->add_vertex({3,3});
-    G1->add_vertex({5,4});
+    G1.add_vertex({1,2});
+    G1.add_vertex({2,1});
+    G1.add_vertex({4,5});
+    G1.add_vertex({3,3});
+    G1.add_vertex({5,4});
 
 
-    vector<int> med1 = medoid<int>(*G1);
+    vector<int> med1 = medoid<int>(G1);
 
     /* The medoid is {3,3}*/
     TEST_ASSERT( med1[0] == 3 && med1[1] == 3 );
 
 
-    Graph<vector<int>>* G2 = new Graph<vector<int>>;
+    Graph<vector<int>> G2;
 
-    G2->add_vertex({2,3});
-    G2->add_vertex({3,4});
-    G2->add_vertex({5,1});
-    G2->add_vertex({4,5});
-    G2->add_vertex({1,2});
+    G2.add_vertex({2,3});
+    G2.add_vertex({3,4});
+    G2.add_vertex({5,1});
+    G2.add_vertex({4,5});
+    G2.add_vertex({1,2});
 
     /* There are two possible medoids in the graph {2,3} and {3,4} */
-    vector<int> med2 = medoid<int>(*G2);
+    vector<int> med2 = medoid<int>(G2);
     TEST_ASSERT( (med2[0] == 3 && med2[1] == 4) || (med2[0] == 2 && med2[1] == 3) );
-    
-    delete G1;
+
 }
 
 void test_rDirectional() {
 
     int r = 3;
 
-    Graph<vector<int>>* G = new Graph<vector<int>>;
-    G->add_vertex({1});
-    G->add_vertex({2});
-    G->add_vertex({4});
-    G->add_vertex({3});
-    G->add_vertex({5});
+    Graph<vector<int>> G;
+    G.add_vertex({1});
+    G.add_vertex({2});
+    G.add_vertex({4});
+    G.add_vertex({3});
+    G.add_vertex({5});
 
 
-    rDirectional(*G, r);
+    rDirectional(G, r);
 
     // Check the number of edges
-    TEST_ASSERT( G->get_edge_count() == r * G->get_vertices_count() );
+    TEST_ASSERT( G.get_edge_count() == r * G.get_vertices_count() );
 
     // Checking if rDirectional works if given a non-empty Graph
-    rDirectional(*G, r);
-    TEST_ASSERT( G->get_edge_count() == r * G->get_vertices_count() );
+    rDirectional(G, r);
+    TEST_ASSERT( G.get_edge_count() == r * G.get_vertices_count() );
 
-    delete G;
 }
 
 

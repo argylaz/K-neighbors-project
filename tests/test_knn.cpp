@@ -22,6 +22,7 @@ void test_GreedySearch() {
     set<gIndex> L;
     set<gIndex> V;
 
+    
 
     /* Running the algorithm with s = 'a', xq = 'd', k = 2 and L = 3*/
     pair< set<gIndex>, set<gIndex> > result = GreedySearch<vector<int>>(G, {0}, {3}, 2, 3);
@@ -155,7 +156,7 @@ void test_RobustPrune() {
     G1.add_edge({3}, {2});
     G1.add_edge({4}, {0}); G1.add_edge({4}, {2}); G1.add_edge({4}, {3});
 
-    // Run Robustprune with p = {0}, V = {{1},{2}} (out-neighbors of p), a = 1.2 and R = 2
+    // Run Robustprune with p = {0}, V = {1, 2} (out-neighbors of p), a = 1.2 and R = 2
     set<gIndex> V1 = {1, 2};
     float a = 1.2;
     int R = 2;
@@ -170,7 +171,7 @@ void test_RobustPrune() {
     TEST_ASSERT(G1.exist_edge({4}, {0}) && G1.exist_edge({4}, {2}) && G1.exist_edge({4}, {3}));
 
 
-    // Then we run RobustPrune one more time with p = {4}, V = {{0},{2},{3}}, a=1.2 and R = 1
+    // Then we run RobustPrune one more time with p = {4}, V = {0, 2, 3}, a=1.2 and R = 1
     V1.clear(); V1 = {0, 2, 3};
     V1.clear();
 
@@ -202,13 +203,13 @@ void test_RobustPrune() {
     G2.add_edge({3.1}, {2.1});
     G2.add_edge({4.1}, {0.1}); G2.add_edge({4.1}, {2.1}); G2.add_edge({4.1}, {3.1});
 
-    // Run Robustprune with p = {0.1}, V = {{1.1},{2.1}} (out-neighbors of p), a = 1.2 and R = 2
+    // Run Robustprune with p = {0.1}, V = {1, 2} (out-neighbors of p), a = 1.2 and R = 2
     set<gIndex> V2 = {1, 2};
     a = 1.2;
     R = 2;
     RobustPrune(G2, {0.1}, V2, a, R);
 
-    // Then we run RobustPrune one more time with p = {4.1}, V = {{0.1},{2.1},{3.1}}, a=1.2 and R = 1
+    // Then we run RobustPrune one more time with p = {4.1}, V = {0, 2, 3}, a=1.2 and R = 1
     V2.clear(); V2 = {0, 2, 3};
     R = 1;
     RobustPrune(G2, {4.1}, V2, a, R);
@@ -321,7 +322,6 @@ void test_Vamana() {
     TEST_ASSERT(!G2.exist_edge({2.1, 9.9}, {0.1, 9.9}));
     TEST_ASSERT(!G2.exist_edge({3.1, 9.9}, {0.1, 9.9}));
     TEST_ASSERT(!G2.exist_edge({3.1, 9.9}, {1.1, 9.9}));
-    
 }
 
 // List of all tests to be executed
