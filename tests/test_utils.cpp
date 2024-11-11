@@ -120,7 +120,7 @@ void test_retain_closest_points() {
         G.add_vertex({i});
     }
     
-    vector<gIndex> indices1 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    set<gIndex> indices1 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
     // Then check that retain_closest_neighbors only keeps the closest neighbors
     vector<int> xquery = {10};
@@ -133,7 +133,7 @@ void test_retain_closest_points() {
 
 
     // Now run a second test for a vector that exists in the set
-    vector<gIndex> indices2 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    set<gIndex> indices2 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
     xquery = {9};
     retain_closest_points(G, indices2, xquery, 3);

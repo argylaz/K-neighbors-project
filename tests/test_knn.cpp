@@ -8,7 +8,7 @@ void test_GreedySearch() {
     // Using <vector<int>> because GreedySearch and EuclideanDistance work with vectors.
     TestGraph<vector<int>> G;
     
-    // Add vertices 0,1,2,3,4,5
+    // Add vertices 0,1,2,3,4
     G.add_vertex({0}); G.add_vertex({1}); G.add_vertex({2}); G.add_vertex({3}); G.add_vertex({4}); 
 
     // Add some random edges
@@ -19,12 +19,12 @@ void test_GreedySearch() {
     G.add_edge({4}, {0}); G.add_edge({4}, {2}); G.add_edge({4}, {3});
 
     // Initialising variables for the results of the algorithm
-    vector<gIndex> L;
+    set<gIndex> L;
     vector<gIndex> V;
 
     cout<<1<< endl;
     /* Running the algorithm with s = 'a', xq = 'd', k = 2 and L = 3*/
-    pair< vector<gIndex>, vector<gIndex> > result = GreedySearch<vector<int>>(G, {0}, {3}, 2, 3);
+    pair< set<gIndex>, vector<gIndex> > result = GreedySearch<vector<int>>(G, {0}, {3}, 2, 3);
     L = result.first;
     V = result.second;
 
@@ -48,6 +48,7 @@ void test_GreedySearch() {
     TEST_ASSERT( L.size() ==  0 );
     TEST_ASSERT( V.size() ==  0 );
 
+
     // Testing for floats
 
     TestGraph<vector<float>> G1;
@@ -63,16 +64,15 @@ void test_GreedySearch() {
     G1.add_edge({4.1}, {0.1}); G1.add_edge({4.1}, {2.1}); G1.add_edge({4.1}, {3.1});
 
     // Initialising variables for the results of the algorithm
-    vector<gIndex> L1;
+    set<gIndex> L1;
     vector<gIndex> V1;
 
     /* Running the algorithm with s = 'a', xq = 'd', k = 2 and L = 3*/
-    pair< vector<gIndex>, vector<gIndex> > result1 = GreedySearch<vector<float>>(G1, {0.1}, {3}, 2, 3);
+    pair< set<gIndex>, vector<gIndex> > result1 = GreedySearch<vector<float>>(G1, {0.1}, {3}, 2, 3);
     L1 = result1.first;
     V1 = result1.second;
 
-    // Test that the sets returned contain the correct values (L = {3,5}, V = {1,2,3})
-       // Test that the sets returned contain the correct values (L = {2,4}, V = {0,1,2,4})
+    // Test that the sets returned contain the correct values (L = {2,4}, V = {0,1,2,4})
     TEST_ASSERT(find(L1.begin(), L1.end(), 2) != L1.end());
     TEST_ASSERT(find(L1.begin(), L1.end(), 4) != L1.end());
 
@@ -107,11 +107,11 @@ void test_GreedySearch() {
     G2.add_edge({4,0}, {0,0}); G2.add_edge({4,0}, {2,0}); G2.add_edge({4,0}, {3,0});
 
     // Initialising variables for the results of the algorithm
-    vector<gIndex> L2;
+    set<gIndex> L2;
     vector<gIndex> V2;
 
     /* Running the algorithm with s = 'a', xq = 'd', k = 2 and L = 3*/
-    pair<vector<gIndex>, vector<gIndex> > result2 = GreedySearch<vector<int>>(G2, {0,0}, {3}, 2, 3);
+    pair< set<gIndex>, vector<gIndex> > result2 = GreedySearch<vector<int>>(G2, {0,0}, {3}, 2, 3);
     L2 = result2.first;
     V2 = result2.second;
 

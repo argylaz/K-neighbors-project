@@ -12,7 +12,7 @@ using namespace std;
 // Returns a pair of sets, the first contains the K-approx NNs and the second contains all the visited nodes
 // if L < k the method returns a pair of empty sets
 template <typename T>
-pair<vector<gIndex>, vector<gIndex>> GreedySearch(Graph<T> G, T start, T xquery, int k, int L) {
+pair<set<gIndex>, vector<gIndex>> GreedySearch(Graph<T> G, T start, T xquery, int k, int L) {
     
     // First we check that the input values are correct
     if (L < k) { // L >= k
@@ -23,9 +23,9 @@ pair<vector<gIndex>, vector<gIndex>> GreedySearch(Graph<T> G, T start, T xquery,
     cout<<"a"<< endl;
 
     // Initialize set L_output = {s} and V = { }
-    vector<gIndex> L_output;
+    set<gIndex> L_output;
+    L_output.insert(G.get_index_from_vertex(start));
     vector<gIndex> V;
-    L_output.push_back(G.get_index_from_vertex(start));
     
     // Subtraction of sets L_output \ V
     vector<gIndex> diff_set;
@@ -155,8 +155,8 @@ T Vamana(Graph<T>& G, int L, int R, float a=1.2) {
         T vertex = G.get_vertex_from_index(sigma[i]);
 
         // Calling GreadySearch() from the medoid to the vertex to get the appropriate sets [L_output,V]
-        pair<vector<gIndex>, vector<gIndex>> result = GreedySearch<T>(G, s, vertex, 1, L);
-        vector<gIndex> L_output = result.first;
+        pair<set<gIndex>, vector<gIndex>> result = GreedySearch<T>(G, s, vertex, 1, L);
+        set<gIndex> L_output = result.first;
         vector<gIndex> V = result.second;
 
         // First calling RobustPrune for the vertex

@@ -68,14 +68,22 @@ vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, vector<gIndex> S, vector
 
 /* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
 template <typename Type>
-void retain_closest_points(Graph<vector<Type>> G , vector<gIndex> &output_vec, vector<Type> xquery, int L) {
+void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_set, vector<Type> xquery, int L) {
 
     cout <<"I"<< endl;
-    // Erasing the vertex itself from the set in order to avoid mistaking it for a neighbor
-    gIndex xquery_index = G.get_index_from_vertex(xquery);
-    output_vec.erase(find(output_vec.begin(), output_vec.end(), xquery_index)); 
+    // // Erasing the vertex itself from the set in order to avoid mistaking it for a neighbor
+    // gIndex xquery_index = G.get_index_from_vertex(xquery);
+    // output_vec.erase(find(output_vec.begin(), output_vec.end(), xquery_index)); 
+
+    output_set.erase(G.get_index_from_vertex(xquery)); 
+    
+    // Create vector with the elements of the set
+    vector<gIndex> output_vec(output_set.begin(), output_set.end());
+    for (gIndex g: output_vec) { cout << g<< " ";}
+    cout <<endl;
 
     cout<<"II"<< endl;
+
     // Sort the vector by comparing the Euclidean Distance of each element with xquery
     sort(output_vec.begin(), output_vec.end(), [&xquery, &G](const gIndex a, const gIndex b) {
         return Euclidean_Distance<Type>(G.get_vertex_from_index(a), xquery) < Euclidean_Distance<Type>(G.get_vertex_from_index(b), xquery);
@@ -86,7 +94,12 @@ void retain_closest_points(Graph<vector<Type>> G , vector<gIndex> &output_vec, v
     if( output_vec.size() >= (long unsigned int) L )
         output_vec.resize(L);
     else   
-        cout << "L is greater than the size of the vector/set\n"; 
+        cout << "L is greater than the size of the vector/set\n";
+
+    output_set.clear();
+    output_set.insert(output_vec.begin(), output_vec.end());
+    for (gIndex g: output_vec) { cout << g<< " ";}
+    cout <<endl;
     cout<<"IV"<< endl;
 }
 
