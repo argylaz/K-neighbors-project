@@ -28,10 +28,10 @@ public:
     void print_graph();
 
     /* Method to get vertex from index */
-    const T get_vertex_from_index(gIndex i);
+    inline const T get_vertex_from_index(gIndex i);
 
     /* Method to get index from vertex */
-    gIndex get_index_from_vertex(const T& v);
+    inline gIndex get_index_from_vertex(const T& v);
 
     /* Method which returns the vertices count*/
     const int get_vertices_count();
@@ -200,14 +200,14 @@ void Graph<T>::print_graph(void) {
 
 
 template <typename T>
-const T Graph<T>::get_vertex_from_index(int i) {
+inline const T Graph<T>::get_vertex_from_index(int i) {
     // Returns the first element of the i-th row of the adjacency list, which is the vetrex corresponding to the row
     return this->adjacencyList[i][0];          
 }
 
 
 template <typename T>
-gIndex Graph<T>::get_index_from_vertex(const T& v) {
+inline gIndex Graph<T>::get_index_from_vertex(const T& v) {
     return this->v_index[v];  // Just returning the mapping of v
 }
 
