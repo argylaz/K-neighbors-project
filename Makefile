@@ -40,8 +40,8 @@ $(BIN_DIR)/%: $(BUILD_DIR)/%.o
 	$(CC) $(CFLAGS) -o $@ $<
 
 run:
-	$(CC) -o main main.cpp
-	time ./main 1 15 10 1.2
+	$(CC) $(CFLAGS) -o bin/main main.cpp
+	time ./bin/main  -f small -k 2 -r 10 -l 10 -a 2
 
 
 # Run the test executable

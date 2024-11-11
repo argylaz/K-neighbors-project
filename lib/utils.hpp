@@ -1,24 +1,54 @@
 #include <bits/stdc++.h>
 #include <cmath>
 #include "graph.hpp"
+#include <ctype.h>
+#include <string.h>
 using namespace std;
 
 
 
-// Function for the calculation of the Euclidean distance
-template<typename Type>             // Type is either integer or float
-float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 
-    // Initialise sum and iterators for the vectors
-    float sum = 0;
-    auto i = a.begin();
-    auto j = b.begin();
+/* Method to for printing vectors (mainly used for debugging) */
+template <typename type>
+void print_vector(vector<type> vec) {
+    int size = vec.size();
+    cout << "{";
+    for( int i = 0 ; i < size ; i++){
+        cout << vec[i];
+        if( i != size - 1 &&  size != 1 )
+            cout << ",";
+    }
+    cout << "}";
+}
+
+
+/* Function for the calculation of the Euclidean distance             */
+/* Returns INFINITY as error value indicating problems in calculation */
+template<typename Type>
+inline float Euclidean_Distance(vector<Type> a, vector<Type> b) {
+    /* Implemented with separate for loops instead of iterators so that the compiler can vectorise the operations */
+    /* Vectorized operation: d = sqrt(sum(a^2 - b^2))                                                             */
     
-    // Calculate sum
-    while( i != a.end() || j != b.end() ){
-        sum += pow(*j-*i,2);           // sum = (i1 -j1)^2 + ... + (i_n-j_n)^2  
-        i++;
-        j++;
+    // If the sizes of the vectors don't match throw error and return INFINITY
+    if(a.size() != b.size()) {
+        cerr << "Vector sizes for Euclidean don't match!" << endl;
+        return INFINITY;
+    }
+
+    // This vector will hold a^2 - b^2
+    vector<Type> temp;
+    temp.resize(a.size());
+
+    // Calculate vector (a - b)^2
+    for(size_t i = 0; i < a.size(); i++) {
+        temp[i] = a[i] - b[i];
+        temp[i] = temp[i] * temp[i];
+    }
+
+    // Find the sum of the calculated vector
+    float sum = 0.0f;
+    for(size_t i = 0; i < a.size(); i++) {
+        sum += temp[i];
     }
 
     // Get the square root of the sum
@@ -30,25 +60,15 @@ float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 
 /* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
 template <typename Type>
-vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<gIndex>& S, vector<Type> xquery) {
+vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<vector<Type>> &S, vector<Type> xquery) {
     
-    // Initialise iterator and min_distance/min_point variables
-    auto i = S.begin();
-    vector<Type> vertex = G.get_vertex_from_index(*i);
-    float min_distance = Euclidean_Distance<Type>(xquery, vertex);
-    vector<Type> min_point = vertex;
+    // Find the element with the minimum Euclidean distance from xquery
+    vector<Type> min = *min_element(S.begin(), S.end(), 
+                        [&xquery](const vector<Type>& a, const vector<Type>& b) {
+                            return Euclidean_Distance<Type>(a, xquery) < Euclidean_Distance<Type>(b, xquery);
+    });
 
-    // Iterate through the set to find min
-    while ( ++i != S.end()) {
-        vertex = G.get_vertex_from_index(*i);
-        float eucl = Euclidean_Distance<Type>(xquery, vertex);
-        if ( eucl < min_distance ){
-            min_distance = eucl;
-            min_point = vertex;
-        }
-    }
-
-    return min_point;
+    return min;
 }
 
 
@@ -342,6 +362,132 @@ set<vector<Type>> read_sets(string& filename) {
     return result;
 }
 
+
+// Function that checks if a string is a positive integer (for checking the command line arguments)
+int isPositiveInteger(char *str) {
+    int sz = strlen(str);
+    for (int i = 0; i < sz; i++) {
+        if (!isdigit(str[i])) return 0;
+    }
+    return 1;
+}
+
+
+
+// Function that reads the command line input arguments. Returns 1 or -1
+int get_arguments(int argc, char* argv[], int& k, int& L, float& a, int& R,string& base_name, string& query_name, string& groundtruth_name){
+    // We need at least 8 arguments (Filename, k, L, R and maybe a)
+    if (!(argc == 9 || argc == 11)) {     
+        cerr << "ERROR: Malformed input at command line\n";
+        return -1;
+    }
+
+    
+    // Get the filename
+    char* flag_small;      // Flag for siftsmall
+    if (!strcmp(argv[1], "-f")) flag_small = argv[2];
+    else if (!strcmp(argv[3], "-f")) flag_small = argv[4];
+    else if (!strcmp(argv[5], "-f")) flag_small = argv[6];
+    else if (!strcmp(argv[7], "-f")) flag_small = argv[8];
+    else if (argc == 11 && !strcmp(argv[9], "-f")) flag_small = argv[10];
+    else {
+        cerr << "ERROR: Should include the file name as command line argument like \"-f filename\"\n";
+        return -1;
+    }
+
+    // string base_name;
+    // string groundtruth_name;
+    // string query_name;
+    if( !strcmp(flag_small, "small") ){
+        base_name =  "sift/siftsmall_base.fvecs";
+        query_name = "sift/siftsmall_query.fvecs";
+        groundtruth_name = "sift/siftsmall_groundtruth.ivecs";
+    }
+    else if( !strcmp(flag_small, "large") ){
+        base_name =  "sift/sift_base.fvecs";
+        query_name = "sift/sift_query.fvecs";
+        groundtruth_name = "sift/sift_groundtruth.ivecs";
+    }
+    else{
+        cerr << "ERROR: Should include the file name as command line argument like \"-f small\" or \"-f large\"\n";
+        return -1;
+    }
+
+    // Get K argument
+    // int k;
+    char *tempk;
+    if (!strcmp(argv[1], "-k")) tempk = argv[2];
+    else if (!strcmp(argv[3], "-k")) tempk = argv[4];
+    else if (!strcmp(argv[5], "-k")) tempk = argv[6];
+    else if (!strcmp(argv[7], "-k")) tempk = argv[8];
+    else if (argc == 11 && !strcmp(argv[9], "-k")) tempk = argv[10];
+    else {
+        cerr << "ERROR: Should include the k command line argument like \"-k k_neighbors\"\n";
+        return -1;
+    }
+    k = atoi(tempk);
+    if (k <= 0 || !isPositiveInteger(tempk)) {
+        cerr << "ERROR: Bucket capacity b should be a positive integer number\n";
+        return -1;
+    }
+
+    // Get L argument
+    // int L;
+    char *tempL;
+    if (!strcmp(argv[1], "-l")) tempL = argv[2];
+    else if (!strcmp(argv[3], "-l")) tempL = argv[4];
+    else if (!strcmp(argv[5], "-l")) tempL = argv[6];
+    else if (!strcmp(argv[7], "-l")) tempL = argv[8];
+    else if (argc == 11 && !strcmp(argv[9], "-l")) tempL = argv[10];
+    else {
+        cerr << "ERROR: Should include the l command line argument like \"-l l_argument\"\n";
+        return -1;
+    }
+    L = atoi(tempL);
+    if (L <= 0 || !isPositiveInteger(tempL)) {
+        cerr << "ERROR: L argument should be a positive integer number\n";
+        return -1;
+    }
+
+
+    // Get L argument
+    // int R;
+    char *tempR;
+    if (!strcmp(argv[1], "-r")) tempR = argv[2];
+    else if (!strcmp(argv[3], "-r")) tempR = argv[4];
+    else if (!strcmp(argv[5], "-r")) tempR = argv[6];
+    else if (!strcmp(argv[7], "-r")) tempR = argv[8];
+    else if (argc == 11 && !strcmp(argv[9], "-r")) tempR = argv[10];
+    else {
+        cerr << "ERROR: Should include the r command line argument like \"-r r_argument\"\n";
+        return -1;
+    }
+    R = atoi(tempR);
+    if (R <= 0 || !isPositiveInteger(tempR)) {
+        cerr << "ERROR: R argument should be a positive integer number\n";
+        return -1;
+    }
+
+    // Get L argument
+    // float a;
+    char *tempA;
+    if (!strcmp(argv[1], "-a")) tempA = argv[2];
+    else if (!strcmp(argv[3], "-a")) tempA = argv[4];
+    else if (!strcmp(argv[5], "-a")) tempA = argv[6];
+    else if (!strcmp(argv[7], "-a")) tempA = argv[8];
+    else if (argc == 11 && !strcmp(argv[9], "-a")) tempA = argv[10];
+    else {
+        cerr << "ERROR: Should include the a command line argument like \"-a a_argument\"\n";
+        return -1;
+    }
+    a = atof(tempA);
+    if (a <= 0 ) {
+        cerr << "ERROR: a argument should be a positive integer number\n";
+        return -1;
+    }
+
+    return 1;
+}
 
 
 /*---------------------------Utility functions and classes for the tests-----------------------------------*/
