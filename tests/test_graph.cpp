@@ -1,5 +1,8 @@
 #include "../lib/acutest.h"			// Unit testing library
 #include "../lib/utils.hpp"
+#include <algorithm>
+
+using namespace std;
 
 #define NUM 1000
 
@@ -262,7 +265,8 @@ void test_get_neighbors() {
     G.add_edge(1,3);
     G.add_edge(1,7);
     G.add_edge(1,2);
-   
+    
+
     G.add_edge(2,3);
     G.add_edge(2,4);
     G.add_edge(2,5);
@@ -273,17 +277,17 @@ void test_get_neighbors() {
 
     G.add_edge(9,5);
 
-    set<int> S1 = G.get_neighbors(1);
-    TEST_ASSERT(S1.find(3) != S1.end() && S1.find(7) != S1.end() && S1.find(2) != S1.end() && S1.size() == 3);
+    vector<gIndex> S1 = G.get_neighbors(1);
+    TEST_ASSERT(find(S1.begin(), S1.end(), 3) != S1.end() && find(S1.begin(), S1.end(), 7) != S1.end() && find(S1.begin(), S1.end(), 2) != S1.end() && S1.size() == 3);
 
-    set<int> S2 = G.get_neighbors(2);
-    TEST_ASSERT(S2.find(3) != S2.end() && S2.find(4) != S2.end() && S2.find(5) != S2.end() && S2.find(6) != S2.end() && S2.size() == 4);
+    vector<gIndex> S2 = G.get_neighbors(2);
+    TEST_ASSERT(find(S2.begin(), S2.end(), 3) != S2.end() && find(S2.begin(), S2.end(), 4) != S2.end() && find(S2.begin(), S2.end(), 5) != S2.end() && find(S2.begin(), S2.end(), 6) != S2.end() && S2.size() == 4);
 
-    set<int> S3 = G.get_neighbors(7);
-    TEST_ASSERT(S3.find(1) != S3.end() && S3.find(2) != S3.end() && S3.size() == 2);
+    vector<gIndex> S3 = G.get_neighbors(7);
+    TEST_ASSERT(find(S3.begin(), S3.end(), 1) != S3.end() && find(S3.begin(), S3.end(), 2) != S3.end() && S3.size() == 2);
 
-    set<int> S4 = G.get_neighbors(9);
-    TEST_ASSERT(S4.find(5) != S4.end() && S4.size() == 1);
+    vector<gIndex> S4 = G.get_neighbors(9);
+    TEST_ASSERT(find(S4.begin(), S4.end(), 5) != S4.end() && S4.size() == 1);
 
 }
 

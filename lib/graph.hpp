@@ -18,6 +18,10 @@ public:
     /* Adds a vertex (of type T) to the graph, return false if the vertex is already in the graph*/
     bool add_vertex(const T& v);
 
+    void insert_sorted(vector<gIndex>& v, T key);
+
+    void insert_sorted_in_adj_list(vector<T>& v, T key);
+
     /* Adds edge between vertex(T) start and vertex(T) end */
     bool add_edge(const T& start, const T& end);
 
@@ -43,7 +47,7 @@ public:
     inline const bool is_directed();
 
     /* Returns a set containing all the current neighbours of the given vertex */
-    const set<T> get_neighbors(T vertex);
+    const vector<gIndex> get_neighbors(T vertex);
 
     /* Method that returns if exists an edge from vertex_a to vertex_b*/
     inline bool exist_edge(T vertex_a, T vertex_b);
@@ -108,6 +112,43 @@ bool Graph<T>::add_vertex(const T& v) {
 }
 
 
+
+
+template <typename T>
+void Graph<T>::insert_sorted(vector<gIndex>& v, T key) {
+    v.push_back(v_index[key]);
+    
+    int insertPos = 0;
+    for (auto i = v.begin(); i < v.end() - 1; i++) {
+        if (v_index[key] >= *i) {
+            insertPos++;
+        } else {
+            break;
+        }
+    }
+    copy_backward(v.begin() + insertPos, v.end() - 1, v.end());
+
+    v[insertPos] = v_index[key];
+}
+
+template <typename T>
+void Graph<T>::insert_sorted_in_adj_list(vector<T>& adj, T key) {
+    adj.push_back(key);
+    
+    int insertPos = 1;
+    for (auto i = adj.begin() + 1; i < adj.end() - 1; i++) {
+        if (v_index[key] >= v_index[*i]) {
+            insertPos++;
+        } else {
+            break;
+        }
+    }
+    if (adj.begin() + insertPos < adj.end() - 1) {
+        copy_backward(adj.begin() + insertPos, adj.end() - 1, adj.end());
+        adj[insertPos] = key;
+    }
+}
+
 /* Add edge between vertex(T) start and vertex(T) end, returns true if the edge added successfully*/
 template <typename T>
 bool Graph<T>::add_edge(const T& start, const T& end) {
@@ -123,18 +164,21 @@ bool Graph<T>::add_edge(const T& start, const T& end) {
 
     // Get the index of vertex start and add entry (vertex end) to adjacency list
     int pos_start = v_index[start];
-    adjacencyList[pos_start].push_back(end);
+    insert_sorted_in_adj_list(adjacencyList[pos_start], end);
+
     countEdges++;
 
     /* If the graph is undirected, add also the end->start edge*/
-    if( isDirected == false ){
+    if ( isDirected == false ) {
         auto pos_end = v_index[end];
-        adjacencyList[pos_end].push_back(start);
+        
+        insert_sorted_in_adj_list(adjacencyList[pos_end], start);
         countEdges++;
     }
     
     return true;
 }
+
 
 
 /* Removes edge between node start and node end from the graph, returns true if the edge removed successfully */
@@ -172,6 +216,19 @@ bool Graph<T>::remove_edge(const T& start, const T& end) {
     }
 
     return true;
+}
+
+/* Method to for printing vectors (mainly used for debugging) */
+template <typename type>
+void print_vector(vector<type> vec) {
+    int size = vec.size();
+    cout << "{";
+    for( int i = 0 ; i < size ; i++){
+        cout << vec[i];
+        if( i != size - 1 &&  size != 1 )
+            cout << ",";
+    }
+    cout << "}";
 }
 
 
@@ -233,15 +290,16 @@ inline const bool Graph<T>::is_directed(){
 
 /* Getting the neigbors of a given vertex */
 template <typename T>
-const set<T> Graph<T>::get_neighbors(T vertex) {
+const vector<gIndex> Graph<T>::get_neighbors(T vertex) {
  
-    // Getting the elements in the corresponding row of the adjacency list, i.e the vertex itself and its neighbors
-    vector<T> adj = adjacencyList[v_index[vertex]];
+    // Getting the elements in the corresponding row of the adjacency list without the vertex itself
+    vector<gIndex> neighbors;
+    neighbors.reserve(adjacencyList[v_index[vertex]].size() - 1);
 
-    set<T> neighbors(adj.begin(), adj.end());
-
-    // since adj includes the vertex itself, we remove it from the set
-    neighbors.erase(vertex);
+    // Inserting neighbors into vector in the order they exist within the adjacency list.
+    for (auto ver = adjacencyList[v_index[vertex]].begin() + 1; ver < adjacencyList[v_index[vertex]].end(); ver++) {
+        neighbors.push_back(v_index[*ver]);
+    }
 
     return neighbors;
 }
