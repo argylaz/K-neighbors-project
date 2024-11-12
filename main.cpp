@@ -47,9 +47,9 @@ int main(int argc, char* argv[]) {
         // For each query
         vector<float> q = *n;
         
-        cout << "Query: ";
+        cout << "\nQuery: ";
         print_vector<float>(q);
-        cout << endl;
+        cout << "\n";
 
 
         // Run GreedySearch to get the k nearest neighbors
@@ -70,12 +70,12 @@ int main(int argc, char* argv[]) {
         set<int> V_intersec;
         set_intersection(X.begin(), X.end(), T.begin(), T.end(), inserter(V_intersec, V_intersec.begin()));
 
-        cout << "\nIntersection size is:" << V_intersec.size() << endl;
-        cout << "T size is:" << T.size() << endl;
+        cout << "\nIntersection size is:" << V_intersec.size();
+        cout << "\nT size is:" << T.size();
         
         // Calculate recall and add to total
         float recall = V_intersec.size() / ((float) X.size());
-        cout << "Recall is: " << recall << endl;
+        cout << "\nRecall is: " << recall << endl;
         total_recall += recall;
         count++;
 
@@ -84,6 +84,6 @@ int main(int argc, char* argv[]) {
     }
     
     total_recall = total_recall / count;
-    cout << "Total Recall is " << total_recall*100 <<"%\n" << endl;
+    cout << "\nTotal Recall is " << total_recall*100 <<"%\n" << endl;
     return 0;
 }
