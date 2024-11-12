@@ -8,20 +8,6 @@ using namespace std;
 
 
 
-/* Method to for printing vectors (mainly used for debugging) */
-template <typename type>
-void print_vector(vector<type> vec) {
-    int size = vec.size();
-    cout << "{";
-    for( int i = 0 ; i < size ; i++){
-        cout << vec[i];
-        if( i != size - 1 &&  size != 1 )
-            cout << ",";
-    }
-    cout << "}";
-}
-
-
 /* Function for the calculation of the Euclidean distance             */
 /* Returns INFINITY as error value indicating problems in calculation */
 template<typename Type>
@@ -60,15 +46,15 @@ inline float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 
 /* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
 template <typename Type>
-vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<vector<Type>> &S, vector<Type> xquery) {
+vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<gIndex>& S, vector<Type> xquery) {
     
     // Find the element with the minimum Euclidean distance from xquery
-    vector<Type> min = *min_element(S.begin(), S.end(), 
-                        [&xquery](const vector<Type>& a, const vector<Type>& b) {
-                            return Euclidean_Distance<Type>(a, xquery) < Euclidean_Distance<Type>(b, xquery);
+    gIndex min_index = *min_element(S.begin(), S.end(), 
+                        [&xquery, &G](const gIndex a, const gIndex b) {
+                            return Euclidean_Distance<Type>(G.get_vertex_from_index(a), xquery) < Euclidean_Distance<Type>(G.get_vertex_from_index(b), xquery);
     });
 
-    return min;
+    return G.get_vertex_from_index(min_index);
 }
 
 
