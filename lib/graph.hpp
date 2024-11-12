@@ -32,28 +32,28 @@ public:
     void print_graph();
 
     /* Method to get vertex from index */
-    const T get_vertex_from_index(gIndex i);
+    inline const T get_vertex_from_index(gIndex i);
 
     /* Method to get index from vertex */
-    gIndex get_index_from_vertex(const T& v);
+    inline gIndex get_index_from_vertex(const T& v);
 
     /* Method which returns the vertices count*/
-    const int get_vertices_count();
+    inline const int get_vertices_count();
 
     /* Method that returns the edge count */
-    const int get_edge_count();
+    inline const int get_edge_count();
 
     /* Returns true if the graph is directed */
-    const bool is_directed();
+    inline const bool is_directed();
 
     /* Returns a set containing all the current neighbours of the given vertex */
     const vector<gIndex> get_neighbors(T vertex);
 
     /* Method that returns if exists an edge from vertex_a to vertex_b*/
-    bool exist_edge(T vertex_a, T vertex_b);
+    inline bool exist_edge(T vertex_a, T vertex_b);
 
     /* Getter method for the set of vertices*/
-    set<T> get_vertices() const;
+    inline set<T> get_vertices() const;
 
 protected:
     vector<vector<T>> get_adjacency_list() const;
@@ -257,67 +257,36 @@ void Graph<T>::print_graph(void) {
 
 
 template <typename T>
-const T Graph<T>::get_vertex_from_index(int i) {
+inline const T Graph<T>::get_vertex_from_index(int i) {
     // Returns the first element of the i-th row of the adjacency list, which is the vetrex corresponding to the row
     return this->adjacencyList[i][0];          
 }
 
 
 template <typename T>
-gIndex Graph<T>::get_index_from_vertex(const T& v) {
+inline gIndex Graph<T>::get_index_from_vertex(const T& v) {
     return this->v_index[v];  // Just returning the mapping of v
 }
 
 
 template <typename T>
-const int Graph<T>::get_vertices_count(void) {
+inline const int Graph<T>::get_vertices_count(void) {
     // Just returns the private attribute
     return countVertices;
 }
 
 
 template <typename T>
-const int Graph<T>::get_edge_count(){
+inline const int Graph<T>::get_edge_count(){
     // Just returns the private attribute
     return countEdges;
 }
 
 /* Returns true if the graph is directed */
 template <typename T>
-const bool Graph<T>::is_directed(){
+inline const bool Graph<T>::is_directed(){
     return isDirected;
 }
-
-
-template <typename T>
-set<T> Graph<T>::get_vertices() const {
-    // Just returns the private attribute
-    return vertices;
-}
-
-
-/* Get adjacency list method for testing purposes */
-template <typename T>
-vector<vector<T>> Graph<T>::get_adjacency_list(void) const {
-    // Just returns the private attribute
-    return adjacencyList;
-}
-
-
-/* Method that returns true if an edge from vertex_a to vertex_b exists*/
-template <typename T>
-bool Graph<T>::exist_edge(T vertex_a, T vertex_b) {
-    // First we check whether the nodes themselves exist in the graph
-    if ( vertices.find(vertex_a) == vertices.end() || vertices.find(vertex_b) == vertices.end() )
-        return false;
-        
-    // Then we check whether the entry for the edge exists in the adjacency list
-    if ( find(adjacencyList[v_index[vertex_a]].begin(), adjacencyList[v_index[vertex_a]].end(), vertex_b) == adjacencyList[v_index[vertex_a]].end() )
-        return false;
-
-    return true;
-}
-
 
 /* Getting the neigbors of a given vertex */
 template <typename T>
@@ -334,3 +303,33 @@ const vector<gIndex> Graph<T>::get_neighbors(T vertex) {
 
     return neighbors;
 }
+
+
+/* Get adjacency list method for testing purposes */
+template <typename T>
+vector<vector<T>> Graph<T>::get_adjacency_list(void) const {
+    // Just returns the private attribute
+    return adjacencyList;
+}
+
+
+/* Method that returns true if an edge from vertex_a to vertex_b exists*/
+template <typename T>
+inline bool Graph<T>::exist_edge(T vertex_a, T vertex_b) {
+    // First we check whether the nodes themselves exist in the graph
+    if ( vertices.find(vertex_a) == vertices.end() || vertices.find(vertex_b) == vertices.end() )
+        return false;
+        
+    // Then we check whether the entry for the edge exists in the adjacency list
+    if ( find(adjacencyList[v_index[vertex_a]].begin(), adjacencyList[v_index[vertex_a]].end(), vertex_b) == adjacencyList[v_index[vertex_a]].end() )
+        return false;
+
+    return true;
+}
+
+template <typename T>
+inline set<T> Graph<T>::get_vertices() const {
+    // Just returns the private attribute
+    return vertices;
+}
+

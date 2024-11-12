@@ -46,7 +46,7 @@ inline float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 
 /* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
 template <typename Type>
-vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<gIndex>& S, vector<Type> xquery) {
+inline vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<gIndex>& S, vector<Type> xquery) {
     
     // Find the element with the minimum Euclidean distance from xquery
     gIndex min_index = *min_element(S.begin(), S.end(), 
@@ -60,7 +60,7 @@ vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<gIndex>& S, vector<T
 
 /* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
 template <typename Type>
-void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_set, vector<Type> xquery, int L) {
+inline void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_set, vector<Type> xquery, int L) {
 
     // cout <<"I"<< endl;
     // // Erasing the vertex itself from the set in order to avoid mistaking it for a neighbor
