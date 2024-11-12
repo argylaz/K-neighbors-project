@@ -65,6 +65,91 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int 
 
 
 
+template <typename T>
+pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(Graph<T>& G, vector<gIndex>& S, T& start, T& xquery, vector<pair<int, vector<T> >>& Fq, int& k, int& L) {
+
+     
+
+    // First we check that the input values are correct
+    if (L < k) { // L >= k
+        cerr << "\nSearch list size L must be greater than or equal to k!\n" << endl;
+        // Returns a pair with two empty sets
+        return {{},{}};
+    }
+
+    // Initialize set L_output = {} and V = {}
+    set<gIndex> L_output;
+    vector<gIndex> V;
+
+
+    // Filtering 
+    for( size_t i = 0 ; i < S.size() ; i++ ){
+        // Checking if the intersection of Fs and Fq is empty
+        for( size_t j = 0 ; j < Fq.size() ; j++ ){
+            int dimension = Fq[j].first;
+            vector<T> value = Fq[j].second;
+            
+            // Get the S[i] vertex 
+            T s = G.get_vertex_from_index(i);
+            if(  s[dimension] == value ){               // Checking if the 
+                L_output.insert(S[i]);                  // add S[i] to L_output
+                break;                                  // We need at least one 
+            } 
+        }
+    }
+
+    // Subtraction of sets L_output \ V
+    vector<gIndex> diff_set;
+    set_difference(L_output.begin(), L_output.end(), V.begin(), V.end(), inserter(diff_set, diff_set.begin()));
+
+    while ( !diff_set.empty() ) {
+
+
+        // Find the vertex with the minimum euclidean distance from the xquery
+        T min = find_min_Euclidean(G, diff_set, xquery);
+        V.push_back(G.get_index_from_vertex(min));
+
+
+        // Γραμμή 4 και 5 του ψευδοκώδικα
+        vector<gIndex> neighbors = G.get_neighbors(min);
+        vector<gIndex> N;
+
+        for( size_t n = 0 ; n < neighbors.size() ; n++ ){
+            
+            bool filter_flag = false;
+            // Checking if the intersection of Fs and Fq is empty
+            for( size_t j = 0 ; j < Fq.size() ; j++ ){
+                int dimension = Fq[j].first;
+                vector<T> value = Fq[j].second;
+            
+                // Get the S[i] vertex 
+                T s = G.get_vertex_from_index(n);
+
+                if(  s[dimension] == value ){               // Checking if the  
+                    filter_flag = true;
+                    break;                                  // We need at least one 
+                } 
+            }
+            
+            vector<gIndex>::iterator iter = find(V.begin(), V.end(), min);
+            if( filter_flag && iter == V.end() ){
+                L_output.insert(G.get_index_from_vertex(min));
+            }
+
+        }
+
+
+        // Upper bound check
+        if ( L_output.size() > (long unsigned int) L ) {
+            retain_closest_points(G, L_output, xquery, L);          
+        }
+
+    }
+
+
+
+
+} 
 
 /* Prunes the graph to make it more fit for the GreedySearch algorithm, modified to have at most R out-neighbors for p */
 // p is the index of the given point p, which is included in the Graph
