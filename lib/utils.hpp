@@ -60,7 +60,7 @@ set<vector<Type>> read_sets(string& filename);
 
 
 // Function that checks if a string is a positive integer (for checking the command line arguments)
-int isPositiveInteger(char *str);
+bool isPositiveInteger(char *str);
 
 
 // Function that reads the command line input arguments. Returns 1 or -1
@@ -408,7 +408,7 @@ set<vector<Type>> read_sets(string& filename) {
 
 
 // Function that checks if a string is a positive integer (for checking the command line arguments)
-int isPositiveInteger(char *str) {
+bool isPositiveInteger(char *str) {
     int sz = strlen(str);
     for (int i = 0; i < sz; i++) {
         if (!isdigit(str[i])) return 0;

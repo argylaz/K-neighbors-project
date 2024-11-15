@@ -212,7 +212,20 @@ void test_rDirectional() {
 
 }
 
+void test_isPositiveInteger() {
+    // Testing for actual positive integers
+    char *s = "1";      TEST_ASSERT(isPositiveInteger(s));
+    s = "123123";       TEST_ASSERT(isPositiveInteger(s));
 
+    // Testing for other things (should return false)
+    s = "a";            TEST_ASSERT(!isPositiveInteger(s));
+    s = "abcxdfg";      TEST_ASSERT(!isPositiveInteger(s));
+    s = "12354abcxdfg"; TEST_ASSERT(!isPositiveInteger(s));
+}
+
+void test_get_arguments() {
+    
+}
 
 /* Testing fvec_to_graph */
 void test_fvec_to_graph() {
@@ -301,6 +314,8 @@ TEST_LIST = {
     { "Retain_closest_neighbors", test_retain_closest_points},
     { "Medoid", test_medoid},
     { "rDirectional", test_rDirectional},
+    { "isPositiveInteger", test_isPositiveInteger},
+    { "get_arguments", test_get_arguments},
     { "fvec to graph", test_fvec_to_graph },
     { "ivec to graph", test_ivec_to_graph },
     { NULL, NULL }
