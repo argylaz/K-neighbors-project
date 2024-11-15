@@ -7,9 +7,76 @@ using namespace std;
 
 
 
+/*----------------------------------------------------Function Declarations---------------------------------------------------------*/
+
+
 
 /* Function for the calculation of the Euclidean distance             */
 /* Returns INFINITY as error value indicating problems in calculation */
+template<typename Type>
+inline float Euclidean_Distance(vector<Type> a, vector<Type> b);
+
+
+/* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
+template <typename Type>
+inline vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<gIndex>& S, vector<Type> xquery);
+
+
+/* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
+template <typename Type>
+inline void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_set, vector<Type> xquery, int L);
+
+
+/* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
+template <typename Type>
+inline void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_set, vector<Type> xquery, int L);
+
+
+/* Method which finds the medoid of a given graph */
+template <typename Type>
+vector<Type> medoid(Graph<vector<Type>>& G);
+
+
+/* Method which adds randomly exactly R outgoing neighbors to each vertex of the graph */
+template <typename T>
+void rDirectional(Graph<T>& G, int R);
+
+
+/* Given an empty graph, reads an fvec file and fills the graph with all the vectors read as its vertices and no edges */
+/* This functions assumes that all the vectors given in the file will be of the same dimension                         */
+/* Otherwise, the entries inside the graph will be uneven (vectors of different dimensions)                            */
+template <typename type>
+void vec_to_graph(const string& filename, Graph<vector<type>>& G);
+
+
+/* Method that reads vectors from an fvec or ivec and returns a vector containing all of them */
+template <typename Type>
+vector<vector<Type>> read_vecs(string& filename);
+
+
+/* Same as the above but returns a set containing all the vectors instead */
+template <typename Type>
+set<vector<Type>> read_sets(string& filename);
+
+
+// Function that checks if a string is a positive integer (for checking the command line arguments)
+int isPositiveInteger(char *str);
+
+
+// Function that reads the command line input arguments. Returns 1 or -1
+int get_arguments(int argc, char* argv[], int& k, int& L, float& a, int& R,string& base_name, string& query_name, string& groundtruth_name);
+
+
+/* Creates an fvec file with the given vectors for testing */
+template <typename type>
+void make_vec(const string& filename, const vector<vector<type>>& vectors);
+
+
+
+/*----------------------------------------------------Function Definitions-----------------------------------------------------------*/
+
+
+
 template<typename Type>
 inline float Euclidean_Distance(vector<Type> a, vector<Type> b) {
     /* Implemented with separate for loops instead of iterators so that the compiler can vectorise the operations */
@@ -44,7 +111,6 @@ inline float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 
 
 
-/* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
 template <typename Type>
 inline vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<gIndex>& S, vector<Type> xquery) {
     
@@ -71,17 +137,12 @@ inline void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_s
     
     // Create vector with the elements of the set
     vector<gIndex> output_vec(output_set.begin(), output_set.end());
-    // for (gIndex g: output_vec) { cout << g<< " ";}
-    // cout <<endl;
-
-    // cout<<"II"<< endl;
 
     // Sort the vector by comparing the Euclidean Distance of each element with xquery
     sort(output_vec.begin(), output_vec.end(), [&xquery, &G](const gIndex a, const gIndex b) {
         return Euclidean_Distance<Type>(G.get_vertex_from_index(a), xquery) < Euclidean_Distance<Type>(G.get_vertex_from_index(b), xquery);
     });
 
-    // cout<<"III"<< endl;
     // Resize the output to size L to only keep the L closest neighbors
     if( output_vec.size() >= (long unsigned int) L )
         output_vec.resize(L);
@@ -90,9 +151,6 @@ inline void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_s
 
     output_set.clear();
     output_set.insert(output_vec.begin(), output_vec.end());
-    // for (gIndex g: output_vec) { cout << g<< " ";}
-    // cout <<endl;
-    // cout<<"IV"<< endl;
 }
 
 
