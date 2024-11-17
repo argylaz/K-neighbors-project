@@ -113,24 +113,21 @@ bool Graph<T>::add_vertex(const T& v) {
 
 
 
-
+/* Inserts the index of vertex key in the given vector at the correct position so it remains sorted */
 template <typename T>
 void Graph<T>::insert_sorted(vector<gIndex>& v, T key) {
-    v.push_back(v_index[key]);
-    
-    int insertPos = 0;
-    for (auto i = v.begin(); i < v.end() - 1; i++) {
-        if (v_index[key] >= *i) {
-            insertPos++;
-        } else {
-            break;
-        }
-    }
-    copy_backward(v.begin() + insertPos, v.end() - 1, v.end());
+    // Get the value to be inserted
+    gIndex value = v_index.at(key);
 
-    v[insertPos] = v_index[key];
+    // Find the correct position to insert using binary search
+    auto insertPos = std::lower_bound(v.begin(), v.end(), value);
+
+    // Insert value at position
+    v.insert(insertPos, value);
 }
 
+
+/* Inserts a vertex key in the given vector of the adjacency list*/
 template <typename T>
 void Graph<T>::insert_sorted_in_adj_list(vector<T>& adj, T key) {
     adj.push_back(key);
@@ -147,6 +144,15 @@ void Graph<T>::insert_sorted_in_adj_list(vector<T>& adj, T key) {
         copy_backward(adj.begin() + insertPos, adj.end() - 1, adj.end());
         adj[insertPos] = key;
     }
+
+    // // Find the correct position to insert using binary search (comparing by equivalent gIndex value)
+    // auto insertPos = std::lower_bound(adj.begin(), adj.end() - 1, key, 
+    //                                   [this](const T& l, const T& r) {
+    //                                       return v_index[l] < v_index[r];
+    //                                   });
+    
+    // // Insert key(vertex) at position
+    // adj.insert(insertPos, key);
 }
 
 /* Add edge between vertex(T) start and vertex(T) end, returns true if the edge added successfully*/
