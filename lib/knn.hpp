@@ -64,9 +64,9 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int 
 
 
 
-
-template <typename T>
-pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(Graph<T>& G, vector<gIndex>& S, T& start, T& xquery, vector<pair<int, vector<T> >>& Fq, int& k, int& L) {
+// Implementation of Filtered Greedy Search
+template <typename Type>
+pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(Graph<vector<Type>>& G, vector<gIndex>& S, vector<Type>& start, vector<Type>& xquery, vector<pair<int, vector<Type>>>& Fq, int& k, int& L) {
 
      
 
@@ -87,10 +87,10 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(Graph<T>& G, vector<gInde
         // Checking if the intersection of Fs and Fq is empty
         for( size_t j = 0 ; j < Fq.size() ; j++ ){
             int dimension = Fq[j].first;
-            vector<T> value = Fq[j].second;
+            Type value = Fq[j].second;
             
             // Get the S[i] vertex 
-            T s = G.get_vertex_from_index(i);
+            vector<Type> s = G.get_vertex_from_index(i);
             if(  s[dimension] == value ){               // Checking if the 
                 L_output.insert(S[i]);                  // add S[i] to L_output
                 break;                                  // We need at least one 
@@ -106,7 +106,7 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(Graph<T>& G, vector<gInde
 
 
         // Find the vertex with the minimum euclidean distance from the xquery
-        T min = find_min_Euclidean(G, diff_set, xquery);
+        vector<Type> min = find_min_Euclidean(G, diff_set, xquery);
         V.push_back(G.get_index_from_vertex(min));
 
 
@@ -120,10 +120,10 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(Graph<T>& G, vector<gInde
             // Checking if the intersection of Fs and Fq is empty
             for( size_t j = 0 ; j < Fq.size() ; j++ ){
                 int dimension = Fq[j].first;
-                vector<T> value = Fq[j].second;
+                Type value = Fq[j].second;
             
                 // Get the S[i] vertex 
-                T s = G.get_vertex_from_index(n);
+                vector<Type> s = G.get_vertex_from_index(n);
 
                 if(  s[dimension] == value ){               // Checking if the  
                     filter_flag = true;
@@ -138,16 +138,12 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(Graph<T>& G, vector<gInde
 
         }
 
-
         // Upper bound check
         if ( L_output.size() > (long unsigned int) L ) {
             retain_closest_points(G, L_output, xquery, L);          
         }
 
     }
-
-
-
 
 } 
 
