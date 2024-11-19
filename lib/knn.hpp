@@ -65,9 +65,13 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int 
 
 
 // Implementation of Filtered Greedy Search
+/*  G:      Graph that represents the dataset        */
+/*  xquery: The query vector                         */
+/*  k:      The number of neaerst neighbors returned */
+/*  L:      The size of the search list              */
+/*  Fq:     The query filters                        */
 template <typename Type>
-pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(Graph<vector<Type>>& G, vector<gIndex>& S, vector<Type>& start, vector<Type>& xquery, vector<pair<int, vector<Type>>>& Fq, int& k, int& L) {
-
+pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Type>>& G, vector<Type> xquery, const int k, const int L, vector<Type> Fq) {
      
 
     // First we check that the input values are correct
@@ -77,6 +81,9 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(Graph<vector<Type>>& G, v
         return {{},{}};
     }
 
+    // Get the set of vertices from the graph
+    set<vector<Type>> S = G.get_vertices();
+
     // Initialize set L_output = {} and V = {}
     set<gIndex> L_output;
     vector<gIndex> V;
@@ -84,26 +91,28 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(Graph<vector<Type>>& G, v
 
     // Filtering 
     for( size_t i = 0 ; i < S.size() ; i++ ){
+        // Get the vertex with index i
+        vector<Type> s = G.get_vertex_from_index(i);
+            
+        /* GET FILTERS FROM GRAPH */
+        vector<Type> Fs /* = G.get_filters(s)*/; // !!!
+
         // Checking if the intersection of Fs and Fq is empty
         for( size_t j = 0 ; j < Fq.size() ; j++ ){
-            int dimension = Fq[j].first;
-            Type value = Fq[j].second;
-            
-            // Get the S[i] vertex 
-            vector<Type> s = G.get_vertex_from_index(i);
-            if(  s[dimension] == value ){               // Checking if the 
-                L_output.insert(S[i]);                  // add S[i] to L_output
-                break;                                  // We need at least one 
-            } 
+
+            /* Check if the filters match */
+            if( Fs[i] == Fq[i]){
+                L_output.insert(s);
+                break;                        // We need at least one to match so that the intersection is non-empty
+            }
         }
     }
 
-    // Subtraction of sets L_output \ V
+    // Subtraction of sets L_output \ V // !!!
     vector<gIndex> diff_set;
     set_difference(L_output.begin(), L_output.end(), V.begin(), V.end(), inserter(diff_set, diff_set.begin()));
 
     while ( !diff_set.empty() ) {
-
 
         // Find the vertex with the minimum euclidean distance from the xquery
         vector<Type> min = find_min_Euclidean(G, diff_set, xquery);
@@ -114,25 +123,30 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(Graph<vector<Type>>& G, v
         vector<gIndex> neighbors = G.get_neighbors(min);
         vector<gIndex> N;
 
-        for( size_t n = 0 ; n < neighbors.size() ; n++ ){
-            
-            bool filter_flag = false;
-            // Checking if the intersection of Fs and Fq is empty
-            for( size_t j = 0 ; j < Fq.size() ; j++ ){
-                int dimension = Fq[j].first;
-                Type value = Fq[j].second;
-            
-                // Get the S[i] vertex 
-                vector<Type> s = G.get_vertex_from_index(n);
+        // For each one of min's (p*) neighbors
+        for( size_t n = 0 ; n < neighbors.size() ; n++ ) {
+ 
+            // Get the vertex with index n           // !!!
+            vector<Type> s = G.get_vertex_from_index(n);
 
-                if(  s[dimension] == value ){               // Checking if the  
+            /* GET FILTERS FROM GRAPH */
+            vector<Type> Fs /* = G.get_filters(s)*/; // !!!
+            
+            // Check if the intersection of Fs and Fq is empty
+            bool filter_flag = false;
+            for( size_t j = 0 ; j < Fq.size() ; j++ ) {
+
+                // We need at least one to match for the intersection to be non-empty
+                if( Fq[i] == Fs[i] ){
                     filter_flag = true;
-                    break;                                  // We need at least one 
+                    break;
                 } 
             }
             
+            // Check whether the p' exists within V  // !!!
             vector<gIndex>::iterator iter = find(V.begin(), V.end(), min);
-            if( filter_flag && iter == V.end() ){
+
+            if( filter_flag && iter == V.end() ) {
                 L_output.insert(G.get_index_from_vertex(min));
             }
 
@@ -145,6 +159,7 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(Graph<vector<Type>>& G, v
 
     }
 
+    return {L_output,V};
 } 
 
 /* Prunes the graph to make it more fit for the GreedySearch algorithm, modified to have at most R out-neighbors for p */

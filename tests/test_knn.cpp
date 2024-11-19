@@ -6,7 +6,7 @@ using namespace std;
 void test_GreedySearch() {
     // Test using simple example solved by hand
     // Using <vector<int>> because GreedySearch and EuclideanDistance work with vectors.
-    TestGraph<vector<int>> G;
+    Graph<vector<int>> G;
     
     // Add vertices 0,1,2,3,4
     G.add_vertex({0}); G.add_vertex({1}); G.add_vertex({2}); G.add_vertex({3}); G.add_vertex({4}); 
@@ -137,19 +137,55 @@ void test_GreedySearch() {
 
 }
 
+/* Testing FilteredGreedySearch method  using an example solved by hand */
+void test_FilteredGreedySerch() {
+    
+    /*Filter*/Graph<vector<int>> G;
 
+    // Adding vertices 0,1,2,3,4
+    G.add_vertex({0}); G.add_vertex({1}); G.add_vertex({2}); G.add_vertex({3}); G.add_vertex({4});
+
+    
+    /* ADD FILTERS */
+
+    
+    // Adding some edges 
+    G.add_edge({0}, {1}); G.add_edge({0}, {3});
+    G.add_edge({1}, {2}); G.add_edge({1}, {4});
+    G.add_edge({2}, {3}); G.add_edge({2}, {4});
+    G.add_edge({3}, {1}); G.add_edge({3}, {4});
+    G.add_edge({4}, {0}); G.add_edge({4}, {1});
+
+    // Run FilteredGreedySearch with 
+    int k = 2;
+    int L = 3;
+
+    auto result = FilteredGreedySearch<int>(G, {0}, k, L, {1});
+    set<gIndex> Lout = result.first;
+    vector<gIndex> V = result.second;
+
+    // Test that the returned values are the ones expected (L = {1,4}, V = {1,2,4})
+    TEST_ASSERT(Lout.size() == 2);
+    TEST_ASSERT(find(Lout.begin(), Lout.end(), 1) != Lout.end());  // 2 in L
+    TEST_ASSERT(find(Lout.begin(), Lout.end(), 4) != Lout.end());  // 5 in L
+
+    TEST_ASSERT(V.size() == 3);
+    TEST_ASSERT(find(V.begin(), V.end(), 1) != V.end());  // 2 on V
+    TEST_ASSERT(find(V.begin(), V.end(), 2) != V.end());  // 3 in V
+    TEST_ASSERT(find(V.begin(), V.end(), 4) != V.end());  // 5 in V
+}
 
 /* Testing the RobustPrune method */
 void test_RobustPrune() {
     
     /* Testing for ints */
 
-    TestGraph<vector<int>> G1;
+    Graph<vector<int>> G1;
     
     // Add vertices 0,1,2,3,4
     G1.add_vertex({0}); G1.add_vertex({1}); G1.add_vertex({2}); G1.add_vertex({3}); G1.add_vertex({4});
 
-    // Add some random edges
+    // Add some edges
     G1.add_edge({0}, {1}); G1.add_edge({0}, {2});
     G1.add_edge({1}, {2});
     G1.add_edge({2}, {0}); G1.add_edge({2}, {4});
@@ -192,7 +228,7 @@ void test_RobustPrune() {
 
     // Testing for floats, shortened version of the int test, same data with {x.1} form
 
-    TestGraph<vector<float>> G2;
+    Graph<vector<float>> G2;
     
     G2.add_vertex({0.1}); G2.add_vertex({1.1}); G2.add_vertex({2.1}); G2.add_vertex({3.1}); G2.add_vertex({4.1});
 
@@ -227,7 +263,7 @@ void test_RobustPrune() {
     
     // Testing for 2D float vectors, shortened version of the int test, same data with {x.1,9.9} form
 
-    TestGraph<vector<float>> G3;
+    Graph<vector<float>> G3;
     
     G3.add_vertex({0.1, 9.9}); G3.add_vertex({1.1, 9.9}); G3.add_vertex({2.1, 9.9}); G3.add_vertex({3.1, 9.9}); G3.add_vertex({4.1, 9.9});
 
@@ -262,7 +298,7 @@ void test_RobustPrune() {
 /* Testing the Vamana method */
 void test_Vamana() {
     /* Testing the vamana method with a simple example with integers solved by hand */
-    TestGraph<vector<int>> G1;
+    Graph<vector<int>> G1;
 
     // Add vertices 0,1,2,3
     G1.add_vertex({0}); G1.add_vertex({1}); G1.add_vertex({2}); G1.add_vertex({3});
@@ -298,7 +334,7 @@ void test_Vamana() {
 
 
     /* Testing the vamana method for 2d float vectors, shortened version of the int test, same data with {x.1,9.9} form*/
-    TestGraph<vector<float>> G2;
+    Graph<vector<float>> G2;
 
     // Add vertices 0,1,2,3
     G2.add_vertex({0.1, 9.9}); G2.add_vertex({1.1, 9.9}); G2.add_vertex({2.1, 9.9}); G2.add_vertex({3.1, 9.9});
@@ -327,6 +363,7 @@ void test_Vamana() {
 // List of all tests to be executed
 TEST_LIST = {
     {"GreedySearch", test_GreedySearch},
+    {"FilteredGreedySearch", test_FilteredGreedySerch},
     {"RobustPrune", test_RobustPrune},
     {"Vamana", test_Vamana},
     { NULL, NULL }
