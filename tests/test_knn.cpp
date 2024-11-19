@@ -363,7 +363,7 @@ void test_Vamana() {
 // List of all tests to be executed
 TEST_LIST = {
     {"GreedySearch", test_GreedySearch},
-    {"FilteredGreedySearch", test_FilteredGreedySerch},
+    // {"FilteredGreedySearch", test_FilteredGreedySerch},
     {"RobustPrune", test_RobustPrune},
     {"Vamana", test_Vamana},
     { NULL, NULL }

@@ -102,7 +102,7 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
 
             /* Check if the filters match */
             if( Fs[i] == Fq[i]){
-                L_output.insert(s);
+                L_output.insert(s);           // !!!
                 break;                        // We need at least one to match so that the intersection is non-empty
             }
         }
@@ -114,8 +114,8 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
 
     while ( !diff_set.empty() ) {
 
-        // Find the vertex with the minimum euclidean distance from the xquery
-        vector<Type> min = find_min_Euclidean(G, diff_set, xquery);
+        // Find the vertex with the minimum euclidean distance from the xquery // !!!
+        vector<Type> min = find_min_Euclidean<Type>(G, diff_set, xquery);
         V.push_back(G.get_index_from_vertex(min));
 
 
@@ -137,7 +137,7 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
             for( size_t j = 0 ; j < Fq.size() ; j++ ) {
 
                 // We need at least one to match for the intersection to be non-empty
-                if( Fq[i] == Fs[i] ){
+                if( Fq[n] == Fs[n] ){
                     filter_flag = true;
                     break;
                 } 
@@ -147,7 +147,7 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
             vector<gIndex>::iterator iter = find(V.begin(), V.end(), min);
 
             if( filter_flag && iter == V.end() ) {
-                L_output.insert(G.get_index_from_vertex(min));
+                L_output.insert(G.get_index_from_vertex(min)); 
             }
 
         }
