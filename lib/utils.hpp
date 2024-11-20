@@ -408,7 +408,7 @@ set<vector<Type>> read_sets(string& filename) {
 
 
 // Function that checks if a string is a positive integer (for checking the command line arguments)
-bool isPositiveInteger(char *str) {
+bool isPositiveInteger(const char *str) {
     int sz = strlen(str);
     for (int i = 0; i < sz; i++) {
         if (!isdigit(str[i])) return 0;
@@ -419,7 +419,7 @@ bool isPositiveInteger(char *str) {
 
 
 // Function that reads the command line input arguments. Returns 1 or -1
-int get_arguments(int argc, char* argv[], int& k, int& L, float& a, int& R,string& base_name, string& query_name, string& groundtruth_name){
+int get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R,string& base_name, string& query_name, string& groundtruth_name){
     // We need at least 8 arguments (Filename, k, L, R and maybe a)
     if (!(argc == 9 || argc == 11)) {     
         cerr << "ERROR: Malformed input at command line\n";
@@ -428,7 +428,7 @@ int get_arguments(int argc, char* argv[], int& k, int& L, float& a, int& R,strin
 
     
     // Get the filename
-    char* flag_small;      // Flag for siftsmall
+    const char* flag_small;      // Flag for siftsmall
     if (!strcmp(argv[1], "-f")) flag_small = argv[2];
     else if (!strcmp(argv[3], "-f")) flag_small = argv[4];
     else if (!strcmp(argv[5], "-f")) flag_small = argv[6];
@@ -459,7 +459,7 @@ int get_arguments(int argc, char* argv[], int& k, int& L, float& a, int& R,strin
 
     // Get K argument
     // int k;
-    char *tempk;
+    const char *tempk;
     if (!strcmp(argv[1], "-k")) tempk = argv[2];
     else if (!strcmp(argv[3], "-k")) tempk = argv[4];
     else if (!strcmp(argv[5], "-k")) tempk = argv[6];
@@ -477,7 +477,7 @@ int get_arguments(int argc, char* argv[], int& k, int& L, float& a, int& R,strin
 
     // Get L argument
     // int L;
-    char *tempL;
+    const char *tempL;
     if (!strcmp(argv[1], "-l")) tempL = argv[2];
     else if (!strcmp(argv[3], "-l")) tempL = argv[4];
     else if (!strcmp(argv[5], "-l")) tempL = argv[6];
@@ -494,9 +494,9 @@ int get_arguments(int argc, char* argv[], int& k, int& L, float& a, int& R,strin
     }
 
 
-    // Get L argument
+    // Get R argument
     // int R;
-    char *tempR;
+    const char *tempR;
     if (!strcmp(argv[1], "-r")) tempR = argv[2];
     else if (!strcmp(argv[3], "-r")) tempR = argv[4];
     else if (!strcmp(argv[5], "-r")) tempR = argv[6];
@@ -512,23 +512,25 @@ int get_arguments(int argc, char* argv[], int& k, int& L, float& a, int& R,strin
         return -1;
     }
 
-    // Get L argument
+    // Get A argument
     // float a;
-    char *tempA;
+    const char *tempA;
     if (!strcmp(argv[1], "-a")) tempA = argv[2];
     else if (!strcmp(argv[3], "-a")) tempA = argv[4];
     else if (!strcmp(argv[5], "-a")) tempA = argv[6];
     else if (!strcmp(argv[7], "-a")) tempA = argv[8];
     else if (argc == 11 && !strcmp(argv[9], "-a")) tempA = argv[10];
-    else {
+    else if (argc == 11 ){
         cerr << "ERROR: Should include the a command line argument like \"-a a_argument\"\n";
         return -1;
     }
-    a = atof(tempA);
-    if (a <= 0 ) {
-        cerr << "ERROR: a argument should be a positive integer number\n";
-        return -1;
-    }
+    if( argc == 11) {
+        a = atof(tempA);
+        if (a <= 0 ) {
+            cerr << "ERROR: a argument should be a positive integer number\n";
+            return -1;
+        }
+    } 
 
     return 1;
 }
