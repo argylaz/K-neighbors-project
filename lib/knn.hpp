@@ -71,7 +71,7 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int 
 /*  L:      The size of the search list              */
 /*  Fq:     The query filters                        */
 template <typename Type>
-pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Type>>& G, vector<Type> xquery, const int k, const int L, vector<Type> Fq) {
+pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Type>>& G, vector<Type>& xquery, const int k, const int L, vector<Type>& Fq) {
      
 
     // First we check that the input values are correct
@@ -102,13 +102,13 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
 
             /* Check if the filters match */
             if( Fs[i] == Fq[i]){
-                L_output.insert(s);           // !!!
+                L_output.insert(G.get_index_from_vertex(s));
                 break;                        // We need at least one to match so that the intersection is non-empty
             }
         }
     }
 
-    // Subtraction of sets L_output \ V // !!!
+    // Subtraction of sets L_output \ V
     vector<gIndex> diff_set;
     set_difference(L_output.begin(), L_output.end(), V.begin(), V.end(), inserter(diff_set, diff_set.begin()));
 
@@ -121,12 +121,11 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
 
         // Γραμμή 4 και 5 του ψευδοκώδικα
         vector<gIndex> neighbors = G.get_neighbors(min);
-        vector<gIndex> N;
 
         // For each one of min's (p*) neighbors
-        for( size_t n = 0 ; n < neighbors.size() ; n++ ) {
+        for ( n : neighbors) {
  
-            // Get the vertex with index n           // !!!
+            // Get the vertex with index n
             vector<Type> s = G.get_vertex_from_index(n);
 
             /* GET FILTERS FROM GRAPH */
@@ -143,9 +142,10 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
                 } 
             }
             
-            // Check whether the p' exists within V  // !!!
-            vector<gIndex>::iterator iter = find(V.begin(), V.end(), min);
+            // Check whether the p' exists within V
+            vector<gIndex>::iterator iter = find(V.begin(), V.end(), s);
 
+            // Inserting straight to L_output instead of making a new set N'out(p*)
             if( filter_flag && iter == V.end() ) {
                 L_output.insert(G.get_index_from_vertex(min)); 
             }
@@ -157,6 +157,9 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
             retain_closest_points(G, L_output, xquery, L);          
         }
 
+        // Recalculate the difference of L and V
+        diff_set.clear();
+        set_difference(L_output.begin(), L_output.end(), V.begin(), V.end(), inserter(diff_set, diff_set.begin()));
     }
 
     return {L_output,V};
