@@ -90,7 +90,7 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
 
 
     // Filtering 
-    for( s : S ){
+    for( vector<Type> s : S ){
             
         /* GET FILTERS FROM GRAPH */
         vector<Type> Fs /* = G.get_filters(s)*/; // !!!
@@ -141,7 +141,7 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
             }
             
             // Check whether the p' exists within V
-            vector<gIndex>::iterator iter = find(V.begin(), V.end(), s);
+            vector<gIndex>::iterator iter = find(V.begin(), V.end(), n);
 
             // Inserting straight to L_output instead of making a new set N'out(p*)
             if( filter_flag && iter == V.end() ) {
