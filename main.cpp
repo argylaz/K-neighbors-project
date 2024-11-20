@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
     int k, L, R;
     float a = 2;    // Default value 
     string base_name, query_name, groundtruth_name;
-    if( get_arguments(argc, argv, k, L, a, R, base_name, query_name, groundtruth_name) == -1){
+    if( get_arguments(argc, (const char**)argv, k, L, a, R, base_name, query_name, groundtruth_name) == -1){
         return -1;
     }
     
