@@ -90,9 +90,7 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
 
 
     // Filtering 
-    for( size_t i = 0 ; i < S.size() ; i++ ){
-        // Get the vertex with index i
-        vector<Type> s = G.get_vertex_from_index(i);
+    for( s : S ){
             
         /* GET FILTERS FROM GRAPH */
         vector<Type> Fs /* = G.get_filters(s)*/; // !!!
@@ -101,7 +99,7 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
         for( size_t j = 0 ; j < Fq.size() ; j++ ){
 
             /* Check if the filters match */
-            if( Fs[i] == Fq[i]){
+            if( Fs[j] == Fq[j]){
                 L_output.insert(G.get_index_from_vertex(s));
                 break;                        // We need at least one to match so that the intersection is non-empty
             }
@@ -109,7 +107,7 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
     }
 
     // Subtraction of sets L_output \ V
-    vector<gIndex> diff_set;
+    set<gIndex> diff_set;  // !!! vector for performance
     set_difference(L_output.begin(), L_output.end(), V.begin(), V.end(), inserter(diff_set, diff_set.begin()));
 
     while ( !diff_set.empty() ) {
@@ -123,7 +121,7 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
         vector<gIndex> neighbors = G.get_neighbors(min);
 
         // For each one of min's (p*) neighbors
-        for ( n : neighbors) {
+        for ( gIndex n : neighbors) {
  
             // Get the vertex with index n
             vector<Type> s = G.get_vertex_from_index(n);
@@ -136,7 +134,7 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
             for( size_t j = 0 ; j < Fq.size() ; j++ ) {
 
                 // We need at least one to match for the intersection to be non-empty
-                if( Fq[n] == Fs[n] ){
+                if( Fq[j] == Fs[j] ){
                     filter_flag = true;
                     break;
                 } 

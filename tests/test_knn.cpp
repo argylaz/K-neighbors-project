@@ -159,8 +159,10 @@ void test_FilteredGreedySerch() {
     // Run FilteredGreedySearch with 
     int k = 2;
     int L = 3;
+    vector<int> xquery = {0};
+    vector<int> filter = {1};
 
-    auto result = FilteredGreedySearch<int>(G, {0}, k, L, {1});
+    auto result = FilteredGreedySearch<int>(G, xquery, k, L, filter);
     set<gIndex> Lout = result.first;
     vector<gIndex> V = result.second;
 
