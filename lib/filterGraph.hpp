@@ -1,4 +1,5 @@
-#include "graph.hpp"
+#include "utils.hpp"
+// #include <concepts>
 
 using namespace std;
 
@@ -15,13 +16,13 @@ class FilterGraph : public Graph<T> {
 
 public:
     // Default constructor
-    FilterGraph(bool isDirected = true) : Graph<T>(isDirected), filters();
+    FilterGraph<T,F>(bool isDirected = true);
 
     // Constructor that reads the contents of a .bin file with very specific structure and initialises graph
     // Only works for T = vector<float> since that's the type of the data in the given files for the project
     /* filename       : the path of the .bin file containing the data                        */
     /* num_dimensions : The dimension of the vectors in the data (without the filters)       */
-    FilterGraph(const string& filename, int num_dimensions, bool isDirected=true) requires same_as<T, vector<float>;
+    FilterGraph<T,F>(const string& filename, int num_dimensions, bool isDirected=true) /*requires same_as<T, vector<float>*/;
 
 
     // Overriding method to also add filters 
@@ -32,45 +33,54 @@ public:
 
 
 private: 
-    std::map<gIndex, vector<F>> filters;  // Supports multiple filters
+    map<gIndex, vector<F>> filters;  // Supports multiple filters
 
-    // Helper method to check file extention
-    bool hasBinExtension(const string& filename) const {
-        size_t pos = filename.rfind('.');
-        return pos != string::npos && filename.substr(pos) == ".bin"
-    }
+    
 };
+
+// Helper method to check file extention
+bool hasBinExtension(const string& filename) {
+    size_t pos = filename.rfind('.');
+    return pos != string::npos && filename.substr(pos) == ".bin";
+}
 
 
 
 /*------------------------------------------------------METHOD DEFINITIONS---------------------------------------------------------*/
 
+
+
+/* Default constructor definition */
+template <typename T, typename F>
+FilterGraph<T,F>::FilterGraph(bool isDirected): Graph<T>(isDirected) {
+    // No actual code, just the definition
+}
+
+
 // Implemented using the given ReadBin method in io.h of the given datasets
 template <typename T, typename F>
-FilterGraph<T,F>::FilterGraph(const string& filename, int num_dimensions, bool isDirected=true) : FilterGraph()  {
+FilterGraph<T,F>::FilterGraph(const string& filename, int num_dimensions, bool isDirected)  : Graph<T>(isDirected) {
     // Check the file extention
-    if(!hasBinExtention(filename)) { // !!! SHOULD BE CALLED WITH TRY AND CATCH
+    if(!hasBinExtension(filename)) { // !!! SHOULD BE CALLED WITH TRY AND CATCH
         throw invalid_argument("File must have a .bin extention: " + filename);
     }
 
 
     // Open file and check if it was opened properly
-    ifstream ifs(filename, std::ios::binary);
+    ifstream ifs(filename, ios::binary);
     assert(ifs.is_open());
 
-    std::cout << "Reading Data: " << filename << std::endl;
+    cout << "Reading Data: " << filename << endl;
 
 
-    // Get number of points and resize vertex container
+    // Get number of points
     uint32_t N;
     ifs.read((char *)&N, sizeof(uint32_t));
-    this->vertices.resize(N);
-    std::cout << "# of points: " << N << std::endl;
+    cout << "# of points: " << N << endl;
 
 
     // Initialise buffer
-    std::vector<float> buff(num_dimensions);
-    int counter = 0;
+    vector<float> buff(num_dimensions);
 
     // Read data repeatitively
     while (ifs.read((char *)buff.data(), (2 + num_dimensions) * sizeof(float))) {
@@ -80,19 +90,19 @@ FilterGraph<T,F>::FilterGraph(const string& filename, int num_dimensions, bool i
         /* Ignoring timestamp buff[2] */ 
 
         // Casting data to float
-        std::vector<float> row(num_dimensions);
+        vector<float> row(num_dimensions);
         for (int d = 0; d < num_dimensions; d++) {
             row[d] = static_cast<float>(buff[d+2]); // !!!
         }
-
+                
         // Adding entry to graph
-        this->add_vertex(row, {F});
+        this->add_vertex(row, {filter});
     }
 
 
     // Close file
     ifs.close();
-    std::cout << "Finish Reading Data" << endl;
+    cout << "Finish Reading Data" << endl;
 };
 
 
@@ -105,8 +115,10 @@ bool FilterGraph<T,F>::add_vertex(const T v, const vector<F> f) {
         Graph<T>::add_vertex(v);
 
         // Add mapping to filter
-        filters[vertex] = f;
-        cout << "Filter '"; print_vector(f); cout << << f << "' added to vertex " << vertex << ".\n"; // !!!
+        filters[this->get_index_from_vertex(v)] = f;
+    //     cout << "Filter '"; print_vector(f);
+    //     print_vector(v); 
+    //     cout << "' added to vertex " << v << ".\n"; // !!!
     }
     else {
         cerr << "Can't add vertex without filter!!!" << endl;
@@ -116,8 +128,12 @@ bool FilterGraph<T,F>::add_vertex(const T v, const vector<F> f) {
     return true;
 }
 
-
 template <typename T, typename F>
-vector<F> get_filters(gIndex i) {
-    return filters[i];
+vector<F> FilterGraph<T,F>:: get_filters(gIndex i){
+    return this->filters[i];
 }
+
+// template <typename F>
+// vector<F> get_filters(gIndex i) {
+//     return this->filters[i];
+// }

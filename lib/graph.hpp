@@ -57,8 +57,7 @@ public:
 
 protected:
     vector<vector<T>> get_adjacency_list() const;
-    
-private:
+
     int countEdges;
     int countVertices;
     bool isDirected;                        // True if the graph is directed
