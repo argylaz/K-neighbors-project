@@ -105,7 +105,7 @@ FilterGraph<T,F>::FilterGraph(const string& filename, int num_dimensions, bool i
     cout << "Finish Reading Data" << endl;
 };
 
-
+// Add_vertex function for adding a vertex with a specific filter in the graph
 template <typename T, typename F>
 bool FilterGraph<T,F>::add_vertex(const T v, const vector<F> f) {
 
@@ -128,12 +128,9 @@ bool FilterGraph<T,F>::add_vertex(const T v, const vector<F> f) {
     return true;
 }
 
+
+// Getter Function for getting the filter of the node with gIndex i
 template <typename T, typename F>
 vector<F> FilterGraph<T,F>:: get_filters(gIndex i){
     return this->filters[i];
 }
-
-// template <typename F>
-// vector<F> get_filters(gIndex i) {
-//     return this->filters[i];
-// }

@@ -138,17 +138,14 @@ void test_GreedySearch() {
 }
 
 /* Testing FilteredGreedySearch method  using an example solved by hand */
-void test_FilteredGreedySerch() {
+void test_FilteredGreedySearch() {
     
-    /*Filter*/Graph<vector<int>> G;
+    FilterGraph<vector<int>,int> G(true);
 
+    // added some random filters
     // Adding vertices 0,1,2,3,4
-    G.add_vertex({0}); G.add_vertex({1}); G.add_vertex({2}); G.add_vertex({3}); G.add_vertex({4});
+    G.add_vertex({0},{0}); G.add_vertex({1},{1}); G.add_vertex({2},{1}); G.add_vertex({3},{0}); G.add_vertex({4},{1});
 
-    
-    /* ADD FILTERS */
-
-    
     // Adding some edges 
     G.add_edge({0}, {1}); G.add_edge({0}, {3});
     G.add_edge({1}, {2}); G.add_edge({1}, {4});
@@ -159,22 +156,27 @@ void test_FilteredGreedySerch() {
     // Run FilteredGreedySearch with 
     int k = 2;
     int L = 3;
-    vector<int> xquery = {0};
+    vector<int> xquery = {2};
     vector<int> filter = {1};
 
-    auto result = FilteredGreedySearch<int>(G, xquery, k, L, filter);
+    auto result = FilteredGreedySearch<int, int>(G, xquery, k, L, filter);
     set<gIndex> Lout = result.first;
-    vector<gIndex> V = result.second;
+    set<gIndex> V = result.second;
+
+    cout << endl;
+    for( gIndex s : Lout){
+        cout << s << endl;
+    }
 
     // Test that the returned values are the ones expected (L = {1,4}, V = {1,2,4})
     TEST_ASSERT(Lout.size() == 2);
-    TEST_ASSERT(find(Lout.begin(), Lout.end(), 1) != Lout.end());  // 2 in L
-    TEST_ASSERT(find(Lout.begin(), Lout.end(), 4) != Lout.end());  // 5 in L
+    TEST_ASSERT(find(Lout.begin(), Lout.end(), 1) != Lout.end());  // 1 in L
+    TEST_ASSERT(find(Lout.begin(), Lout.end(), 4) != Lout.end());  // 4 in L
 
     TEST_ASSERT(V.size() == 3);
-    TEST_ASSERT(find(V.begin(), V.end(), 1) != V.end());  // 2 on V
-    TEST_ASSERT(find(V.begin(), V.end(), 2) != V.end());  // 3 in V
-    TEST_ASSERT(find(V.begin(), V.end(), 4) != V.end());  // 5 in V
+    TEST_ASSERT(find(V.begin(), V.end(), 1) != V.end());  // 1 on V
+    TEST_ASSERT(find(V.begin(), V.end(), 2) != V.end());  // 2 in V
+    TEST_ASSERT(find(V.begin(), V.end(), 4) != V.end());  // 4 in V
 }
 
 /* Testing the RobustPrune method */
@@ -365,7 +367,7 @@ void test_Vamana() {
 // List of all tests to be executed
 TEST_LIST = {
     {"GreedySearch", test_GreedySearch},
-    // {"FilteredGreedySearch", test_FilteredGreedySerch},
+    {"FilteredGreedySearch", test_FilteredGreedySearch},
     {"RobustPrune", test_RobustPrune},
     {"Vamana", test_Vamana},
     { NULL, NULL }

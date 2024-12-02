@@ -1,7 +1,8 @@
 /* This file contains all the algorithms relevant to the KNN project such as vamana indexing algorithm */
-#include "utils.hpp"
+// #include "utils.hpp"
 #include <limits.h>
 #include <numeric>
+#include "../lib/filterGraph.hpp"
 using namespace std;
 
 /* Traverses the graph and finds k-approx NNs */
@@ -70,8 +71,9 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int 
 /*  k:      The number of neaerst neighbors returned */
 /*  L:      The size of the search list              */
 /*  Fq:     The query filters                        */
-template <typename Type>
-pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Type>>& G, vector<Type>& xquery, const int k, const int L, vector<Type>& Fq) {
+// template <typename Type>
+template <typename Type, typename F> 
+pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>& G, vector<Type>& xquery, const int k, const int L, vector<F>& Fq) {
      
 
     // First we check that the input values are correct
@@ -81,21 +83,22 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
         return {{},{}};
     }
 
+
     // Get the set of vertices from the graph
     set<vector<Type>> S = G.get_vertices();
 
     // Initialize set L_output = {} and V = {}
     set<gIndex> L_output;
-    vector<gIndex> V;
+    set<gIndex> V;
 
 
     // Filtering 
     for( vector<Type> s : S ){
             
         /* GET FILTERS FROM GRAPH */
-        vector<Type> Fs /* = G.get_filters(s)*/; // !!!
+        vector<F> Fs  = G.get_filters(G.get_index_from_vertex(s)); 
 
-        // Checking if the intersection of Fs and Fq is empty
+        // Checking if the intersection of Fs and Fq is empty        
         for( size_t j = 0 ; j < Fq.size() ; j++ ){
 
             /* Check if the filters match */
@@ -114,20 +117,18 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
 
         // Find the vertex with the minimum euclidean distance from the xquery // !!!
         vector<Type> min = find_min_Euclidean<Type>(G, diff_set, xquery);
-        V.push_back(G.get_index_from_vertex(min));
+        // Check whether min has been already inserted to V
+        // Check whether the p' exists within V
+        V.insert(G.get_index_from_vertex(min));
 
-
-        // Γραμμή 4 και 5 του ψευδοκώδικα
+        // Line 4 && 5 of pseudocode
         vector<gIndex> neighbors = G.get_neighbors(min);
 
         // For each one of min's (p*) neighbors
         for ( gIndex n : neighbors) {
  
-            // Get the vertex with index n
-            vector<Type> s = G.get_vertex_from_index(n);
-
             /* GET FILTERS FROM GRAPH */
-            vector<Type> Fs /* = G.get_filters(s)*/; // !!!
+            vector<Type> Fs = G.get_filters(n); // !!!
             
             // Check if the intersection of Fs and Fq is empty
             bool filter_flag = false;
@@ -141,7 +142,9 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
             }
             
             // Check whether the p' exists within V
-            vector<gIndex>::iterator iter = find(V.begin(), V.end(), n);
+            // vector<gIndex>::iterator iter = find(V.begin(), V.end(), n);
+            set<gIndex>:: iterator iter = find(V.begin(), V.end(), n);
+
 
             // Inserting straight to L_output instead of making a new set N'out(p*)
             if( filter_flag && iter == V.end() ) {
@@ -158,7 +161,10 @@ pair<set<gIndex>, vector<gIndex>> FilteredGreedySearch(/*Filter*/Graph<vector<Ty
         // Recalculate the difference of L and V
         diff_set.clear();
         set_difference(L_output.begin(), L_output.end(), V.begin(), V.end(), inserter(diff_set, diff_set.begin()));
+        
     }
+
+    retain_closest_points(G, L_output, xquery, k);
 
     return {L_output,V};
 } 
