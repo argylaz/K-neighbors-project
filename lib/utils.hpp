@@ -577,3 +577,35 @@ void make_vec(const string& filename, const vector<vector<type>>& vectors) {
     // Close the files
     file.close();
 }
+
+
+/* Creates a .bin file with the given data vectors that starts with the number of vectors */
+template <typename T>
+void make_bin(const string& filename, const vector<vector<T>> vectors) {
+    // Create/Open file
+    ofstream file(filename, std::ios::binary);
+    if (!file) {
+        throw runtime_error("Failed to open file for writing: " + filename); // !!! Used with try/catch
+    }
+
+    // First we write the number of vectors as the first entry of the file
+    uint32_t num_vectors = vectors.size();                                     // Assuming all vectors will have the same number of dimensions as the first one
+    file.write(reinterpret_cast<const char*>(&num_vectors), sizeof(num_vectors));
+
+    // Write data from vectors to .bin file
+    for (const auto& vector : vectors) {        
+        
+        float filter = vector[0];                                             // Filter
+        file.write(reinterpret_cast<const char*>(&filter), sizeof(float));
+       
+        float timestamp = vector[1];                                          // Timestamp
+        file.write(reinterpret_cast<const char*>(&timestamp), sizeof(float)); 
+
+        // Write the remaining vector data (excluding the filter)             // Vector
+        file.write(reinterpret_cast<const char*>(&vector[2]), (vector.size() - 2) * sizeof(T));
+    }
+
+    // Close file
+    file.close();
+    cout << "Data written to " << filename << " successfully.\n";
+}
