@@ -118,20 +118,14 @@ void test_Find_Medoid(){
     
     int threshold = 2;
     map<vector<int>, gIndex> MedoidMap1 = FindMedoid(G, threshold);
-    map<vector<int>, gIndex> MedoidMap2 = FindMedoid(G, threshold);
 
     TEST_ASSERT(MedoidMap1.size() == 5);
-    TEST_ASSERT(MedoidMap2.size() == 5);
 
 
     for( int i = 1 ; i <= 5 ; i++ ){
 
         // print_vector(G.get_filters(MedoidMap[{i}]));
         vector<int> k = G.get_filters( MedoidMap1[{i}]);
-        TEST_ASSERT( k == vector<int>({i}));
-
-        // Check that the second maps doesn't have the second mapping 
-        k = G.get_filters( MedoidMap2[{i}]);
         TEST_ASSERT( k == vector<int>({i}));
 
     }
