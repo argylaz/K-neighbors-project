@@ -5,14 +5,15 @@
 #include <string.h>
 
 
+
 /*--------------------------------------------------Namespaces and Type aliases-----------------------------------------------------*/
 
 using namespace std;
 
 /* Defining a filter as a vector of pairs int(dimension) and Type(value)        */
 /* These filters will be used to check certain values of a given vector(point)  */
-template <typename Type>
-using filter = <pair<int, Type>;
+// template <typename Type>
+// using filter = <pair<int, Type>;
 
 
 /*----------------------------------------------------Function Declarations---------------------------------------------------------*/
@@ -45,11 +46,11 @@ template <typename Type>
 vector<Type> medoid(Graph<vector<Type>>& G);
 
 
-/*  Filter is pair<int, Type>
-    Function returns a map M, mapping filters to the equivalent medoid node
-*/ 
-template <typename Type>
-map<pair<int, Type> , vector<Type>> FindMedoid(Graph<vector<Type>>& G, filter<Type> &F,  int threshold);
+// /*  Filter is pair<int, Type>
+//     Function returns a map M, mapping filters to the equivalent medoid node
+// */ 
+// template <typename Type, typename F>
+// map<vector<F> , gIndex> FindMedoid(Graph<vector<Type>>& G, int threshold);
 
 
 template <typename T>
@@ -209,88 +210,86 @@ vector<Type> medoid(Graph<vector<Type>>& G){
     return medoid_vertice;
 }
 
-template <typename Type>
-/*  Filter is pair<int, Type>
-    Function returns a map M, mapping filters to the equivalent medoid node 
-    Argument F is the set of all filters
-*/
-// We suppose that the set of all filters is given as a vector of filters(pair) 
-map<filter<Type> , gIndex> FindMedoid(Graph<vector<Type>>& G, vector<filter<Type>>& F,  int threshold){
-    map<filter<Type> , gIndex> M;
+// template <typename Type, typename F>
+// /*  Filter is pair<int, Type>
+//     Function returns a map M, mapping filters to the equivalent medoid node 
+//     Argument F is the set of all filters
+// */
+// // We suppose that the set of all filters is given as a vector of filters(pair) 
+// map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int threshold){
+//     map<vector<F> , gIndex> M;
+
+//     set<vector<F>> Filters = G.get_filters_set(); 
     
-    // Νομίζω ότι εξ αρχής αρχικοποιείται σαν zero map
-    // εναλλακτικά θα πρέπει να κάνουμε αρχικοποίηση σε 0 κάθε στοιχείο του map 
-    map<gIndex, int> T;               // Zero map T is intended as a counter
+//     // Νομίζω ότι εξ αρχής αρχικοποιείται σαν zero map
+//     // εναλλακτικά θα πρέπει να κάνουμε αρχικοποίηση σε 0 κάθε στοιχείο του map 
+//     map<gIndex, int> T;               // Zero map T is intended as a counter
 
-    set<vector<Type>> vertices = G.get_vertices();
-    
-    size_t Filter_set_size = F.size();
-    // For each filter in the set
-    for( size_t i = 0 ; i < Filter_set_size ; i++ ){
+//     set<vector<Type>> vertices = G.get_vertices();
+ 
+//     // For each filter in the set
+//     for( vector<F> f : Filters ){
 
+//         // contains the gIndices of all points matching filter in question
+//         vector<gIndex> Pf;
 
-        // contains the gIndices of all points matching filter in question
-        vector<gIndex> Pf;
+//         // Find all the gIndices matching the filter f
+//         for( vector<Type> v : vertices ){
 
-        // Find all the gIndices matching the filter f
-        for( v : vertices ){
+//             // int dimension = F[i].first
+//             // F value = F[i].second
 
-            int dimension = F[i].first
-            Type value = F[i].second
-
-            // Maybe this line isn't necessary in opimized version
-            if( dimension >= v.size() ){
-                cerr << "ERROR: Medoid can't be calculated\n";
-            }
+//             vector<F> filter = G.get_filters(G.get_index_from_vertex(v));              
             
+//             if( filter == f ){
+//                 Pf.push_back(G.get_index_from_vertex(v));
+//             }
 
-            if( v[dimension] == value ){
-                Pf.push_back(G.get_index_from_vertex(v));
-            }      
-        }
+//             // if( v[dimension] == value ){
+//             //     Pf.push_back(G.get_index_from_vertex(v));
+//             // }      
+//         }
         
 
-        // To do :: Check for optimization
-        // Let Rf <- threshold randomly sampled data point ids from Pf
+//         // To do :: Check for optimization
+//         // Let Rf <- threshold randomly sampled data point ids from Pf        
+//         // Create a vector with all the elements of Pf
+//         vector<gIndex> temp_vector(vertices.begin(), vertices.end());
+
+//         // To obtain a time-based seed 
+//         unsigned seed = chrono::system_clock::now().time_since_epoch().count();
         
+//         // Shuffle the temp vector Pf
+//         shuffle(temp_vector.begin(), temp_vector.end(), default_random_engine(seed));
+
+
+//         // Keep the first threshold items of the shuffled vector
+//         vector<gIndex> Rf(temp_vector.begin(), temp_vector.begin() + threshold);
+
+
+//         if( Rf.size() <= 0 ){
+//             cerr << "The set Rf in medoid calculation is empty";
+//         }
+
+//         // Finding p_min point, where p_min is min{T[p], for each p in Rf};
+//         gIndex p_min_index;
+
+//         p_min_index = Rf[0];
+//         for( size_t i = 1 ; i < Rf.size() ; i++ ){
+//             if( T[Rf[i]] < T[p_min_index] ){
+//                 p_min_index = Rf[i];
+//             }
+//         }
         
-        // Create a vector with all the elements of Pf
-        vector<Pf> temp_vector(vertices.begin(), vertices.end());
+//         M[f] = p_min_index;
+//         T[p_min_index]++;
 
-        // To obtain a time-based seed 
-        unsigned seed = chrono::system_clock::now().time_since_epoch().count();
-        
-        // Shuffle the temp vector Pf
-        shuffle(temp_vector.begin(), temp_vector.end(), default_random_engine(seed));
+//     }
 
 
-        // Keep the first threshold items of the shuffled vector
-        vector<gIndex> Rf(temp_vector.begin(), temp_vector.begin() + threshold);
+//     return M;
 
-
-        if( Rf.size() <= 0 ){
-            cerr << "The set Rf in medoid calculation is empty"
-        }
-
-        // Finding p_min point, where p_min is min{T[p], for each p in Rf};
-        vector<gIndex> p_min_index;
-
-        p_min_index = Rf[0];
-        for( size_t i = 1 ; i < Rf.size() ; i++ ){
-            if( T[Rf[i]] < T[p_min_index] ){
-                p_min_index = Rf[i];
-            }
-        }
-        
-        M[F[i]] = p_min_index;
-        T[p_min_index]++;
-
-    }
-
-
-    return M;
-
-}
+// }
 
 /* Method which adds randomly exactly R outgoing neighbors to each vertex of the graph */
 template <typename T>
