@@ -18,7 +18,7 @@ using namespace std;
 // Returns a pair of sets, the first contains the K-approx NNs and the second contains all the visited nodes
 // if L < k the method returns a pair of empty sets
 template <typename T>
-pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int k, int L);
+pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, const T& start, const T& xquery, int k, int L);
 
 
 
@@ -42,7 +42,7 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>
 // a is the distance threshold
 // R is the degree bound
 template <typename T>
-void RobustPrune(Graph<T>& G, T point, set<gIndex>& V, float a, int R);
+void RobustPrune(Graph<T>& G, const T& point, set<gIndex>& V, float a, int R);
 
 
 
@@ -88,7 +88,7 @@ map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int thresho
 // Returns a pair of sets, the first contains the K-approx NNs and the second contains all the visited nodes
 // if L < k the method returns a pair of empty sets
 template <typename T>
-pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int k, int L) {
+pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, const T& start, const T& xquery, int k, int L) {
     
     // First we check that the input values are correct
     if (L < k) { // L >= k
@@ -108,7 +108,6 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int 
 
     // while L_output\V != 0
     while ( !diff_set.empty() ) {
-        // cout<<"c"<< endl;
 
         // Find the vertex with the minimum euclidean distance from the xquery
         T min = find_min_Euclidean(G, diff_set, xquery);
@@ -118,7 +117,6 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int 
         set_union(L_output.begin(), L_output.end(), neighbors.begin(), neighbors.end(), inserter(L_output, L_output.begin()));
 
         V.insert(G.get_index_from_vertex(min));
-        // G.insert_sorted(V, min);
 
         // Upper bound check
         if ( L_output.size() > (long unsigned int) L ) {
@@ -250,7 +248,7 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>
 // a is the distance threshold
 // R is the degree bound
 template <typename T>
-void RobustPrune(Graph<T>& G, T point, set<gIndex>& V, float a, int R) {
+void RobustPrune(Graph<T>& G, const T& point, set<gIndex>& V, float a, int R) {
 
     // First we check that the input values are correct
     if (a < 1) { // a >= 1
@@ -265,9 +263,10 @@ void RobustPrune(Graph<T>& G, T point, set<gIndex>& V, float a, int R) {
     // V <- {V U Nout(p)} \ {p}
     set_union(V.begin(), V.end(), neighbors.begin(), neighbors.end(), inserter(V, V.begin()));
     auto k = find(V.begin(), V.end(), G.get_index_from_vertex(point)); 
-    if( k != V.end() ){   // Only remove if it was found within V
+    if ( k != V.end() ) {   // Only remove if it was found within V
         V.erase(k);
     }
+    // V.erase(G.get_index_from_vertex(point));
     
     // Removing all edges leaving the given vertex and selectively adding up to R edges
     for (gIndex j: neighbors) {
@@ -298,7 +297,8 @@ void RobustPrune(Graph<T>& G, T point, set<gIndex>& V, float a, int R) {
             }
         }
         for (gIndex vertex_index: toBeRemoved) {
-            V.erase(find(V.begin(), V.end(), vertex_index));
+            // V.erase(find(V.begin(), V.end(), vertex_index));
+            V.erase(vertex_index);
         }
     }
 }
@@ -394,7 +394,9 @@ void FilteredRobustPrune(FilterGraph<T,F>& G, T point, set<gIndex>& V, float a, 
 // L is the search list size
 // R is the degree bound
 template <typename T>
+
 T Vamana(Graph<T>& G, int L, int R, float a) {
+
     
     int n = G.get_vertices_count();
 
@@ -404,6 +406,7 @@ T Vamana(Graph<T>& G, int L, int R, float a) {
 
     // Calculating the medoid of the points given
     T s = medoid(G);
+    // T s = G.get_vertex_from_index(8736);
     
     // Getting the vertex indices in a random order. Vector sigma will be the random permutation.
     vector<gIndex> sigma(n);

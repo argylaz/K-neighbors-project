@@ -18,8 +18,9 @@ public:
     /* Adds a vertex (of type T) to the graph, return false if the vertex is already in the graph*/
     virtual bool add_vertex(const T& v);
 
+    /* Adds a key in a sorted vector, in a sorted way based on the vertex index key */
     void insert_sorted(vector<gIndex>& v, T key);
-
+    /* Adds a key in an adjacency list, in a sorted way based on the vertex index key */
     void insert_sorted_in_adj_list(vector<T>& v, T key);
 
     /* Adds edge between vertex(T) start and vertex(T) end */
@@ -112,11 +113,13 @@ bool Graph<T>::add_vertex(const T& v) {
 
 
 
-
+/* Adds a key in a sorted vector, in a sorted way based on the vertex index key */
 template <typename T>
 void Graph<T>::insert_sorted(vector<gIndex>& v, T key) {
+    // First appending the element in the vector, so that it can grow in size if needed
     v.push_back(v_index[key]);
     
+    // Looking for the right place in the vector
     int insertPos = 0;
     for (auto i = v.begin(); i < v.end() - 1; i++) {
         if (v_index[key] >= *i) {
@@ -130,10 +133,12 @@ void Graph<T>::insert_sorted(vector<gIndex>& v, T key) {
     v[insertPos] = v_index[key];
 }
 
+/* Adds a key in an adjacency list, in a sorted way based on the vertex index key. Similar to the above but ignoring the first element of the vector */
 template <typename T>
 void Graph<T>::insert_sorted_in_adj_list(vector<T>& adj, T key) {
     adj.push_back(key);
     
+    // Looking after the first element
     int insertPos = 1;
     for (auto i = adj.begin() + 1; i < adj.end() - 1; i++) {
         if (v_index[key] >= v_index[*i]) {

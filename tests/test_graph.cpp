@@ -56,6 +56,49 @@ void test_add_vertex() {
     TEST_ASSERT(G1.get_vertices_count() == countBefore);
 }
 
+/* Testing insert_sorted method */
+void test_insert_sorted() {
+    TestGraph<int> G;
+
+    // Adding 10 vertices with v_index[v] = v
+    for (int i = 0; i < 10; i++) { 
+        G.add_vertex(i);
+    }
+
+    vector<int> v = {3, 4, 8};
+    G.insert_sorted(v, 2);
+    G.insert_sorted(v, 4);
+    G.insert_sorted(v, 7);
+    G.insert_sorted(v, 9);
+
+    vector<int> test_v = {2, 3, 4, 4, 7, 8, 9};
+
+    TEST_ASSERT(v == test_v);
+}
+
+/* Testing insert_sorted_in_adj_list method */
+void test_insert_sorted_in_adj_list() {
+    TestGraph<int> G;
+
+    // Adding 10 vertices with v_index[v] = v
+    for (int i = 0; i < 10; i++) { 
+        G.add_vertex(i);
+    }
+
+    // Inserting at (the copy of) the adjacency list of vertex 5
+    vector<int> adj = G.get_private_adjacency_list()[5];
+
+    G.insert_sorted_in_adj_list(adj, 1);
+    G.insert_sorted_in_adj_list(adj, 7);
+    G.insert_sorted_in_adj_list(adj, 5);
+    G.insert_sorted_in_adj_list(adj, 4);
+    
+    vector<int> test_adj = {5, 1, 4, 5, 7};
+
+    TEST_ASSERT(adj == test_adj);
+
+}
+
 /* Testing add_edge method */
 void test_add_edge() {
     // Testing for one directed and one undirected graph
@@ -295,6 +338,8 @@ void test_get_neighbors() {
 TEST_LIST = {
     { "graph_create", test_create },
     { "add_vertex", test_add_vertex },
+    { "insert_sorted", test_insert_sorted},
+    { "insert_sorted_in_adj_list", test_insert_sorted_in_adj_list},
     { "add_edge", test_add_edge },
     { "exist_edge", test_exist_edge },
     { "remove_edge", test_remove_edge },

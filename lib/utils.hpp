@@ -659,7 +659,7 @@ void make_vec(const string& filename, const vector<vector<type>>& vectors) {
         return;
     }
 
-    // Read vectors and wite them in the files
+    // Read vectors and write them in the files
     for (const auto& v: vectors) {
         int d = v.size();         // Get the dimension of the vector
 
