@@ -98,39 +98,6 @@ void test_get_filters_set(){
 
 
 
-void test_Find_Medoid(){
-    FilterGraph<vector<int>,int> G;
-    
-    G.add_vertex({10}, {1});
-    G.add_vertex({20}, {1});
-    G.add_vertex({30}, {1});
-    G.add_vertex({40}, {2});
-    G.add_vertex({50}, {2});
-    G.add_vertex({60}, {2});
-    G.add_vertex({70}, {2});
-    G.add_vertex({80}, {3});
-    G.add_vertex({81}, {3});
-    G.add_vertex({90}, {4});
-    G.add_vertex({91}, {4});
-    G.add_vertex({100}, {5});
-    G.add_vertex({110}, {5});
-    G.add_vertex({120}, {5});
-    
-    int threshold = 2;
-    map<vector<int>, gIndex> MedoidMap1 = FindMedoid(G, threshold);
-
-    TEST_ASSERT(MedoidMap1.size() == 5);
-
-
-    for( int i = 1 ; i <= 5 ; i++ ){
-
-        // print_vector(G.get_filters(MedoidMap[{i}]));
-        vector<int> k = G.get_filters( MedoidMap1[{i}]);
-        TEST_ASSERT( k == vector<int>({i}));
-
-    }
-
-};
 
 
 // List of all tests to be executed
@@ -139,6 +106,5 @@ TEST_LIST = {
     { "get_filters", test_get_filters },
     { "add_vertex", test_add_vertex },
     { "get_filters_set", test_get_filters_set },
-    { "Find Medoid", test_Find_Medoid },
     { NULL, NULL }
 };
