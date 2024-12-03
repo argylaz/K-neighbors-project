@@ -3,59 +3,75 @@
 #include "graph.hpp"
 #include <ctype.h>
 #include <string.h>
+
+
+
+/*--------------------------------------------------Namespaces and Type aliases-----------------------------------------------------*/
+
 using namespace std;
 
+/* Defining a filter as a vector of pairs int(dimension) and Type(value)        */
+/* These filters will be used to check certain values of a given vector(point)  */
+// template <typename Type>
+// using filter = <pair<int, Type>;
 
 
 /*----------------------------------------------------Function Declarations---------------------------------------------------------*/
 
 
 
+template<typename Type>
 /* Function for the calculation of the Euclidean distance             */
 /* Returns INFINITY as error value indicating problems in calculation */
-template<typename Type>
 inline float Euclidean_Distance(vector<Type> a, vector<Type> b);
 
 
-/* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
 template <typename Type>
+/* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
 inline vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<gIndex>& S, vector<Type> xquery);
 
 
-/* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
 template <typename Type>
+/* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
 inline void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_set, vector<Type> xquery, int L);
 
 
-/* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
 template <typename Type>
+/* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
 inline void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_set, vector<Type> xquery, int L);
 
 
+template <typename Type>
 /* Method which finds the medoid of a given graph */
-template <typename Type>
 vector<Type> medoid(Graph<vector<Type>>& G);
 
 
-/* Method which adds randomly exactly R outgoing neighbors to each vertex of the graph */
+// /*  Filter is pair<int, Type>
+//     Function returns a map M, mapping filters to the equivalent medoid node
+// */ 
+// template <typename Type, typename F>
+// map<vector<F> , gIndex> FindMedoid(Graph<vector<Type>>& G, int threshold);
+
+
 template <typename T>
+/* Method which adds randomly exactly R outgoing neighbors to each vertex of the graph */
 void rDirectional(Graph<T>& G, int R);
 
 
+template <typename type>
 /* Given an empty graph, reads an fvec file and fills the graph with all the vectors read as its vertices and no edges */
 /* This functions assumes that all the vectors given in the file will be of the same dimension                         */
 /* Otherwise, the entries inside the graph will be uneven (vectors of different dimensions)                            */
-template <typename type>
 void vec_to_graph(const string& filename, Graph<vector<type>>& G);
 
 
-/* Method that reads vectors from an fvec or ivec and returns a vector containing all of them */
 template <typename Type>
+/* Method that reads vectors from an fvec or ivec and returns a vector containing all of them */
 vector<vector<Type>> read_vecs(string& filename);
 
 
-/* Same as the above but returns a set containing all the vectors instead */
 template <typename Type>
+/* Same as the above but returns a set containing all the vectors instead */
 set<vector<Type>> read_sets(string& filename);
 
 
@@ -194,6 +210,86 @@ vector<Type> medoid(Graph<vector<Type>>& G){
     return medoid_vertice;
 }
 
+// template <typename Type, typename F>
+// /*  Filter is pair<int, Type>
+//     Function returns a map M, mapping filters to the equivalent medoid node 
+//     Argument F is the set of all filters
+// */
+// // We suppose that the set of all filters is given as a vector of filters(pair) 
+// map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int threshold){
+//     map<vector<F> , gIndex> M;
+
+//     set<vector<F>> Filters = G.get_filters_set(); 
+    
+//     // Νομίζω ότι εξ αρχής αρχικοποιείται σαν zero map
+//     // εναλλακτικά θα πρέπει να κάνουμε αρχικοποίηση σε 0 κάθε στοιχείο του map 
+//     map<gIndex, int> T;               // Zero map T is intended as a counter
+
+//     set<vector<Type>> vertices = G.get_vertices();
+ 
+//     // For each filter in the set
+//     for( vector<F> f : Filters ){
+
+//         // contains the gIndices of all points matching filter in question
+//         vector<gIndex> Pf;
+
+//         // Find all the gIndices matching the filter f
+//         for( vector<Type> v : vertices ){
+
+//             // int dimension = F[i].first
+//             // F value = F[i].second
+
+//             vector<F> filter = G.get_filters(G.get_index_from_vertex(v));              
+            
+//             if( filter == f ){
+//                 Pf.push_back(G.get_index_from_vertex(v));
+//             }
+
+//             // if( v[dimension] == value ){
+//             //     Pf.push_back(G.get_index_from_vertex(v));
+//             // }      
+//         }
+        
+
+//         // To do :: Check for optimization
+//         // Let Rf <- threshold randomly sampled data point ids from Pf        
+//         // Create a vector with all the elements of Pf
+//         vector<gIndex> temp_vector(vertices.begin(), vertices.end());
+
+//         // To obtain a time-based seed 
+//         unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+        
+//         // Shuffle the temp vector Pf
+//         shuffle(temp_vector.begin(), temp_vector.end(), default_random_engine(seed));
+
+
+//         // Keep the first threshold items of the shuffled vector
+//         vector<gIndex> Rf(temp_vector.begin(), temp_vector.begin() + threshold);
+
+
+//         if( Rf.size() <= 0 ){
+//             cerr << "The set Rf in medoid calculation is empty";
+//         }
+
+//         // Finding p_min point, where p_min is min{T[p], for each p in Rf};
+//         gIndex p_min_index;
+
+//         p_min_index = Rf[0];
+//         for( size_t i = 1 ; i < Rf.size() ; i++ ){
+//             if( T[Rf[i]] < T[p_min_index] ){
+//                 p_min_index = Rf[i];
+//             }
+//         }
+        
+//         M[f] = p_min_index;
+//         T[p_min_index]++;
+
+//     }
+
+
+//     return M;
+
+// }
 
 /* Method which adds randomly exactly R outgoing neighbors to each vertex of the graph */
 template <typename T>

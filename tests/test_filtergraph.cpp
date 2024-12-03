@@ -71,11 +71,74 @@ void test_add_vertex() {
 
 };
 
+void test_get_filters_set(){
+    
+    // First template is Graph data Type, the second tempalet is the Filter data Type 
+    FilterGraph<vector<int>,int> G(true);
+    TEST_ASSERT( G.add_vertex({10}, {1}) == true );
+    TEST_ASSERT( G.add_vertex({20}, {1}) == true );
+    TEST_ASSERT( G.add_vertex({30}, {1}) == true );
+    TEST_ASSERT( G.add_vertex({40}, {2}) == true );
+    TEST_ASSERT( G.add_vertex({50}, {2}) == true );
+    TEST_ASSERT( G.add_vertex({60}, {2}) == true );
+    TEST_ASSERT( G.add_vertex({70}, {3}) == true );
+    TEST_ASSERT( G.add_vertex({80}, {4}) == true );
+    TEST_ASSERT( G.add_vertex({90}, {5}) == true );
+
+    set<vector<int>> filters = G.get_filters_set();
+    // The set contains all the discrete values of the filters
+    TEST_ASSERT( filters.size() == 5);
+    // The set should be filters = {1,2,3,4,5}
+    TEST_ASSERT(filters.find({1}) != filters.end());
+    TEST_ASSERT(filters.find({2}) != filters.end());
+    TEST_ASSERT(filters.find({3}) != filters.end());
+    TEST_ASSERT(filters.find({4}) != filters.end());
+    TEST_ASSERT(filters.find({5}) != filters.end());
+};
+
+
+
+void test_Find_Medoid(){
+    FilterGraph<vector<int>,int> G;
+    
+    G.add_vertex({10}, {1});
+    G.add_vertex({20}, {1});
+    G.add_vertex({30}, {1});
+    G.add_vertex({40}, {2});
+    G.add_vertex({50}, {2});
+    G.add_vertex({60}, {2});
+    G.add_vertex({70}, {2});
+    G.add_vertex({80}, {3});
+    G.add_vertex({81}, {3});
+    G.add_vertex({90}, {4});
+    G.add_vertex({91}, {4});
+    G.add_vertex({100}, {5});
+    G.add_vertex({110}, {5});
+    G.add_vertex({120}, {5});
+    
+    int threshold = 2;
+    map<vector<int>, gIndex> MedoidMap1 = FindMedoid(G, threshold);
+
+    TEST_ASSERT(MedoidMap1.size() == 5);
+
+
+    for( int i = 1 ; i <= 5 ; i++ ){
+
+        // print_vector(G.get_filters(MedoidMap[{i}]));
+        vector<int> k = G.get_filters( MedoidMap1[{i}]);
+        TEST_ASSERT( k == vector<int>({i}));
+
+    }
+
+};
+
 
 // List of all tests to be executed
 TEST_LIST = {
     { "read_from_bin", test_read_from_bin },
     { "get_filters", test_get_filters },
     { "add_vertex", test_add_vertex },
+    { "get_filters_set", test_get_filters_set },
+    { "Find Medoid", test_Find_Medoid },
     { NULL, NULL }
 };
