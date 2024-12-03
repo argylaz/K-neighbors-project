@@ -18,7 +18,7 @@ using namespace std;
 // Returns a pair of sets, the first contains the K-approx NNs and the second contains all the visited nodes
 // if L < k the method returns a pair of empty sets
 template <typename T>
-pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int k, int L);
+pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, const T& start, const T& xquery, int k, int L);
 
 
 
@@ -42,7 +42,7 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>
 // a is the distance threshold
 // R is the degree bound
 template <typename T>
-void RobustPrune(Graph<T>& G, T point, set<gIndex>& V, float a, int R);
+void RobustPrune(Graph<T>& G, const T& point, set<gIndex>& V, float a, int R);
 
 
 
