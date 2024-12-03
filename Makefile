@@ -50,6 +50,9 @@ test: $(TEST_EXEC)
 		./$$test_exec; \
 	done
 
+valgrind: 
+	make
+	valgrind make test 
 
 clean:
 	rm -rf $(BUILD_DIR)/*.o 

@@ -16,7 +16,7 @@ public:
 
    
     /* Adds a vertex (of type T) to the graph, return false if the vertex is already in the graph*/
-    bool add_vertex(const T& v);
+    virtual bool add_vertex(const T& v);
 
     /* Adds a key in a sorted vector, in a sorted way based on the vertex index key */
     void insert_sorted(vector<gIndex>& v, T key);
@@ -58,8 +58,7 @@ public:
 
 protected:
     vector<vector<T>> get_adjacency_list() const;
-    
-private:
+
     int countEdges;
     int countVertices;
     bool isDirected;                        // True if the graph is directed

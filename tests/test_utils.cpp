@@ -212,7 +212,45 @@ void test_rDirectional() {
 
 }
 
+void test_isPositiveInteger() {
+    // Testing for actual positive integers
+    const char *s = "1";      TEST_ASSERT(isPositiveInteger(s));
+    s = "123123";       TEST_ASSERT(isPositiveInteger(s));
 
+    // Testing for other things (should return false)
+    s = "a";            TEST_ASSERT(!isPositiveInteger(s));
+    s = "abcxdfg";      TEST_ASSERT(!isPositiveInteger(s));
+    s = "12354abcxdfg"; TEST_ASSERT(!isPositiveInteger(s));
+}
+
+void test_get_arguments() {
+    
+    int argc = 11; 
+    float a = 2;    // Default Value
+    const char* argv[] = { "main",  "-f", "small", "-k", "2", "-r", "10", "-l", "10", "-a", "1.2"};
+    int k, L, R;
+    string base_name, query_name, groundtruth_name;
+
+    TEST_ASSERT( get_arguments(argc, argv, k, L, a, R, base_name, query_name, groundtruth_name) == 1);
+
+    TEST_ASSERT(base_name == "sift/siftsmall_base.fvecs");
+    TEST_ASSERT(query_name == "sift/siftsmall_query.fvecs");
+    TEST_ASSERT(groundtruth_name == "sift/siftsmall_groundtruth.ivecs");
+    TEST_ASSERT(k == 2 && R == 10 && a == (float)1.2);
+
+
+    int k1, L1, R1;
+    string base_name1, query_name1, groundtruth_name1;
+    float a1 = 2;  // Default value
+    const char* argv1[] = { "main",  "-k", "10", "-f", "large", "-l", "10", "-r", "10"};
+    argc = 9;
+    TEST_ASSERT(get_arguments(argc, argv1, k1, L1, a1, R1, base_name1, query_name1, groundtruth_name1));
+    TEST_ASSERT(base_name1 == "sift/sift_base.fvecs");
+    TEST_ASSERT(query_name1 == "sift/sift_query.fvecs");
+    TEST_ASSERT(groundtruth_name1 == "sift/sift_groundtruth.ivecs");
+    TEST_ASSERT(k1 == 10 && R1 == 10 && a1 == 2);
+
+}
 
 /* Testing fvec_to_graph */
 void test_fvec_to_graph() {
@@ -301,6 +339,8 @@ TEST_LIST = {
     { "Retain_closest_neighbors", test_retain_closest_points},
     { "Medoid", test_medoid},
     { "rDirectional", test_rDirectional},
+    { "isPositiveInteger", test_isPositiveInteger},
+    { "get_arguments", test_get_arguments},
     { "fvec to graph", test_fvec_to_graph },
     { "ivec to graph", test_ivec_to_graph },
     { NULL, NULL }
