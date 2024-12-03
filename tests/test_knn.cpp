@@ -299,6 +299,45 @@ void test_RobustPrune() {
 
 }
 
+
+
+/* Testing the FilteredRobustPrune method */
+void test_FilteredRobustPrune() {
+    
+    /* Testing for ints */
+
+    FilterGraph<vector<int>, int> G(true);
+    
+    // added some random filters
+    // Adding vertices 0,1,2,3,4
+    G.add_vertex({0},{0}); G.add_vertex({1},{1}); G.add_vertex({2},{1}); G.add_vertex({3},{0}); G.add_vertex({4},{1});
+
+    // Adding some edges 
+    G.add_edge({0}, {1}); G.add_edge({0}, {3});
+    G.add_edge({1}, {2}); G.add_edge({1}, {4});
+    G.add_edge({2}, {3}); G.add_edge({2}, {4});
+    G.add_edge({3}, {1}); G.add_edge({3}, {4});
+    G.add_edge({4}, {0}); G.add_edge({4}, {1});
+
+    // Run Robustprune with p = {0}, V = {0, 3, 4} (out-neighbors of p), a = 1.2 and R = 2
+    set<gIndex> V1 = {0, 3, 4};
+    float a = 2;
+    int R = 2;
+
+    FilteredRobustPrune(G, {2}, V1, a, R);
+
+
+    // Now check that the algorithm works as intended (only edge removes is the one from 1 to 3)
+    TEST_ASSERT(G.exist_edge({0}, {1}) && G.exist_edge({0}, {3}) && !G.exist_edge({0}, {2}));
+    TEST_ASSERT(G.exist_edge({1}, {2}) && G.exist_edge({1}, {4}));
+    TEST_ASSERT(G.exist_edge({2}, {0}) && G.exist_edge({2}, {3}) && !G.exist_edge({2}, {4}));
+    TEST_ASSERT(G.exist_edge({3}, {1}) && G.exist_edge({3}, {4}));
+    TEST_ASSERT(G.exist_edge({4}, {0}) && G.exist_edge({4}, {1}));
+
+    V1.clear();
+
+}
+
 /* Testing the Vamana method */
 void test_Vamana() {
     /* Testing the vamana method with a simple example with integers solved by hand */
@@ -364,11 +403,48 @@ void test_Vamana() {
     TEST_ASSERT(!G2.exist_edge({3.1, 9.9}, {1.1, 9.9}));
 }
 
+
+void test_Find_Medoid(){
+    FilterGraph<vector<int>,int> G;
+    
+    G.add_vertex({10}, {1});
+    G.add_vertex({20}, {1});
+    G.add_vertex({30}, {1});
+    G.add_vertex({40}, {2});
+    G.add_vertex({50}, {2});
+    G.add_vertex({60}, {2});
+    G.add_vertex({70}, {2});
+    G.add_vertex({80}, {3});
+    G.add_vertex({81}, {3});
+    G.add_vertex({90}, {4});
+    G.add_vertex({91}, {4});
+    G.add_vertex({100}, {5});
+    G.add_vertex({110}, {5});
+    G.add_vertex({120}, {5});
+    
+    int threshold = 2;
+    map<vector<int>, gIndex> MedoidMap1 = FindMedoid(G, threshold);
+
+    TEST_ASSERT(MedoidMap1.size() == 5);
+
+
+    for( int i = 1 ; i <= 5 ; i++ ){
+
+        // print_vector(G.get_filters(MedoidMap[{i}]));
+        vector<int> k = G.get_filters( MedoidMap1[{i}]);
+        TEST_ASSERT( k == vector<int>({i}));
+
+    }
+
+};
+
 // List of all tests to be executed
 TEST_LIST = {
     {"GreedySearch", test_GreedySearch},
     {"FilteredGreedySearch", test_FilteredGreedySearch},
     {"RobustPrune", test_RobustPrune},
+    {"FilteredRobustPrune", test_FilteredRobustPrune},
     {"Vamana", test_Vamana},
+    { "Find Medoid", test_Find_Medoid },
     { NULL, NULL }
 };
