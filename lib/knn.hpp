@@ -32,7 +32,6 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, const T& start, const T
 
     // while L_output\V != 0
     while ( !diff_set.empty() ) {
-        // cout<<"c"<< endl;
 
         // Find the vertex with the minimum euclidean distance from the xquery
         T min = find_min_Euclidean(G, diff_set, xquery);
@@ -42,7 +41,6 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, const T& start, const T
         set_union(L_output.begin(), L_output.end(), neighbors.begin(), neighbors.end(), inserter(L_output, L_output.begin()));
 
         V.insert(G.get_index_from_vertex(min));
-        // G.insert_sorted(V, min);
 
         // Upper bound check
         if ( L_output.size() > (long unsigned int) L ) {
@@ -133,7 +131,7 @@ void RobustPrune(Graph<T>& G, const T& point, set<gIndex>& V, float a, int R) {
 // L is the search list size
 // R is the degree bound
 template <typename T>
-T Vamana(Graph<T>& G, int L, int R, float a =1.2) {
+T Vamana(Graph<T>& G, int L, int R, float a = 1.2) {
     
     int n = G.get_vertices_count();
 
