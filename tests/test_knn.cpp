@@ -157,7 +157,7 @@ void test_FilteredGreedySearch() {
     int k = 2;
     int L = 3;
     vector<int> xquery = {2};
-    vector<int> filter = {1};
+    set<int> filter = {1};
 
     auto result = FilteredGreedySearch<int, int>(G, xquery, k, L, filter);
     set<gIndex> Lout = result.first;
@@ -359,6 +359,7 @@ void test_Vamana() {
 
     // Test that the new form of the graph is the one one expected
     // 0->1, 1->0, 1->2, 2->1, 2->3, 3->2 are the exact edges the graph should have
+    cout << G1.get_edge_count()<<  endl;
     TEST_ASSERT(G1.get_edge_count() == 6);
     TEST_ASSERT(G1.exist_edge({0}, {1}));
     TEST_ASSERT(G1.exist_edge({1}, {0}));
@@ -423,17 +424,15 @@ void test_Find_Medoid() {
     G.add_vertex({120}, {5});
     
     int threshold = 2;
-    map<vector<int>, gIndex> MedoidMap1 = FindMedoid(G, threshold);
+    map<int, gIndex> MedoidMap1 = FindMedoid(G, threshold);
 
     TEST_ASSERT(MedoidMap1.size() == 5);
-
 
     for( int i = 1 ; i <= 5 ; i++ ){
 
         // print_vector(G.get_filters(MedoidMap[{i}]));
-        vector<int> k = G.get_filters( MedoidMap1[{i}]);
-        TEST_ASSERT( k == vector<int>({i}));
-
+        set<int> Fk = G.get_filters( MedoidMap1[i]);
+        TEST_ASSERT(Fk.find(i) != Fk.end());
     }
 
 };
