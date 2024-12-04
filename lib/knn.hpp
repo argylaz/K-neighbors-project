@@ -475,7 +475,9 @@ void FilteredVamana(FilterGraph<vector<Type>,F>& G, int L, int R, float a){
     // Calculating the medoid of the points given
     // Threshold is 1                                         ///////////// Maybe this has to be changed
     map<vector<F> , gIndex> MedoidMap = FindMedoid(G, 1);
-    set<vector<Type>> Sf = get_nodes_from_gIndex_map(G, MedoidMap);
+    // set<vector<Type>> Sf = get_nodes_from_gIndex_map(G, MedoidMap);
+
+    
     
     // Getting the vertex indices in a random order. Vector sigma will be the random permutation.
     vector<gIndex> sigma(n);
@@ -490,6 +492,17 @@ void FilteredVamana(FilterGraph<vector<Type>,F>& G, int L, int R, float a){
         
         // Getting its filter
         vector<F> filter = G.get_filters(sigma[i]);
+
+
+        // Construct S, which is the set of starting nodes belonging to the same filters  as vertex sigma(i)
+        set<vector<Type>> Sf;
+        Sf.insert(G.get_vertex_from_index(MedoidMap[filter]));
+
+        for( vector<Type> k : Sf){
+            cout << "\nThe Medoid of filter is ";
+            print_vector(k);
+            cout << endl;
+        }
 
         // Calling GreadySearch() from the medoid to the vertex to get the appropriate sets [L_output,V]
         pair<set<gIndex>, set<gIndex>> result = FilteredGreedySearch<Type,F>(G, Sf, vertex, 0, L, filter);
@@ -510,17 +523,17 @@ void FilteredVamana(FilterGraph<vector<Type>,F>& G, int L, int R, float a){
         for (gIndex j: neighbors) {
             
             vector<Type> neighbor = G.get_vertex_from_index(j);
-            //  we add an edge from the neighbor j to the vertex itself
-            G.add_edge(neighbor, vertex);
+            // //  we add an edge from the neighbor j to the vertex itself
+            // G.add_edge(neighbor, vertex);
 
             // The neighbors of the neighbor j
             vector<gIndex> j_neighbors = G.get_neighbors(neighbor);
+            G.insert_sorted(j_neighbors, vertex);
             set<gIndex> set_j_neighbors(j_neighbors.begin(), j_neighbors.end());
 
-            if( j_neighbors.size() > (long unsigned int) R){
+            if( set_j_neighbors.size() > (long unsigned int) R){
                 FilteredRobustPrune<vector<Type>,F>(G,G.get_vertex_from_index(j), set_j_neighbors, a, R);
             }
-
 
 
             // // We calculate a candidate set with the neighbor's neighbors and the vertex itself
