@@ -34,6 +34,9 @@ public:
     // Method to get a set with all the discrete filters used in the graph
     set<vector<F>> get_filters_set();
 
+    // Destructor doing nothing
+    ~FilterGraph<T,F>();
+
 
 private: 
     map<gIndex, vector<F>> filters;  // Supports multiple filters
@@ -150,3 +153,5 @@ set<vector<F>> FilterGraph<T,F>:: get_filters_set(){
     return this->filters_set;
 }
 
+template<typename T, typename F>
+FilterGraph<T,F>::~FilterGraph() {}

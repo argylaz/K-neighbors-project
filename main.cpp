@@ -83,6 +83,8 @@ int main(int argc, char* argv[]) {
         n++;
     }
     
+    delete G;
+
     total_recall = total_recall / count;
     cout << "\nTotal Recall is " << total_recall*100 <<"%\n" << endl;
     return 0;

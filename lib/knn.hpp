@@ -31,7 +31,7 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, const T& start, const T
 /*  Fq:     The query filters                        */
 // template <typename Type>
 template <typename Type, typename F> 
-pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>& G, vector<Type>& xquery, const int k, const int L, vector<F>& Fq);
+pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>& G, const vector<Type>& xquery, const int k, const int L, vector<F>& Fq);
 
 
 
@@ -53,7 +53,7 @@ void RobustPrune(Graph<T>& G, const T& point, set<gIndex>& V, float a, int R);
 // a is the distance threshold
 // R is the degree bound
 template <typename T,typename F>
-void FilteredRobustPrune(FilterGraph<T,F>& G, T point, set<gIndex>& V, float a, int R);
+void FilteredRobustPrune(FilterGraph<T,F>& G, const T& point, set<gIndex>& V, float a, int R);
 
 
 
@@ -74,6 +74,18 @@ T Vamana(Graph<T>& G, int L, int R, float a = 1.2);
 template <typename Type, typename F>
 map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int threshold);
 
+
+
+
+
+
+
+/* Implementation of the Stiched Vamana Indexing Algorithm */
+// Lsmall is the search list size for the regular Vamana algorithm
+// Rsmall is the degree bound for the regular Vamana algorithm
+// Rstiched is is the degree bound for the
+template <typename T>
+T StichedVamana(Graph<T>& G, int Lsmall, int Rsmall, int Rstiched, float a = 1.2);
 
 
 /*----------------------------------------------------Function Definitions-----------------------------------------------------------*/
@@ -146,7 +158,7 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, const T& start, const T
 /*  Fq:     The query filters                        */
 // template <typename Type>
 template <typename Type, typename F> 
-pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>& G, vector<Type>& xquery, const int k, const int L, vector<F>& Fq) {
+pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>& G, const vector<Type>& xquery, const int k, const int L, vector<F>& Fq) {
      
 
     // First we check that the input values are correct
@@ -310,7 +322,7 @@ void RobustPrune(Graph<T>& G, const T& point, set<gIndex>& V, float a, int R) {
 // a is the distance threshold
 // R is the degree bound
 template <typename T,typename F>
-void FilteredRobustPrune(FilterGraph<T,F>& G, T point, set<gIndex>& V, float a, int R) {
+void FilteredRobustPrune(FilterGraph<T,F>& G, const T& point, set<gIndex>& V, float a, int R) {
 
     // First we check that the input values are correct
     if (a < 1) { // a >= 1
@@ -394,7 +406,6 @@ void FilteredRobustPrune(FilterGraph<T,F>& G, T point, set<gIndex>& V, float a, 
 // L is the search list size
 // R is the degree bound
 template <typename T>
-
 T Vamana(Graph<T>& G, int L, int R, float a) {
 
     
@@ -474,7 +485,7 @@ map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int thresho
     set<vector<Type>> vertices = G.get_vertices();
  
     // For each filter in the set
-    for( vector<F> f : Filters ){
+    for ( vector<F> f : Filters ) {
 
         // cout << "\nFilter ";
         // print_vector(f);
@@ -484,7 +495,7 @@ map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int thresho
         vector<gIndex> Pf;
 
         // Find all the gIndices matching the filter f
-        for( vector<Type> v : vertices ){
+        for ( vector<Type> v : vertices ) {
 
             // int dimension = F[i].first
             // F value = F[i].second
@@ -508,7 +519,7 @@ map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int thresho
         // Let Rf <- threshold randomly sampled data point ids from Pf        
         // Create a vector with all the elements of Pf
         vector<gIndex> temp_vector;
-        for( gIndex vec : Pf ){
+        for ( gIndex vec : Pf ) {
             temp_vector.push_back(vec);
         }
 
@@ -520,7 +531,7 @@ map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int thresho
         shuffle(temp_vector.begin(), temp_vector.end(), default_random_engine(seed));
 
 
-        if( (size_t) threshold >= temp_vector.size() ){
+        if ( (size_t) threshold >= temp_vector.size() ) {
             threshold = temp_vector.size();
         }
 
@@ -531,8 +542,8 @@ map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int thresho
         gIndex p_min_index;
 
         p_min_index = Rf[0];
-        for( size_t i = 1 ; i < Rf.size() ; i++ ){
-            if( T[Rf[i]] < T[p_min_index] ){
+        for ( size_t i = 1 ; i < Rf.size() ; i++ ) {
+            if ( T[Rf[i]] < T[p_min_index] ) {
                 p_min_index = Rf[i];
             }
         }
@@ -542,7 +553,57 @@ map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int thresho
 
     }
 
-
     return M;
+
+}
+
+/* Implementation of the Stiched Vamana Indexing Algorithm */
+// Lsmall is the search list size for the regular Vamana algorithm
+// Rsmall is the degree bound for the regular Vamana algorithm
+// Rstiched is is the degree bound for the
+template <typename T, typename F>
+void StichedVamana(FilterGraph<T, F>& G, int Lsmall, int Rsmall, int Rstiched, float a = 1.2) {
+
+    // int n = G.get_vertices_count();
+    // set<gIndex> V;
+
+    set<vector<F>> filters = G.get_filters_set();
+    // int filter_count = filters.size();
+
+    map<vector<F>, Graph<T>> Gf;
+
+    set<T> vertices = G.get_vertices();
+
+    Graph<T>* graph_f;
+
+    for (vector<F> f: filters) {
+
+        // Getting the set Pf of points matching filter f
+        vector<gIndex> Pf;
+        for (T vertex : vertices) {
+            vector<F> filter = G.get_filters(G.get_index_from_vertex(vertex));
+            if (filter == f) {
+                Pf.push_back(G.get_index_from_vertex(vertex));
+            }
+        }
+
+        graph_f = new Graph<T>;
+
+
+        // Vamana(graph_f)
+
+        // Gf[f]
+
+        delete graph_f;
+    }
+
+
+
+
+
+    for (T vertex : vertices) {
+
+    }
+
 
 }

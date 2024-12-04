@@ -404,7 +404,7 @@ void test_Vamana() {
 }
 
 
-void test_Find_Medoid(){
+void test_Find_Medoid() {
     FilterGraph<vector<int>,int> G;
     
     G.add_vertex({10}, {1});
@@ -438,6 +438,38 @@ void test_Find_Medoid(){
 
 };
 
+
+
+
+void test_StichedVamana() {
+    FilterGraph<vector<float>,int> G;
+    
+    /* Float vertices of x.x form for no ambiguity regarding which closest of the nearby points is the closest
+    The vertices with each filter are 0:{0,1,2}, 1:{0,2,3}, 2:{0,3,4}, 3:{5,6} to make the corresponding
+    subgraphs to stich.*/
+    G.add_vertex({0.0}, {0, 1, 2});
+    G.add_vertex({1.1}, {0});
+    G.add_vertex({2.2}, {0, 1});
+    G.add_vertex({3.3}, {1, 2});
+    G.add_vertex({4.4}, {2});
+    G.add_vertex({5.5}, {3});
+    G.add_vertex({6.6}, {3});
+
+
+    StichedVamana<vector<float>, int>(G, 2, 2, 2);
+
+    // TEST_ASSERT(G.get_edge_count() == 11);
+    // TEST_ASSERT(G.exist_edge({0.0}, {1.1}) && G.exist_edge({0.0}, {2.2}));
+    // TEST_ASSERT(G.exist_edge({1.1}, {0.0}) && G.exist_edge({1.1}, {2.2}));
+    // TEST_ASSERT(G.exist_edge({2.2}, {1.1}) && G.exist_edge({2.2}, {3.3}));
+    // TEST_ASSERT(G.exist_edge({3.3}, {2.2}) && G.exist_edge({3.3}, {4.4}));
+    // TEST_ASSERT(G.exist_edge({4.4}, {3.3}));
+    // TEST_ASSERT(G.exist_edge({5.5}, {6.6}));
+    // TEST_ASSERT(G.exist_edge({6.6}, {5.5}));
+}
+
+
+
 // List of all tests to be executed
 TEST_LIST = {
     {"GreedySearch", test_GreedySearch},
@@ -445,6 +477,7 @@ TEST_LIST = {
     {"RobustPrune", test_RobustPrune},
     {"FilteredRobustPrune", test_FilteredRobustPrune},
     {"Vamana", test_Vamana},
-    { "Find Medoid", test_Find_Medoid },
+    {"Find_Medoid", test_Find_Medoid },
+    {"StichedVamana", test_StichedVamana},
     { NULL, NULL }
 };

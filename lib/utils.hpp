@@ -1,9 +1,8 @@
-#include <bits/stdc++.h>
 #include <cmath>
-#include "graph.hpp"
 #include <ctype.h>
 #include <string.h>
 
+#include "graph.hpp"
 
 
 /*--------------------------------------------------Namespaces and Type aliases-----------------------------------------------------*/
