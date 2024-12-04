@@ -180,11 +180,13 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>
         /* GET FILTERS FROM GRAPH */
         vector<F> Fs  = G.get_filters(G.get_index_from_vertex(s)); 
 
+        vector<F> Fx = G.get_filters(G.get_index_from_vertex(xquery));
+ 
         // Checking if the intersection of Fs and Fq is empty        
-        for( size_t j = 0 ; j < Fq.size() ; j++ ){
+        for( size_t j = 0 ; j < Fx.size() ; j++ ){
 
             /* Check if the filters match */
-            if( Fs[j] == Fq[j]){
+            if( Fs[j] == Fx[j]){
                 L_output.insert(G.get_index_from_vertex(s));
                 break;                        // We need at least one to match so that the intersection is non-empty
             }
@@ -534,6 +536,7 @@ void FilteredVamana(FilterGraph<vector<Type>,F>& G, int L, int R, float a){
             if( set_j_neighbors.size() > (long unsigned int) R){
                 FilteredRobustPrune<vector<Type>,F>(G,G.get_vertex_from_index(j), set_j_neighbors, a, R);
             }
+
 
 
             // // We calculate a candidate set with the neighbor's neighbors and the vertex itself
