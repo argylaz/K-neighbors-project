@@ -457,14 +457,14 @@ void test_StichedVamana() {
 
     StichedVamana<vector<float>, int>(G, 2, 2, 2);
 
-    // TEST_ASSERT(G.get_edge_count() == 11);
-    // TEST_ASSERT(G.exist_edge({0.0}, {1.1}) && G.exist_edge({0.0}, {2.2}));
-    // TEST_ASSERT(G.exist_edge({1.1}, {0.0}) && G.exist_edge({1.1}, {2.2}));
-    // TEST_ASSERT(G.exist_edge({2.2}, {1.1}) && G.exist_edge({2.2}, {3.3}));
-    // TEST_ASSERT(G.exist_edge({3.3}, {2.2}) && G.exist_edge({3.3}, {4.4}));
-    // TEST_ASSERT(G.exist_edge({4.4}, {3.3}));
-    // TEST_ASSERT(G.exist_edge({5.5}, {6.6}));
-    // TEST_ASSERT(G.exist_edge({6.6}, {5.5}));
+    TEST_ASSERT(G.get_edge_count() == 11);
+    TEST_ASSERT(G.exist_edge({0.0}, {1.1}) && G.exist_edge({0.0}, {2.2}));
+    TEST_ASSERT(G.exist_edge({1.1}, {0.0}) && G.exist_edge({1.1}, {2.2}));
+    TEST_ASSERT(G.exist_edge({2.2}, {1.1}) && G.exist_edge({2.2}, {3.3}));
+    TEST_ASSERT(G.exist_edge({3.3}, {2.2}) && G.exist_edge({3.3}, {4.4}));
+    TEST_ASSERT(G.exist_edge({4.4}, {3.3}));
+    TEST_ASSERT(G.exist_edge({5.5}, {6.6}));
+    TEST_ASSERT(G.exist_edge({6.6}, {5.5}));
 }
 
 

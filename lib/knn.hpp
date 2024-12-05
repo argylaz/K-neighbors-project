@@ -535,13 +535,7 @@ void StichedVamana(FilterGraph<T, F>& G, int Lsmall, int Rsmall, int Rstiched, f
 
     Graph<T>* graph_f;
 
-    for (F ff: filters) {
-        cout << ff << " ";
-    }
-    cout << endl;
-
     for (F filter: filters) {
-        cout << "\n" << filter << "" << endl;
 
         // Getting the set Pf of points matching filter f
         vector<gIndex> Pf;
@@ -552,7 +546,7 @@ void StichedVamana(FilterGraph<T, F>& G, int Lsmall, int Rsmall, int Rstiched, f
                 Pf.push_back(G.get_index_from_vertex(vertex));
             }
         }
-        print_vector(Pf);
+        // print_vector(Pf);
 
         // Creating the subgraph Gf with the points of Pf and running Vamana algorithm for them
         graph_f = new Graph<T>;
@@ -560,28 +554,34 @@ void StichedVamana(FilterGraph<T, F>& G, int Lsmall, int Rsmall, int Rstiched, f
             graph_f->add_vertex(G.get_vertex_from_index(i));
         }
 
-        // cout<<"\n\n";
-        // for (int ff: f) {
-        //     cout << ff << " ";
-        // }
-        // cout<<endl;
-
         Vamana(*graph_f, Lsmall, Rsmall, a);
 
         Gf.insert({filter, graph_f});
-
     }
 
-
+    // Merging the Gf subgraphs into G (adding the edges of all )
     for (F filter: filters) {
-        Gf[filter]->print_graph();
+        
+        // Copying all edges of Gf to G
+        set<T> gf_vertices = Gf[filter]->get_vertices();
+        for (T gf_vertex: gf_vertices) {
+            vector<gIndex> gf_neighbor_indices = Gf[filter]->get_neighbors(gf_vertex);
+            for (gIndex gf_neighbor_index: gf_neighbor_indices) {
+                T neighbor = Gf[filter]->get_vertex_from_index(gf_neighbor_index);
+                G.add_edge(gf_vertex, neighbor);
+            }
+        }
+
         delete Gf[filter];
     }
 
-
+    // Filtered Robust Prune to remove excess edges
     for (T vertex : vertices) {
-
+        vector<gIndex> neighbor_indices = G.get_neighbors(vertex);
+        set<gIndex> Nout(neighbor_indices.begin(), neighbor_indices.end());
+        FilteredRobustPrune<T, F>(G, vertex, Nout, a, Rstiched);
     }
 
+    // G.print_graph();
 
 }
