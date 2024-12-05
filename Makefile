@@ -23,7 +23,7 @@ TEST_EXEC = $(patsubst $(TEST_DIR)/%.cpp, $(BIN_DIR)/%, $(TEST_SRC))
 # Default target
 .PHONY: all create test clean
 
-all: create $(TEST_EXEC)
+all: clean create $(TEST_EXEC)
 
 # Create Directories
 create:
@@ -39,13 +39,13 @@ $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
 $(BIN_DIR)/%: $(BUILD_DIR)/%.o
 	$(CC) $(CFLAGS) -o $@ $<
 
-run:
+run: clean
 	$(CC) $(CFLAGS) -o bin/main main.cpp
-	time ./bin/main  -f small -k 100 -r 100 -l 100 -a 2
+	time ./bin/main  -f small -k 10 -l 50 -r 50 -a 1.2
 
 
 # Run the test executable
-test: $(TEST_EXEC)
+test: clean $(TEST_EXEC)
 	@for test_exec in $(TEST_EXEC); do \
 		./$$test_exec; \
 	done

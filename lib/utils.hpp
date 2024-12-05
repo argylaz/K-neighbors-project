@@ -1,9 +1,8 @@
-#include <bits/stdc++.h>
 #include <cmath>
-#include "graph.hpp"
 #include <ctype.h>
 #include <string.h>
 
+#include "graph.hpp"
 
 
 /*--------------------------------------------------Namespaces and Type aliases-----------------------------------------------------*/
@@ -295,6 +294,7 @@ vector<Type> medoid(Graph<vector<Type>>& G){
 template <typename T>
 void rDirectional(Graph<T>& G, int R) {
     
+    
     // Check if R is larger than the number of vertices (task impossible)
     if ( R > G.get_vertices_count() ) {
         cerr << "R-Directional Graph initialization failed...\n" << endl;
@@ -333,8 +333,8 @@ void rDirectional(Graph<T>& G, int R) {
         // Add R random outgoing neighbors
         int i = 0;
         int count = 0;
-        while ( count < R ){
-            if ( shuffled_vertices[i] != v ){
+        while ( count < R ) {
+            if ( shuffled_vertices[i] != v ) {
                 G.add_edge(v, shuffled_vertices[i]);  
                 count++;  
             }

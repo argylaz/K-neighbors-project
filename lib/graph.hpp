@@ -1,7 +1,6 @@
 /* Graph data structure representation using STL vector and set*/
 #include <iostream>
 #include <bits/stdc++.h>
-#include <set>
 using namespace std;
 
 /*------------------------------------- CLASS DECLARATION ----------------------------------------------------*/
@@ -55,6 +54,9 @@ public:
 
     /* Getter method for the set of vertices*/
     inline set<T> get_vertices() const;
+
+    /* Virtual destructor doing nothing*/
+    virtual ~Graph();
 
 protected:
     vector<vector<T>> get_adjacency_list() const;
@@ -336,4 +338,7 @@ inline set<T> Graph<T>::get_vertices() const {
     // Just returns the private attribute
     return vertices;
 }
+
+template <typename T>
+Graph<T>::~Graph() {}
 
