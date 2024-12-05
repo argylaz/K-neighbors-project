@@ -88,6 +88,10 @@ template <typename type>
 void make_vec(const string& filename, const vector<vector<type>>& vectors);
 
 
+/* Reads queries from sift/dummy-queries.bin */
+/* Returns a map from query nodes to their floating type filter value (-1 for no filter) */
+map<vector<float>, float> read_queries(const string& filename, int num_queries);  // !!! Throws exception if file extention is not .bin (call with try/catch)
+
 
 /*----------------------------------------------------Function Definitions-----------------------------------------------------------*/
 
@@ -704,4 +708,61 @@ void make_bin(const string& filename, const vector<vector<T>> vectors) {
     // Close file
     file.close();
     cout << "Data written to " << filename << " successfully.\n";
+}
+
+
+
+/* Reads queries from sift/dummy-queries.bin */
+/* Returns a map from query nodes to their floating type filter value (-1 for no filter) */
+map<vector<float>, float> read_queries(const string& filename, int num_queries, int num_dimensions) {
+    // Check the file extention
+    if(!hasBinExtension(filename)) { // !!! SHOULD BE CALLED WITH TRY AND CATCH
+        throw invalid_argument("File must have a .bin extention: " + filename);
+    }
+
+
+    // Open file and check if it was opened properly
+    ifstream ifs(filename, ios::binary);
+    assert(ifs.is_open());
+
+    cout << "Reading Queries: " << filename << endl;
+
+
+    // Get number of queries
+    uint32_t N;
+    ifs.read((char *)&N, sizeof(uint32_t));
+    cout << "# of pueries: " << N << endl;
+
+
+    // Initialise buffer and map
+    vector<float> buff(4 + num_dimensions);
+    map<vector<float>, float> M;
+
+    // Read query data repeatitively
+    while (ifs.read((char *)buff.data(), (4 + num_dimensions) * sizeof(float))) {
+        
+        // Casting and storing query value (not used)
+        int query_value = static_cast<float>(buff[0]);
+
+        // Casting and storing the filter (categorical attribute)
+        float filter = static_cast<float>(buff[1]);
+
+        /* Ignoring timestamps (buff[2] and buff[3]) */
+
+        // Casting query vector data to float
+        vector<float> q(num_dimensions);
+        for (int d = 0; d < num_dimensions; d++) {
+            q[d] = static_cast<float>(buff[d+4]);
+        }
+
+        /* ADDING ENTRY TO MAP */
+        M[q] = filter; // filter == -1 for no filter
+    }
+
+
+    // Close file
+    ifs.close();
+    cout << "Finish Reading Queries" << endl;
+
+    return M;
 }
