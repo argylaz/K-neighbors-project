@@ -46,12 +46,6 @@ private:
     
 };
 
-// Helper method to check file extention
-bool hasBinExtension(const string& filename) {
-    size_t pos = filename.rfind('.');
-    return pos != string::npos && filename.substr(pos) == ".bin";
-}
-
 
 
 /*------------------------------------------------------METHOD DEFINITIONS---------------------------------------------------------*/
@@ -88,7 +82,7 @@ FilterGraph<T,F>::FilterGraph(const string& filename, int num_dimensions, bool i
 
 
     // Initialise buffer
-    vector<float> buff(num_dimensions);
+    vector<float> buff(2 + num_dimensions);
 
     // Read data repeatitively
     while (ifs.read((char *)buff.data(), (2 + num_dimensions) * sizeof(float))) {

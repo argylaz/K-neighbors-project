@@ -50,6 +50,16 @@ test: clean $(TEST_EXEC)
 		./$$test_exec; \
 	done
 
+
+groundtruth:
+	$(CC) $(CFLAGS) -o bin/groundtruth groundtruth.cpp
+	./bin/groundtruth
+
+g_test:
+	$(CC) $(CFLAGS) -o bin/groundtruth_reading_test groundtruth_reading_test.cpp
+	./bin/groundtruth_reading_test
+
+
 valgrind: 
 	make
 	valgrind make test 
