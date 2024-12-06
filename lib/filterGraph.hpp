@@ -43,12 +43,6 @@ private:
     
 };
 
-// Helper method to check file extention
-bool hasBinExtension(const string& filename) {
-    size_t pos = filename.rfind('.');
-    return pos != string::npos && filename.substr(pos) == ".bin";
-}
-
 
 
 /*------------------------------------------------------METHOD DEFINITIONS---------------------------------------------------------*/

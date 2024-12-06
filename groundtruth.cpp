@@ -71,18 +71,20 @@ int main(void){
     
     // It will be replaced with the reading of the dummy_query.bin
     // -------------------------------------------------------------------------------- 
-    create_test_bin_files();
+    // create_test_bin_files();
 
 
-    vector<vector<float>> queries_data    = { {0.0f}, {4.0f}, {10.0f}, {8.0f}};
-    vector<vector<float>> queries_filters = { {1.0f}, {1.0f}, {2.0f} , {3.0f}};
+    // vector<vector<float>> queries_data    = { {0.0f}, {4.0f}, {10.0f}, {8.0f}};
+    // vector<vector<float>> queries_filters = { {1.0f}, {1.0f}, {2.0f} , {3.0f}};
 
+    // Read queries from dummy-queries.bin
+    map<vector<float>, float> queries_data = read_queries("sift/dummy-queries.bin", 100);
 
     // --------------------------------------------------------------------------------
             
 
     // FilterGraph<vector<float>, float> G("sift/dummy-data.bin", 100, true);
-    FilterGraph<vector<float>, float> G("sift/test_data.bin", 1, true);
+    FilterGraph<vector<float>, float> G("sift/dummy_data.bin", 1, true);
     int k = 2;
 
     set<vector<float>> vertices = G.get_vertices();
@@ -119,19 +121,19 @@ int main(void){
     groundtruth_file.write(reinterpret_cast<const char*>(&N), sizeof(N));
 
 
-    // temp vector for the calculations
-    set<gIndex> temp1;
-    for( vector<float> l : vertices){
-        temp1.insert(G.get_index_from_vertex(l));
-    }
 
-    for( size_t i = 0 ; i < queries_data.size() ; i++ ){
+    for( auto it = queries_data.begin(); it != queries_data.end(); it++ ){
+        // Initialising temp vector for the calculations
+        set<gIndex> temp1;
+        for( vector<float> l : vertices){
+            temp1.insert(G.get_index_from_vertex(l));
+        }
 
         set<gIndex> temp = temp1;
         // cout << "tesmp size is " << temp.size() << endl;
         // Set with all the gIndices
         // erase the vertex itself from the search list (temp vector)
-        auto p = find(temp.begin(), temp.end(), G.get_index_from_vertex(queries_data[i])); 
+        auto p = find(temp.begin(), temp.end(), G.get_index_from_vertex(it->first)); 
         if ( p != temp.end() ) {                        // Only remove if it was found within temp
             temp.erase(p);
         }
@@ -141,9 +143,9 @@ int main(void){
         vector<vector<float>> k_nearests;
 
         cout << endl << k << " nearests of ";
-        print_vector(queries_data[i]);
+        print_vector(it->first);
         cout << " with filter ";
-        print_vector(queries_filters[i]);
+        cout << it->second;
         cout << " are:\n";
         
         // k nearest points, so k iterations
@@ -152,7 +154,7 @@ int main(void){
         while( count < k && j < n){
             
             // Find the nearest each time 
-            vector<float> min = find_min_Euclidean<float>(G, temp, queries_data[i]); 
+            vector<float> min = find_min_Euclidean<float>(G, temp, it->first); 
 
             // cout << "Min is ";
             // print_vector(min);
@@ -160,7 +162,7 @@ int main(void){
 
 
             // The point in question is one of the k-nearest neighbors only if has the same filter as the query
-            if( queries_filters[i] == G.get_filters(G.get_index_from_vertex(min)) ){
+            if( it->second == G.get_filters(G.get_index_from_vertex(min))[0] ){
                 // --------------
                 print_vector(min);
                 cout << " with filter ";
