@@ -1,5 +1,5 @@
 #include "lib/filterGraph.hpp"
-// #include "lib/utils.hpp"
+#include "lib/utils.hpp"
 
 using namespace std;
  
@@ -49,7 +49,7 @@ void write_to_bin(ofstream& groundtruth_file, vector<gIndex>& k_nearests){
     groundtruth_file.write(reinterpret_cast<const char*>(&k), sizeof(k));
     
     cout << "Writing index vector of size " << k << endl; 
-    int c = 0;
+
 
     for( gIndex neighbor : k_nearests ){
         // Write the neighbors index into the file
@@ -131,14 +131,17 @@ int main(void){
             // Find the nearest each time 
             vector<float> min = find_min_Euclidean<float>(G, temp, it->first); 
 
+            set<float> filters_min = G.get_filters(G.get_index_from_vertex(min));
+            set<float> filter_temp;
+            filter_temp.insert(it->second);
 
             // The point in question is one of the k-nearest neighbors only if has the same filter as the query
-            if( it->second == G.get_filters(G.get_index_from_vertex(min))[0]  || it->second == -1){       // If the query has no categorical attribute (== -1) then ignore the filter
+            if( filter_temp == filters_min  || it->second == -1){       // If the query has no categorical attribute (== -1) then ignore the filter
                 // --------------
-                print_vector(min);
-                cout << " with filter ";
-                print_vector(G.get_filters(G.get_index_from_vertex(min)));
-                cout << endl;
+                // print_vector(min);
+                // cout << " with filter ";
+                // print_vector(G.get_filters(G.get_index_from_vertex(min)));
+                // cout << endl;
                 // --------------
                 k_nearests.push_back(G.get_index_from_vertex(min));
                 count++;

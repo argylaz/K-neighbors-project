@@ -25,9 +25,9 @@ int main(void){
 
     int num_dimensions = 1;
     // Initialize buffer
-    vector<float> buff(num_dimensions);
+    vector<gIndex> buff(num_dimensions);
     
-    vector<vector<float>> gt_data;
+    vector<vector<gIndex>> gt_data;
 
     for( int i = 0 ; i < (int)N ; i++ ){
 
@@ -38,7 +38,7 @@ int main(void){
         cout << "Query " << i + 1 << ": (k neighbors found = " << k << ")"<< endl;
 
         // Read the vector of dimension k
-        vector<float> nearest_neighbor(k);
+        vector<gIndex> nearest_neighbor(k);
         groundtruth.read(reinterpret_cast<char*>(nearest_neighbor.data()), k * sizeof(float));
 
         // Print the groundtruth of the query
@@ -51,24 +51,6 @@ int main(void){
 
 
     }
-
-    // // Read data repeatitively
-    // while (ifs.read((char *)buff.data(), (num_dimensions) * sizeof(float) sizeof(size_t)) ) {
-    //     // Casting and storing filter
-    //     F filter = static_cast<F>(buff[0]);
-
-    //     /* Ignoring timestamp buff[2] */ 
-
-    //     // Casting data to float
-    //     vector<float> row(num_dimensions);
-    //     for (int d = 0; d < num_dimensions; d++) {
-    //         row[d] = static_cast<float>(buff[d+2]); // !!!
-    //     }
-                
-    //     // Adding entry to graph
-    //     this->add_vertex(row, {filter});
-    // }
-
 
     // Close file
     groundtruth.close();
