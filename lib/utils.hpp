@@ -750,7 +750,7 @@ void make_vec(const string& filename, const vector<vector<type>>& vectors) {
 template <typename T>
 void make_bin(const string& filename, const vector<vector<T>> vectors) {
     // Create/Open file
-    ofstream file(filename, std::ios::binary);
+    ofstream file(filename, ios::binary);
     if (!file) {
         throw runtime_error("Failed to open file for writing: " + filename); // !!! Used with try/catch
     }

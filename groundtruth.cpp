@@ -43,20 +43,19 @@ void create_test_bin_files(){
 
 */
 
-void write_to_bin(ofstream& groundtruth_file, vector<vector<float>>& k_nearests){
+void write_to_bin(ofstream& groundtruth_file, vector<gIndex>& k_nearests){
     // Write k, because some queries might have less than k-nearests neighbors
     size_t k = k_nearests.size();
     groundtruth_file.write(reinterpret_cast<const char*>(&k), sizeof(k));
     
+    cout << "Writing index vector of size " << k << endl; 
+    int c = 0;
 
-    for( const auto& neighbor : k_nearests ){
-        // Write the k-neighbors, the elementys of the vector
-        if (!neighbor.empty()) {
-            groundtruth_file.write(reinterpret_cast<const char*>(neighbor.data()), neighbor.size() * sizeof(float));
-        }
-
+    for( gIndex neighbor : k_nearests ){
+        // Write the neighbors index into the file
+        groundtruth_file.write(reinterpret_cast<const char*>(&neighbor), sizeof(gIndex));
     }
-
+    cout << "Finished writing data" << endl;
 }
 
 
@@ -68,44 +67,18 @@ void write_to_bin(ofstream& groundtruth_file, vector<vector<float>>& k_nearests)
 
 // To do:: flags arguments
 int main(void){
-    
-    // It will be replaced with the reading of the dummy_query.bin
-    // -------------------------------------------------------------------------------- 
-    // create_test_bin_files();
-
-
-    // vector<vector<float>> queries_data    = { {0.0f}, {4.0f}, {10.0f}, {8.0f}};
-    // vector<vector<float>> queries_filters = { {1.0f}, {1.0f}, {2.0f} , {3.0f}};
 
     // Read queries from dummy-queries.bin
-    map<vector<float>, float> queries_data = read_queries("sift/dummy-queries.bin", 100);
+    map<vector<float>, float> queries_data = read_queries("sift/dummy-queries.bin", 100);  
 
-    // --------------------------------------------------------------------------------
-            
-
-    // FilterGraph<vector<float>, float> G("sift/dummy-data.bin", 100, true);
+    // Create a FilterGraph with the data from dummy-data.bin
     FilterGraph<vector<float>, float> G("sift/dummy-data.bin", 100, true);
-    int k = 100;
 
+    // Get the data vectors from the graph
     set<vector<float>> vertices = G.get_vertices();
-    // cout << "Size of vectors within graph: " << endl;;
-    // for (vector<float> v : vertices) cout << v.size() << endl;
     int n = G.get_vertices_count();
 
-    // for( vector<float> v : vertices ){
-    //     vector<float> filter = G.get_filters(G.get_index_from_vertex(v));
-    //     cout << "Point ";
-    //     print_vector(v);
-    //     cout << " has filter ";
-    //     print_vector(filter);
-    //     cout << endl;
-    // }
-
-
-
-    // Contains the k nearest points of each point
-    // vector<vector<vector<float>>> groundtruth;
-    // Calculation of the groundtruth for k nearest points
+    int k = 100;
 
     
 
@@ -115,7 +88,6 @@ int main(void){
         cerr << "Error opening file for writing!" << endl;
         return 1;
     }
-
 
 
     // Write the number of queries - groudtruth
@@ -129,13 +101,13 @@ int main(void){
         temp1.insert(G.get_index_from_vertex(l));
     }
 
+    /* Repeatitively find neares neighbors for each query and write into groudtruth.bin */
     for( auto it = queries_data.begin(); it != queries_data.end(); it++ ){
 
-        set<gIndex> temp = temp1;
-        print_vector(it->first); cout <<endl;
-        // cout << "tesmp size is " << temp.size() << endl;
         // Set with all the gIndices
-        // erase the vertex itself from the search list (temp vector)
+        set<gIndex> temp = temp1;
+
+        // Erase the vertex itself from the search list (temp vector)
         auto p = find(temp.begin(), temp.end(), G.get_index_from_vertex(it->first)); 
         if ( p != temp.end() ) {                        // Only remove if it was found within temp
             temp.erase(p);
@@ -143,7 +115,7 @@ int main(void){
 
         
         // vector with the k-nearests points of the point in question
-        vector<vector<float>> k_nearests;
+        vector<gIndex> k_nearests;
 
         cout << endl << k << " nearests of ";
         print_vector(it->first);
@@ -159,10 +131,6 @@ int main(void){
             // Find the nearest each time 
             vector<float> min = find_min_Euclidean<float>(G, temp, it->first); 
 
-            // cout << "Min is ";
-            // print_vector(min);
-            // cout << endl;
-
 
             // The point in question is one of the k-nearest neighbors only if has the same filter as the query
             if( it->second == G.get_filters(G.get_index_from_vertex(min))[0]  || it->second == -1){       // If the query has no categorical attribute (== -1) then ignore the filter
@@ -172,7 +140,7 @@ int main(void){
                 print_vector(G.get_filters(G.get_index_from_vertex(min)));
                 cout << endl;
                 // --------------
-                k_nearests.push_back(min);
+                k_nearests.push_back(G.get_index_from_vertex(min));
                 count++;
             }
 
