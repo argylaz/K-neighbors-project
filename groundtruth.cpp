@@ -84,10 +84,12 @@ int main(void){
             
 
     // FilterGraph<vector<float>, float> G("sift/dummy-data.bin", 100, true);
-    FilterGraph<vector<float>, float> G("sift/dummy_data.bin", 1, true);
-    int k = 2;
+    FilterGraph<vector<float>, float> G("sift/dummy-data.bin", 100, true);
+    int k = 100;
 
     set<vector<float>> vertices = G.get_vertices();
+    // cout << "Size of vectors within graph: " << endl;;
+    // for (vector<float> v : vertices) cout << v.size() << endl;
     int n = G.get_vertices_count();
 
     // for( vector<float> v : vertices ){
@@ -121,15 +123,16 @@ int main(void){
     groundtruth_file.write(reinterpret_cast<const char*>(&N), sizeof(N));
 
 
+    // Initialising temp vector for the calculations
+    set<gIndex> temp1;
+    for( vector<float> l : vertices){
+        temp1.insert(G.get_index_from_vertex(l));
+    }
 
     for( auto it = queries_data.begin(); it != queries_data.end(); it++ ){
-        // Initialising temp vector for the calculations
-        set<gIndex> temp1;
-        for( vector<float> l : vertices){
-            temp1.insert(G.get_index_from_vertex(l));
-        }
 
         set<gIndex> temp = temp1;
+        print_vector(it->first); cout <<endl;
         // cout << "tesmp size is " << temp.size() << endl;
         // Set with all the gIndices
         // erase the vertex itself from the search list (temp vector)
@@ -144,7 +147,7 @@ int main(void){
 
         cout << endl << k << " nearests of ";
         print_vector(it->first);
-        cout << " with filter ";
+        cout << endl << " with filter " << endl;
         cout << it->second;
         cout << " are:\n";
         

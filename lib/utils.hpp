@@ -670,11 +670,11 @@ map<vector<float>, float> read_queries(const string& filename, int num_queries) 
 
 
     // Initialise buffer and map
-    vector<float> buff(4 + num_dimensions);
+    vector<float> buff(104);
     map<vector<float>, float> M;
 
     // Read query data repeatitively
-    while (ifs.read((char *)buff.data(), (4 + num_dimensions) * sizeof(float))) {
+    while (ifs.read((char *)buff.data(), (104) * sizeof(float))) {
         
         // Casting and storing query value (not used)
         // int query_value = static_cast<float>(buff[0]);
@@ -685,8 +685,8 @@ map<vector<float>, float> read_queries(const string& filename, int num_queries) 
         /* Ignoring timestamps (buff[2] and buff[3]) */
 
         // Casting query vector data to float
-        vector<float> q(num_dimensions);
-        for (int d = 0; d < num_dimensions; d++) {
+        vector<float> q(100);
+        for (int d = 0; d < 100; d++) {
             q[d] = static_cast<float>(buff[d+4]);
         }
 
