@@ -649,7 +649,7 @@ bool hasBinExtension(const string& filename) {
 
 /* Reads queries from sift/dummy-queries.bin */
 /* Returns a map from query nodes to their floating type filter value (-1 for no filter) */
-map<vector<float>, float> read_queries(const string& filename, int num_queries, int num_dimensions) {
+map<vector<float>, float> read_queries(const string& filename, int num_queries) {
     // Check the file extention
     if(!hasBinExtension(filename)) { // !!! SHOULD BE CALLED WITH TRY AND CATCH
         throw invalid_argument("File must have a .bin extention: " + filename);
@@ -677,7 +677,7 @@ map<vector<float>, float> read_queries(const string& filename, int num_queries, 
     while (ifs.read((char *)buff.data(), (4 + num_dimensions) * sizeof(float))) {
         
         // Casting and storing query value (not used)
-        int query_value = static_cast<float>(buff[0]);
+        // int query_value = static_cast<float>(buff[0]);
 
         // Casting and storing the filter (categorical attribute)
         float filter = static_cast<float>(buff[1]);
