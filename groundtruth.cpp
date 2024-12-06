@@ -147,7 +147,7 @@ int main(void){
 
         cout << endl << k << " nearests of ";
         print_vector(it->first);
-        cout << endl << " with filter " << endl;
+        cout << endl << " with filter ";
         cout << it->second;
         cout << " are:\n";
         
@@ -165,7 +165,7 @@ int main(void){
 
 
             // The point in question is one of the k-nearest neighbors only if has the same filter as the query
-            if( it->second == G.get_filters(G.get_index_from_vertex(min))[0] ){
+            if( it->second == G.get_filters(G.get_index_from_vertex(min))[0]  || it->second == -1){       // If the query has no categorical attribute (== -1) then ignore the filter
                 // --------------
                 print_vector(min);
                 cout << " with filter ";
