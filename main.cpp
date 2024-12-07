@@ -1,4 +1,5 @@
 #include <iostream>
+#include "lib/file_io.hpp"
 #include "lib/knn.hpp"
 
 using namespace std;
