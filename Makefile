@@ -51,21 +51,32 @@ test: clean $(TEST_EXEC)
 	done
 
 
+# Create groundtruth.bin file
 groundtruth:
 	$(CC) $(CFLAGS) -o bin/groundtruth groundtruth.cpp
 	./bin/groundtruth
+
 
 g_test:
 	$(CC) $(CFLAGS) -o bin/groundtruth_reading_test groundtruth_reading_test.cpp
 	./bin/groundtruth_reading_test
 
 
+# Run tests with valgrind
 valgrind: 
-	make
 	valgrind make test 
 
+# Cleaning everything in bin and build folders except *_graph.bin files,
+# which contain saved Graphs made with Filtered, Stiched or Simple Vamana algorithms  
 clean:
-	rm -rf $(BUILD_DIR)/*.o 
+	rm -rf $(BUILD_DIR)/*.o
+	find $(BIN_DIR) -type f ! -name '*_graph.bin' ! -name 'groundtruth.bin' -delete 
+
+# Erase everything in bin and build folders
+erase:
+	rm -rf $(BUILD_DIR)/*.o
 	rm -rf $(BIN_DIR)/*
+	
+
 
 
