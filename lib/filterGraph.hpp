@@ -1,5 +1,4 @@
-#include "utils.hpp"
-// #include <concepts>
+#include "file_io.hpp" // Also includes utils
 
 using namespace std;
 
@@ -47,7 +46,6 @@ private:
 };
 
 
-
 /*------------------------------------------------------METHOD DEFINITIONS---------------------------------------------------------*/
 
 
@@ -82,7 +80,7 @@ FilterGraph<T,F>::FilterGraph(const string& filename, int num_dimensions, bool i
 
 
     // Initialise buffer
-    vector<float> buff(2 + num_dimensions);
+    vector<float> buff(num_dimensions);
 
     // Read data repeatitively
     while (ifs.read((char *)buff.data(), (2 + num_dimensions) * sizeof(float))) {
