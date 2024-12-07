@@ -1,76 +1,66 @@
-#include <bits/stdc++.h>
 #include <cmath>
-#include "graph.hpp"
 #include <ctype.h>
 #include <string.h>
+
+#include "graph.hpp"
+// #include "file_io.hpp"
+
+
+
+/*--------------------------------------------------Namespaces and Type aliases-----------------------------------------------------*/
+
 using namespace std;
 
+/* Defining a filter as a vector of pairs int(dimension) and Type(value)        */
+/* These filters will be used to check certain values of a given vector(point)  */
+// template <typename Type>
+// using filter = <pair<int, Type>;
 
 
 /*----------------------------------------------------Function Declarations---------------------------------------------------------*/
 
 
 
+template<typename Type>
 /* Function for the calculation of the Euclidean distance             */
 /* Returns INFINITY as error value indicating problems in calculation */
-template<typename Type>
 inline float Euclidean_Distance(vector<Type> a, vector<Type> b);
 
 
-/* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
 template <typename Type>
+/* Function that given a set S and a point xquery, finds the point p in S with the min Euclidean distance with xquery*/
 inline vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<gIndex>& S, vector<Type> xquery);
 
 
-/* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
 template <typename Type>
+/* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
 inline void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_set, vector<Type> xquery, int L);
 
 
-/* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
 template <typename Type>
+/* Given a set of vectors and a target vector (xquery), only keep the L vectors closest to xquery */
 inline void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_set, vector<Type> xquery, int L);
 
 
+template <typename Type>
 /* Method which finds the medoid of a given graph */
-template <typename Type>
 vector<Type> medoid(Graph<vector<Type>>& G);
 
 
-/* Method which adds randomly exactly R outgoing neighbors to each vertex of the graph */
+// /*  Filter is pair<int, Type>
+//     Function returns a map M, mapping filters to the equivalent medoid node
+// */ 
+// template <typename Type, typename F>
+// map<vector<F> , gIndex> FindMedoid(Graph<vector<Type>>& G, int threshold);
+
+
 template <typename T>
+/* Method which adds randomly exactly R outgoing neighbors to each vertex of the graph */
 void rDirectional(Graph<T>& G, int R);
-
-
-/* Given an empty graph, reads an fvec file and fills the graph with all the vectors read as its vertices and no edges */
-/* This functions assumes that all the vectors given in the file will be of the same dimension                         */
-/* Otherwise, the entries inside the graph will be uneven (vectors of different dimensions)                            */
-template <typename type>
-void vec_to_graph(const string& filename, Graph<vector<type>>& G);
-
-
-/* Method that reads vectors from an fvec or ivec and returns a vector containing all of them */
-template <typename Type>
-vector<vector<Type>> read_vecs(string& filename);
-
-
-/* Same as the above but returns a set containing all the vectors instead */
-template <typename Type>
-set<vector<Type>> read_sets(string& filename);
 
 
 // Function that checks if a string is a positive integer (for checking the command line arguments)
 bool isPositiveInteger(char *str);
-
-
-// Function that reads the command line input arguments. Returns 1 or -1
-int get_arguments(int argc, char* argv[], int& k, int& L, float& a, int& R,string& base_name, string& query_name, string& groundtruth_name);
-
-
-/* Creates an fvec file with the given vectors for testing */
-template <typename type>
-void make_vec(const string& filename, const vector<vector<type>>& vectors);
-
 
 
 /*----------------------------------------------------Function Definitions-----------------------------------------------------------*/
@@ -194,10 +184,91 @@ vector<Type> medoid(Graph<vector<Type>>& G){
     return medoid_vertice;
 }
 
+// template <typename Type, typename F>
+// /*  Filter is pair<int, Type>
+//     Function returns a map M, mapping filters to the equivalent medoid node 
+//     Argument F is the set of all filters
+// */
+// // We suppose that the set of all filters is given as a vector of filters(pair) 
+// map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int threshold){
+//     map<vector<F> , gIndex> M;
+
+//     set<vector<F>> Filters = G.get_filters_set(); 
+    
+//     // Νομίζω ότι εξ αρχής αρχικοποιείται σαν zero map
+//     // εναλλακτικά θα πρέπει να κάνουμε αρχικοποίηση σε 0 κάθε στοιχείο του map 
+//     map<gIndex, int> T;               // Zero map T is intended as a counter
+
+//     set<vector<Type>> vertices = G.get_vertices();
+ 
+//     // For each filter in the set
+//     for( vector<F> f : Filters ){
+
+//         // contains the gIndices of all points matching filter in question
+//         vector<gIndex> Pf;
+
+//         // Find all the gIndices matching the filter f
+//         for( vector<Type> v : vertices ){
+
+//             // int dimension = F[i].first
+//             // F value = F[i].second
+
+//             vector<F> filter = G.get_filters(G.get_index_from_vertex(v));              
+            
+//             if( filter == f ){
+//                 Pf.push_back(G.get_index_from_vertex(v));
+//             }
+
+//             // if( v[dimension] == value ){
+//             //     Pf.push_back(G.get_index_from_vertex(v));
+//             // }      
+//         }
+        
+
+//         // To do :: Check for optimization
+//         // Let Rf <- threshold randomly sampled data point ids from Pf        
+//         // Create a vector with all the elements of Pf
+//         vector<gIndex> temp_vector(vertices.begin(), vertices.end());
+
+//         // To obtain a time-based seed 
+//         unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+        
+//         // Shuffle the temp vector Pf
+//         shuffle(temp_vector.begin(), temp_vector.end(), default_random_engine(seed));
+
+
+//         // Keep the first threshold items of the shuffled vector
+//         vector<gIndex> Rf(temp_vector.begin(), temp_vector.begin() + threshold);
+
+
+//         if( Rf.size() <= 0 ){
+//             cerr << "The set Rf in medoid calculation is empty";
+//         }
+
+//         // Finding p_min point, where p_min is min{T[p], for each p in Rf};
+//         gIndex p_min_index;
+
+//         p_min_index = Rf[0];
+//         for( size_t i = 1 ; i < Rf.size() ; i++ ){
+//             if( T[Rf[i]] < T[p_min_index] ){
+//                 p_min_index = Rf[i];
+//             }
+//         }
+        
+//         M[f] = p_min_index;
+//         T[p_min_index]++;
+
+//     }
+
+
+//     return M;
+
+// }
 
 /* Method which adds randomly exactly R outgoing neighbors to each vertex of the graph */
 template <typename T>
 void rDirectional(Graph<T>& G, int R) {
+    
     
     // Check if R is larger than the number of vertices (task impossible)
     if ( R > G.get_vertices_count() ) {
@@ -237,8 +308,8 @@ void rDirectional(Graph<T>& G, int R) {
         // Add R random outgoing neighbors
         int i = 0;
         int count = 0;
-        while ( count < R ){
-            if ( shuffled_vertices[i] != v ){
+        while ( count < R ) {
+            if ( shuffled_vertices[i] != v ) {
                 G.add_edge(v, shuffled_vertices[i]);  
                 count++;  
             }
@@ -250,165 +321,8 @@ void rDirectional(Graph<T>& G, int R) {
 }
 
 
-/* Given an empty graph, reads an fvec file and fills the graph with all the vectors read as its vertices and no edges */
-/* This functions assumes that all the vectors given in the file will be of the same dimension                         */
-/* Otherwise, the entries inside the graph will be uneven (vectors of different dimensions)                            */
-template <typename type>
-void vec_to_graph(const string& filename, Graph<vector<type>>& G) {
-    // First we open the file and check if it was opened properly
-    ifstream file(filename, ios::binary);
-    if (!file) {
-        cerr << "Error when opening file " << filename << endl;
-        return;
-    }
-
-    // This variable will indicate that the format of the file is correct and as expected.
-    bool correctFormat = true;
-
-    // Read the contents of the file
-    while (file.peek() != EOF) {
-        // Read the dimension of the vector 
-        int d;
-        file.read(reinterpret_cast<char*>(&d), sizeof(int));
-
-        // If there is no data following the dimension the file format is incorrect.
-        if (!file) {
-            correctFormat = false; 
-            break;
-        }
-
-        // Create vector to hold the values and resize to the correct dimension
-        vector<type> v; v.resize(d);
-
-        // Read the data from file
-        file.read(reinterpret_cast<char*>(v.data()), d * sizeof(type));
-        if (!file) break;
-
-        // If the number of floats read and the dimension read don't match, the format is incorrect
-        if (v.size() != (size_t) d) {
-            correctFormat = false;
-            break;
-        }
-
-        G.add_vertex(v);
-    }
-
-    if (!correctFormat) cerr << "Input file format incorrect! Graph might have errors." << endl;
-    file.close();
-}
-
-
-
-/*--------------------------------------Methods used in main.cpp-------------------------------------*/
-
-
-
-/* Method that reads vectors from an fvec or ivec and returns a vector containing all of them */
-template <typename Type>
-vector<vector<Type>> read_vecs(string& filename) {
-    
-    vector<vector<Type>> result;
-    
-    // First we open the file and check if it was opened properly
-    ifstream file(filename, ios::binary);
-    if (!file) {
-        cerr << "Error when opening file " << filename << endl;
-        return result;
-    }
-
-    // This variable will indicate that the format of the file is correct and as expected.
-    bool correctFormat = true;
-
-    // Read the contents of the file
-    while (file.peek() != EOF) {
-        // Read the dimension of the vector 
-        int d;
-        file.read(reinterpret_cast<char*>(&d), sizeof(int));
-
-        // If there is no data following the dimension the file format is incorrect.
-        if (!file) {
-            correctFormat = false; 
-            break;
-        }
-
-        // Create vector to hold the values and resize to the correct dimension
-        vector<Type> v; v.resize(d);
-
-        // Read the data from file
-        file.read(reinterpret_cast<char*>(v.data()), d * sizeof(Type));
-        if (!file) break;
-
-        // If the number of floats read and the dimension read don't match, the format is incorrect
-        if (v.size() != (size_t) d) {
-            correctFormat = false;
-            break;
-        }
-
-        result.push_back(v);
-    }
-
-    // Throw error if the format of the file was not as expected
-    if (!correctFormat) cerr << "Input file format incorrect! Graph might have errors." << endl;
-    file.close();
-
-    return result;
-}
-
-
-/* Same as the above but returns a set containing all the vectors instead */
-template <typename Type>
-set<vector<Type>> read_sets(string& filename) {
-    
-    set<vector<Type>> result;
-    
-    // First we open the file and check if it was opened properly
-    ifstream file(filename, ios::binary);
-    if (!file) {
-        cerr << "Error when opening file " << filename << endl;
-        return result;
-    }
-
-    // This variable will indicate that the format of the file is correct and as expected.
-    bool correctFormat = true;
-
-    // Read the contents of the file
-    while (file.peek() != EOF) {
-        // Read the dimension of the vector 
-        int d;
-        file.read(reinterpret_cast<char*>(&d), sizeof(int));
-
-        // If there is no data following the dimension the file format is incorrect.
-        if (!file) {
-            correctFormat = false; 
-            break;
-        }
-
-        // Create vector to hold the values and resize to the correct dimension
-        vector<Type> v; v.resize(d);
-
-        // Read the data from file
-        file.read(reinterpret_cast<char*>(v.data()), d * sizeof(Type));
-        if (!file) break;
-
-        // If the number of floats read and the dimension read don't match, the format is incorrect
-        if (v.size() != (size_t) d) {
-            correctFormat = false;
-            break;
-        }
-
-        result.push_back(v);
-    }
-
-    // Throw error if the format of the file was not as expected
-    if (!correctFormat) cerr << "Input file format incorrect! Graph might have errors." << endl;
-    file.close();
-
-    return result;
-}
-
-
 // Function that checks if a string is a positive integer (for checking the command line arguments)
-bool isPositiveInteger(char *str) {
+bool isPositiveInteger(const char *str) {
     int sz = strlen(str);
     for (int i = 0; i < sz; i++) {
         if (!isdigit(str[i])) return 0;
@@ -416,122 +330,6 @@ bool isPositiveInteger(char *str) {
     return 1;
 }
 
-
-
-// Function that reads the command line input arguments. Returns 1 or -1
-int get_arguments(int argc, char* argv[], int& k, int& L, float& a, int& R,string& base_name, string& query_name, string& groundtruth_name){
-    // We need at least 8 arguments (Filename, k, L, R and maybe a)
-    if (!(argc == 9 || argc == 11)) {     
-        cerr << "ERROR: Malformed input at command line\n";
-        return -1;
-    }
-
-    
-    // Get the filename
-    char* flag_small;      // Flag for siftsmall
-    if (!strcmp(argv[1], "-f")) flag_small = argv[2];
-    else if (!strcmp(argv[3], "-f")) flag_small = argv[4];
-    else if (!strcmp(argv[5], "-f")) flag_small = argv[6];
-    else if (!strcmp(argv[7], "-f")) flag_small = argv[8];
-    else if (argc == 11 && !strcmp(argv[9], "-f")) flag_small = argv[10];
-    else {
-        cerr << "ERROR: Should include the file name as command line argument like \"-f filename\"\n";
-        return -1;
-    }
-
-    // string base_name;
-    // string groundtruth_name;
-    // string query_name;
-    if( !strcmp(flag_small, "small") ){
-        base_name =  "sift/siftsmall_base.fvecs";
-        query_name = "sift/siftsmall_query.fvecs";
-        groundtruth_name = "sift/siftsmall_groundtruth.ivecs";
-    }
-    else if( !strcmp(flag_small, "large") ){
-        base_name =  "sift/sift_base.fvecs";
-        query_name = "sift/sift_query.fvecs";
-        groundtruth_name = "sift/sift_groundtruth.ivecs";
-    }
-    else{
-        cerr << "ERROR: Should include the file name as command line argument like \"-f small\" or \"-f large\"\n";
-        return -1;
-    }
-
-    // Get K argument
-    // int k;
-    char *tempk;
-    if (!strcmp(argv[1], "-k")) tempk = argv[2];
-    else if (!strcmp(argv[3], "-k")) tempk = argv[4];
-    else if (!strcmp(argv[5], "-k")) tempk = argv[6];
-    else if (!strcmp(argv[7], "-k")) tempk = argv[8];
-    else if (argc == 11 && !strcmp(argv[9], "-k")) tempk = argv[10];
-    else {
-        cerr << "ERROR: Should include the k command line argument like \"-k k_neighbors\"\n";
-        return -1;
-    }
-    k = atoi(tempk);
-    if (k <= 0 || !isPositiveInteger(tempk)) {
-        cerr << "ERROR: Bucket capacity b should be a positive integer number\n";
-        return -1;
-    }
-
-    // Get L argument
-    // int L;
-    char *tempL;
-    if (!strcmp(argv[1], "-l")) tempL = argv[2];
-    else if (!strcmp(argv[3], "-l")) tempL = argv[4];
-    else if (!strcmp(argv[5], "-l")) tempL = argv[6];
-    else if (!strcmp(argv[7], "-l")) tempL = argv[8];
-    else if (argc == 11 && !strcmp(argv[9], "-l")) tempL = argv[10];
-    else {
-        cerr << "ERROR: Should include the l command line argument like \"-l l_argument\"\n";
-        return -1;
-    }
-    L = atoi(tempL);
-    if (L <= 0 || !isPositiveInteger(tempL)) {
-        cerr << "ERROR: L argument should be a positive integer number\n";
-        return -1;
-    }
-
-
-    // Get L argument
-    // int R;
-    char *tempR;
-    if (!strcmp(argv[1], "-r")) tempR = argv[2];
-    else if (!strcmp(argv[3], "-r")) tempR = argv[4];
-    else if (!strcmp(argv[5], "-r")) tempR = argv[6];
-    else if (!strcmp(argv[7], "-r")) tempR = argv[8];
-    else if (argc == 11 && !strcmp(argv[9], "-r")) tempR = argv[10];
-    else {
-        cerr << "ERROR: Should include the r command line argument like \"-r r_argument\"\n";
-        return -1;
-    }
-    R = atoi(tempR);
-    if (R <= 0 || !isPositiveInteger(tempR)) {
-        cerr << "ERROR: R argument should be a positive integer number\n";
-        return -1;
-    }
-
-    // Get L argument
-    // float a;
-    char *tempA;
-    if (!strcmp(argv[1], "-a")) tempA = argv[2];
-    else if (!strcmp(argv[3], "-a")) tempA = argv[4];
-    else if (!strcmp(argv[5], "-a")) tempA = argv[6];
-    else if (!strcmp(argv[7], "-a")) tempA = argv[8];
-    else if (argc == 11 && !strcmp(argv[9], "-a")) tempA = argv[10];
-    else {
-        cerr << "ERROR: Should include the a command line argument like \"-a a_argument\"\n";
-        return -1;
-    }
-    a = atof(tempA);
-    if (a <= 0 ) {
-        cerr << "ERROR: a argument should be a positive integer number\n";
-        return -1;
-    }
-
-    return 1;
-}
 
 
 /*---------------------------Utility functions and classes for the tests-----------------------------------*/
@@ -551,27 +349,4 @@ public:
 };
 
 
-/* Creates an fvec file with the given vectors for testing */
-template <typename type>
-void make_vec(const string& filename, const vector<vector<type>>& vectors) {
-    // Create file and check it was created successfully
-    ofstream file(filename, ios::binary);
-    if (!file) {
-        cerr << "Error when creating file " << filename << endl;
-        return;
-    }
 
-    // Read vectors and wite them in the files
-    for (const auto& v: vectors) {
-        int d = v.size();         // Get the dimension of the vector
-
-        // First write the dimension as an int
-        file.write(reinterpret_cast<const char*>(&d), sizeof(int));
-
-        // Then write the data as floats
-        file.write(reinterpret_cast<const char*>(v.data()), d * sizeof(type));
-    }
-
-    // Close the files
-    file.close();
-}

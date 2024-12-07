@@ -1,7 +1,6 @@
 /* Graph data structure representation using STL vector and set*/
 #include <iostream>
 #include <bits/stdc++.h>
-#include <set>
 using namespace std;
 
 /*------------------------------------- CLASS DECLARATION ----------------------------------------------------*/
@@ -16,10 +15,11 @@ public:
 
    
     /* Adds a vertex (of type T) to the graph, return false if the vertex is already in the graph*/
-    bool add_vertex(const T& v);
+    virtual bool add_vertex(const T& v);
 
+    /* Adds a key in a sorted vector, in a sorted way based on the vertex index key */
     void insert_sorted(vector<gIndex>& v, T key);
-
+    /* Adds a key in an adjacency list, in a sorted way based on the vertex index key */
     void insert_sorted_in_adj_list(vector<T>& v, T key);
 
     /* Adds edge between vertex(T) start and vertex(T) end */
@@ -55,10 +55,12 @@ public:
     /* Getter method for the set of vertices*/
     inline set<T> get_vertices() const;
 
+    /* Virtual destructor doing nothing*/
+    virtual ~Graph();
+
 protected:
     vector<vector<T>> get_adjacency_list() const;
-    
-private:
+
     int countEdges;
     int countVertices;
     bool isDirected;                        // True if the graph is directed
@@ -113,6 +115,7 @@ bool Graph<T>::add_vertex(const T& v) {
 
 
 
+
 /* Inserts the index of vertex key in the given vector at the correct position so it remains sorted */
 template <typename T>
 void Graph<T>::insert_sorted(vector<gIndex>& v, T key) {
@@ -128,10 +131,13 @@ void Graph<T>::insert_sorted(vector<gIndex>& v, T key) {
 
 
 /* Inserts a vertex key in the given vector of the adjacency list*/
+/* Adds a key in an adjacency list, in a sorted way based on the vertex index key. Similar to the above but ignoring the first element of the vector */
+
 template <typename T>
 void Graph<T>::insert_sorted_in_adj_list(vector<T>& adj, T key) {
     adj.push_back(key);
     
+    // Looking after the first element
     int insertPos = 1;
     for (auto i = adj.begin() + 1; i < adj.end() - 1; i++) {
         if (v_index[key] >= v_index[*i]) {
@@ -338,4 +344,7 @@ inline set<T> Graph<T>::get_vertices() const {
     // Just returns the private attribute
     return vertices;
 }
+
+template <typename T>
+Graph<T>::~Graph() {}
 

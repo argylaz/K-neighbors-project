@@ -5,6 +5,7 @@
 *.tar.gz
 *.fvecs
 *.ivecs
+*.bin
 
 # Compiled Object files
 *.slo

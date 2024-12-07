@@ -6,7 +6,7 @@ using namespace std;
 void test_GreedySearch() {
     // Test using simple example solved by hand
     // Using <vector<int>> because GreedySearch and EuclideanDistance work with vectors.
-    TestGraph<vector<int>> G;
+    Graph<vector<int>> G;
     
     // Add vertices 0,1,2,3,4
     G.add_vertex({0}); G.add_vertex({1}); G.add_vertex({2}); G.add_vertex({3}); G.add_vertex({4}); 
@@ -137,19 +137,59 @@ void test_GreedySearch() {
 
 }
 
+/* Testing FilteredGreedySearch method  using an example solved by hand */
+void test_FilteredGreedySearch() {
+    
+    FilterGraph<vector<int>,int> G(true);
 
+    // added some random filters
+    // Adding vertices 0,1,2,3,4
+    G.add_vertex({0},{0}); G.add_vertex({1},{1}); G.add_vertex({2},{1}); G.add_vertex({3},{0}); G.add_vertex({4},{1});
+
+    // Adding some edges 
+    G.add_edge({0}, {1}); G.add_edge({0}, {3});
+    G.add_edge({1}, {2}); G.add_edge({1}, {4});
+    G.add_edge({2}, {3}); G.add_edge({2}, {4});
+    G.add_edge({3}, {1}); G.add_edge({3}, {4});
+    G.add_edge({4}, {0}); G.add_edge({4}, {1});
+
+    // Run FilteredGreedySearch with 
+    int k = 2;
+    int L = 3;
+    vector<int> xquery = {2};
+    set<int> filter = {1};
+
+    auto result = FilteredGreedySearch<int, int>(G, xquery, k, L, filter);
+    set<gIndex> Lout = result.first;
+    set<gIndex> V = result.second;
+
+    cout << endl;
+    for( gIndex s : Lout){
+        cout << s << endl;
+    }
+
+    // Test that the returned values are the ones expected (L = {1,4}, V = {1,2,4})
+    TEST_ASSERT(Lout.size() == 2);
+    TEST_ASSERT(find(Lout.begin(), Lout.end(), 1) != Lout.end());  // 1 in L
+    TEST_ASSERT(find(Lout.begin(), Lout.end(), 4) != Lout.end());  // 4 in L
+
+    TEST_ASSERT(V.size() == 3);
+    TEST_ASSERT(find(V.begin(), V.end(), 1) != V.end());  // 1 on V
+    TEST_ASSERT(find(V.begin(), V.end(), 2) != V.end());  // 2 in V
+    TEST_ASSERT(find(V.begin(), V.end(), 4) != V.end());  // 4 in V
+}
 
 /* Testing the RobustPrune method */
 void test_RobustPrune() {
     
     /* Testing for ints */
 
-    TestGraph<vector<int>> G1;
+    Graph<vector<int>> G1;
     
     // Add vertices 0,1,2,3,4
     G1.add_vertex({0}); G1.add_vertex({1}); G1.add_vertex({2}); G1.add_vertex({3}); G1.add_vertex({4});
 
-    // Add some random edges
+    // Add some edges
     G1.add_edge({0}, {1}); G1.add_edge({0}, {2});
     G1.add_edge({1}, {2});
     G1.add_edge({2}, {0}); G1.add_edge({2}, {4});
@@ -192,7 +232,7 @@ void test_RobustPrune() {
 
     // Testing for floats, shortened version of the int test, same data with {x.1} form
 
-    TestGraph<vector<float>> G2;
+    Graph<vector<float>> G2;
     
     G2.add_vertex({0.1}); G2.add_vertex({1.1}); G2.add_vertex({2.1}); G2.add_vertex({3.1}); G2.add_vertex({4.1});
 
@@ -227,7 +267,7 @@ void test_RobustPrune() {
     
     // Testing for 2D float vectors, shortened version of the int test, same data with {x.1,9.9} form
 
-    TestGraph<vector<float>> G3;
+    Graph<vector<float>> G3;
     
     G3.add_vertex({0.1, 9.9}); G3.add_vertex({1.1, 9.9}); G3.add_vertex({2.1, 9.9}); G3.add_vertex({3.1, 9.9}); G3.add_vertex({4.1, 9.9});
 
@@ -259,10 +299,49 @@ void test_RobustPrune() {
 
 }
 
+
+
+/* Testing the FilteredRobustPrune method */
+void test_FilteredRobustPrune() {
+    
+    /* Testing for ints */
+
+    FilterGraph<vector<int>, int> G(true);
+    
+    // added some random filters
+    // Adding vertices 0,1,2,3,4
+    G.add_vertex({0},{0}); G.add_vertex({1},{1}); G.add_vertex({2},{1}); G.add_vertex({3},{0}); G.add_vertex({4},{1});
+
+    // Adding some edges 
+    G.add_edge({0}, {1}); G.add_edge({0}, {3});
+    G.add_edge({1}, {2}); G.add_edge({1}, {4});
+    G.add_edge({2}, {3}); G.add_edge({2}, {4});
+    G.add_edge({3}, {1}); G.add_edge({3}, {4});
+    G.add_edge({4}, {0}); G.add_edge({4}, {1});
+
+    // Run Robustprune with p = {0}, V = {0, 3, 4} (out-neighbors of p), a = 1.2 and R = 2
+    set<gIndex> V1 = {0, 3, 4};
+    float a = 2;
+    int R = 2;
+
+    FilteredRobustPrune(G, {2}, V1, a, R);
+
+
+    // Now check that the algorithm works as intended (only edge removes is the one from 1 to 3)
+    TEST_ASSERT(G.exist_edge({0}, {1}) && G.exist_edge({0}, {3}) && !G.exist_edge({0}, {2}));
+    TEST_ASSERT(G.exist_edge({1}, {2}) && G.exist_edge({1}, {4}));
+    TEST_ASSERT(G.exist_edge({2}, {0}) && G.exist_edge({2}, {3}) && !G.exist_edge({2}, {4}));
+    TEST_ASSERT(G.exist_edge({3}, {1}) && G.exist_edge({3}, {4}));
+    TEST_ASSERT(G.exist_edge({4}, {0}) && G.exist_edge({4}, {1}));
+
+    V1.clear();
+
+}
+
 /* Testing the Vamana method */
 void test_Vamana() {
     /* Testing the vamana method with a simple example with integers solved by hand */
-    TestGraph<vector<int>> G1;
+    Graph<vector<int>> G1;
 
     // Add vertices 0,1,2,3
     G1.add_vertex({0}); G1.add_vertex({1}); G1.add_vertex({2}); G1.add_vertex({3});
@@ -280,6 +359,7 @@ void test_Vamana() {
 
     // Test that the new form of the graph is the one one expected
     // 0->1, 1->0, 1->2, 2->1, 2->3, 3->2 are the exact edges the graph should have
+    cout << G1.get_edge_count()<<  endl;
     TEST_ASSERT(G1.get_edge_count() == 6);
     TEST_ASSERT(G1.exist_edge({0}, {1}));
     TEST_ASSERT(G1.exist_edge({1}, {0}));
@@ -298,7 +378,7 @@ void test_Vamana() {
 
 
     /* Testing the vamana method for 2d float vectors, shortened version of the int test, same data with {x.1,9.9} form*/
-    TestGraph<vector<float>> G2;
+    Graph<vector<float>> G2;
 
     // Add vertices 0,1,2,3
     G2.add_vertex({0.1, 9.9}); G2.add_vertex({1.1, 9.9}); G2.add_vertex({2.1, 9.9}); G2.add_vertex({3.1, 9.9});
@@ -324,10 +404,79 @@ void test_Vamana() {
     TEST_ASSERT(!G2.exist_edge({3.1, 9.9}, {1.1, 9.9}));
 }
 
+
+void test_Find_Medoid() {
+    FilterGraph<vector<int>,int> G;
+    
+    G.add_vertex({10}, {1});
+    G.add_vertex({20}, {1});
+    G.add_vertex({30}, {1});
+    G.add_vertex({40}, {2});
+    G.add_vertex({50}, {2});
+    G.add_vertex({60}, {2});
+    G.add_vertex({70}, {2});
+    G.add_vertex({80}, {3});
+    G.add_vertex({81}, {3});
+    G.add_vertex({90}, {4});
+    G.add_vertex({91}, {4});
+    G.add_vertex({100}, {5});
+    G.add_vertex({110}, {5});
+    G.add_vertex({120}, {5});
+    
+    int threshold = 2;
+    map<int, gIndex> MedoidMap1 = FindMedoid(G, threshold);
+
+    TEST_ASSERT(MedoidMap1.size() == 5);
+
+    for( int i = 1 ; i <= 5 ; i++ ){
+
+        // print_vector(G.get_filters(MedoidMap[{i}]));
+        set<int> Fk = G.get_filters( MedoidMap1[i]);
+        TEST_ASSERT(Fk.find(i) != Fk.end());
+    }
+
+};
+
+
+
+
+void test_StichedVamana() {
+    FilterGraph<vector<float>,int> G;
+    
+    /* Float vertices of x.x form for no ambiguity regarding which closest of the nearby points is the closest
+    The vertices with each filter are 0:{0,1,2}, 1:{0,2,3}, 2:{0,3,4}, 3:{5,6} to make the corresponding
+    subgraphs to stich.*/
+    G.add_vertex({0.0}, {0, 1, 2});
+    G.add_vertex({1.1}, {0});
+    G.add_vertex({2.2}, {0, 1});
+    G.add_vertex({3.3}, {1, 2});
+    G.add_vertex({4.4}, {2});
+    G.add_vertex({5.5}, {3});
+    G.add_vertex({6.6}, {3});
+
+
+    StichedVamana<vector<float>, int>(G, 2, 2, 2);
+
+    TEST_ASSERT(G.get_edge_count() == 11);
+    TEST_ASSERT(G.exist_edge({0.0}, {1.1}) && G.exist_edge({0.0}, {2.2}));
+    TEST_ASSERT(G.exist_edge({1.1}, {0.0}) && G.exist_edge({1.1}, {2.2}));
+    TEST_ASSERT(G.exist_edge({2.2}, {1.1}) && G.exist_edge({2.2}, {3.3}));
+    TEST_ASSERT(G.exist_edge({3.3}, {2.2}) && G.exist_edge({3.3}, {4.4}));
+    TEST_ASSERT(G.exist_edge({4.4}, {3.3}));
+    TEST_ASSERT(G.exist_edge({5.5}, {6.6}));
+    TEST_ASSERT(G.exist_edge({6.6}, {5.5}));
+}
+
+
+
 // List of all tests to be executed
 TEST_LIST = {
     {"GreedySearch", test_GreedySearch},
+    {"FilteredGreedySearch", test_FilteredGreedySearch},
     {"RobustPrune", test_RobustPrune},
+    {"FilteredRobustPrune", test_FilteredRobustPrune},
     {"Vamana", test_Vamana},
+    {"Find_Medoid", test_Find_Medoid },
+    {"StichedVamana", test_StichedVamana},
     { NULL, NULL }
 };
