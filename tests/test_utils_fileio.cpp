@@ -1,4 +1,3 @@
-// #include "../lib/utils.hpp"			// Unit testing library
 #include "../lib/acutest.h"
 #include "../lib/file_io.hpp"
 
@@ -226,13 +225,13 @@ void test_isPositiveInteger() {
 
 void test_get_arguments() {
     
-    int argc = 11; 
+    int argc = 13; 
     float a = 2;    // Default Value
-    const char* argv[] = { "main",  "-f", "small", "-k", "2", "-r", "10", "-l", "10", "-a", "1.2"};
+    const char* argv[] = { "main",  "-f", "small", "-k", "2", "-r", "10", "-l", "10", "-a", "1.2", "-v", "filtered"};
     int k, L, R;
-    string base_name, query_name, groundtruth_name;
+    string base_name, query_name, groundtruth_name, vamana_type;
 
-    TEST_ASSERT( get_arguments(argc, argv, k, L, a, R, base_name, query_name, groundtruth_name) == 1);
+    TEST_ASSERT( get_arguments(argc, argv, k, L, a, R, base_name, query_name, groundtruth_name, vamana_type) == 1);
 
     TEST_ASSERT(base_name == "sift/siftsmall_base.fvecs");
     TEST_ASSERT(query_name == "sift/siftsmall_query.fvecs");
@@ -241,11 +240,11 @@ void test_get_arguments() {
 
 
     int k1, L1, R1;
-    string base_name1, query_name1, groundtruth_name1;
+    string base_name1, query_name1, groundtruth_name1, vamana_type1;
     float a1 = 2;  // Default value
-    const char* argv1[] = { "main",  "-k", "10", "-f", "large", "-l", "10", "-r", "10"};
-    argc = 9;
-    TEST_ASSERT(get_arguments(argc, argv1, k1, L1, a1, R1, base_name1, query_name1, groundtruth_name1));
+    const char* argv1[] = { "main",  "-k", "10", "-v", "stitched", "-f", "large", "-l", "10", "-r", "10"};
+    argc = 11;
+    TEST_ASSERT(get_arguments(argc, argv1, k1, L1, a1, R1, base_name1, query_name1, groundtruth_name1, vamana_type1));
     TEST_ASSERT(base_name1 == "sift/sift_base.fvecs");
     TEST_ASSERT(query_name1 == "sift/sift_query.fvecs");
     TEST_ASSERT(groundtruth_name1 == "sift/sift_groundtruth.ivecs");

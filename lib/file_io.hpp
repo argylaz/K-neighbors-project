@@ -3,6 +3,8 @@
 // #include <bits/stdc++.h>
 #include "utils.hpp"
 
+#define MAX_ARGS 13
+
 using namespace std;
 
 
@@ -25,7 +27,7 @@ set<vector<Type>> read_sets(string& filename);
 
 
 // Function that reads the command line input arguments. Returns 1 or -1
-int get_arguments(int argc, char* argv[], int& k, int& L, float& a, int& R,string& base_name, string& query_name, string& groundtruth_name);
+int get_arguments(int argc, char* argv[], int& k, int& L, float& a, int& R, string& base_name, string& query_name, string& groundtruth_name, string& vamanaFlag);
 
 
 /* Creates an fvec file with the given vectors for testing */
@@ -46,7 +48,9 @@ template <typename T>
 void make_bin(const string& filename, const vector<vector<T>> vectors);
 
 
+
 /*--------------------------------------Methods used in main.cpp-------------------------------------*/
+
 
 
 /* Given an empty graph, reads an fvec file and fills the graph with all the vectors read as its vertices and no edges */
@@ -206,22 +210,30 @@ set<vector<Type>> read_sets(string& filename) {
 
 
 // Function that reads the command line input arguments. Returns 1 or -1
-int get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R,string& base_name, string& query_name, string& groundtruth_name){
+int get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R, string& base_name, string& query_name, string& groundtruth_name, string& vamana_type){
     // We need at least 8 arguments (Filename, k, L, R and maybe a)
-    if (!(argc == 9 || argc == 11)) {     
+    
+    if (!(argc == MAX_ARGS || argc == MAX_ARGS - 2)) {     
         cerr << "ERROR: Malformed input at command line\n";
         return -1;
     }
 
+    // What is the max argument count, depending on whether the default argument a is given or not  
+    int final_flag = (argc == MAX_ARGS) ? MAX_ARGS - 2 : MAX_ARGS - 4;
+
+    bool arg_found = false;
+
     
     // Get the filename
-    const char* flag_small;      // Flag for siftsmall
-    if (!strcmp(argv[1], "-f")) flag_small = argv[2];
-    else if (!strcmp(argv[3], "-f")) flag_small = argv[4];
-    else if (!strcmp(argv[5], "-f")) flag_small = argv[6];
-    else if (!strcmp(argv[7], "-f")) flag_small = argv[8];
-    else if (argc == 11 && !strcmp(argv[9], "-f")) flag_small = argv[10];
-    else {
+    const char* flag_small;      // Flag for siftsmall  
+    arg_found = false;
+    for (int i = 1; i <= final_flag; i += 2) {
+        if (!strcmp(argv[i], "-f")) {
+            flag_small = argv[i + 1];
+            arg_found = true;
+        }
+    } 
+    if (!arg_found) {
         cerr << "ERROR: Should include the file name as command line argument like \"-f filename\"\n";
         return -1;
     }
@@ -239,41 +251,54 @@ int get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R
         query_name = "sift/sift_query.fvecs";
         groundtruth_name = "sift/sift_groundtruth.ivecs";
     }
+    else if( !strcmp(flag_small, "dummy") ){
+        base_name =  "sift/dummy-data.bin";
+        query_name = "sift/dummy-queries.bin";
+        groundtruth_name = "sift/groundtruth.bin";
+    }
     else{
         cerr << "ERROR: Should include the file name as command line argument like \"-f small\" or \"-f large\"\n";
         return -1;
     }
 
+
     // Get K argument
     // int k;
     const char *tempk;
-    if (!strcmp(argv[1], "-k")) tempk = argv[2];
-    else if (!strcmp(argv[3], "-k")) tempk = argv[4];
-    else if (!strcmp(argv[5], "-k")) tempk = argv[6];
-    else if (!strcmp(argv[7], "-k")) tempk = argv[8];
-    else if (argc == 11 && !strcmp(argv[9], "-k")) tempk = argv[10];
-    else {
+    arg_found = false;
+    for (int i = 1; i <= final_flag; i += 2) {
+        if (!strcmp(argv[i], "-k")) {
+            tempk = argv[i + 1];
+            arg_found = true;
+        }
+    }
+    if (!arg_found) {
         cerr << "ERROR: Should include the k command line argument like \"-k k_neighbors\"\n";
         return -1;
     }
+
     k = atoi(tempk);
     if (k <= 0 || !isPositiveInteger(tempk)) {
-        cerr << "ERROR: Bucket capacity b should be a positive integer number\n";
+        cerr << "ERROR: k should be a positive integer number\n";
         return -1;
     }
+
 
     // Get L argument
     // int L;
     const char *tempL;
-    if (!strcmp(argv[1], "-l")) tempL = argv[2];
-    else if (!strcmp(argv[3], "-l")) tempL = argv[4];
-    else if (!strcmp(argv[5], "-l")) tempL = argv[6];
-    else if (!strcmp(argv[7], "-l")) tempL = argv[8];
-    else if (argc == 11 && !strcmp(argv[9], "-l")) tempL = argv[10];
-    else {
+    arg_found = false;
+    for (int i = 1; i <= final_flag; i += 2) {
+        if (!strcmp(argv[i], "-l")) {
+            tempL = argv[i + 1];
+            arg_found = true;
+        }
+    }
+    if (!arg_found) {
         cerr << "ERROR: Should include the l command line argument like \"-l l_argument\"\n";
         return -1;
     }
+
     L = atoi(tempL);
     if (L <= 0 || !isPositiveInteger(tempL)) {
         cerr << "ERROR: L argument should be a positive integer number\n";
@@ -284,40 +309,70 @@ int get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R
     // Get R argument
     // int R;
     const char *tempR;
-    if (!strcmp(argv[1], "-r")) tempR = argv[2];
-    else if (!strcmp(argv[3], "-r")) tempR = argv[4];
-    else if (!strcmp(argv[5], "-r")) tempR = argv[6];
-    else if (!strcmp(argv[7], "-r")) tempR = argv[8];
-    else if (argc == 11 && !strcmp(argv[9], "-r")) tempR = argv[10];
-    else {
+    arg_found = false;
+    for (int i = 1; i <= final_flag; i += 2) {
+        if (!strcmp(argv[i], "-r")) {
+            tempR = argv[i + 1];
+            arg_found = true;
+        }
+    }
+    if (!arg_found) {
         cerr << "ERROR: Should include the r command line argument like \"-r r_argument\"\n";
         return -1;
     }
+
     R = atoi(tempR);
     if (R <= 0 || !isPositiveInteger(tempR)) {
         cerr << "ERROR: R argument should be a positive integer number\n";
         return -1;
     }
 
-    // Get A argument
+
+    // Get optional A argument
     // float a;
-    const char *tempA;
-    if (!strcmp(argv[1], "-a")) tempA = argv[2];
-    else if (!strcmp(argv[3], "-a")) tempA = argv[4];
-    else if (!strcmp(argv[5], "-a")) tempA = argv[6];
-    else if (!strcmp(argv[7], "-a")) tempA = argv[8];
-    else if (argc == 11 && !strcmp(argv[9], "-a")) tempA = argv[10];
-    else if (argc == 11 ){
-        cerr << "ERROR: Should include the a command line argument like \"-a a_argument\"\n";
-        return -1;
-    }
-    if( argc == 11) {
+    if (argc == MAX_ARGS) {
+        const char *tempA;
+        arg_found = false;
+        for (int i = 1; i <= final_flag; i += 2) {
+            if (!strcmp(argv[i], "-a")) {
+                tempA = argv[i + 1];
+                arg_found = true;
+            }
+        }
+        if (!arg_found) {
+            cerr << "ERROR: Should include the a command line argument like \"-a a_argument\"\n";
+            return -1;
+        }
+    
         a = atof(tempA);
         if (a <= 0 ) {
             cerr << "ERROR: a argument should be a positive integer number\n";
             return -1;
         }
-    } 
+    
+    }
+
+
+    // Get v argument, the Vamana type
+    // string vamana_type;
+    const char *tempV;
+    arg_found = false;
+    for (int i = 1; i <= final_flag; i += 2) {
+        if (!strcmp(argv[i], "-v")) {
+            tempV = argv[i + 1];
+            arg_found = true;
+        }
+    }
+    if (!arg_found) {
+        cerr << "ERROR: Should include the vamana command line argument like \"-v vamana_type\" (simple/filtered/stitched)\n";
+        return -1;
+    }
+
+    vamana_type = string(tempV);
+    if (vamana_type != "simple" && vamana_type != "filtered" && vamana_type != "stitched") {
+        cerr << "Vamana type should be simple/filtered/stitched\n";
+        return -1;
+    }
 
     return 1;
 }
@@ -332,7 +387,7 @@ bool hasBinExtension(const string& filename) {
 
 /* Reads queries from sift/dummy-queries.bin */
 /* Returns a map from query nodes to their floating type filter value (-1 for no filter) */
-map<vector<float>, float> read_queries(const string& filename, int num_queries) {
+map<vector<float>, float> read_queries(const string& filename) {
     // Check the file extention
     if(!hasBinExtension(filename)) { // !!! SHOULD BE CALLED WITH TRY AND CATCH
         throw invalid_argument("File must have a .bin extention: " + filename);
@@ -442,4 +497,59 @@ void make_bin(const string& filename, const vector<vector<T>> vectors) {
     // Close file
     file.close();
     cout << "Data written to " << filename << " successfully.\n";
+}
+
+
+
+// Return 1 if it succeed, else returns 0
+vector<vector<gIndex>> read_groundtruth(string filename) {
+    
+    // Open file and check if it was opened properly
+    ifstream groundtruth(filename, ios::binary);
+    assert(groundtruth.is_open());
+
+    cout << "Reading Data: " << filename << endl;
+
+
+    // Get number of points
+    uint32_t N;
+    groundtruth.read((char *)&N, sizeof(uint32_t));
+    cout << "# of points: " << N << endl;
+
+    int num_dimensions = 1;
+    // Initialize buffer
+    vector<gIndex> buff(num_dimensions);
+    
+    vector<vector<gIndex>> gt_data;
+
+    for (int i = 0 ; i < (int)N ; i++ ){
+
+        // Read k (number of nearest neighbors for this query)
+        size_t k;
+        groundtruth.read(reinterpret_cast<char*>(&k), sizeof(k));
+
+        cout << "Query " << i + 1 << ": (k neighbors found = " << k << ")"<< endl;
+
+        // Read the vector of dimension k
+        vector<gIndex> nearest_neighbor(k);
+        groundtruth.read(reinterpret_cast<char*>(nearest_neighbor.data()), k * sizeof(float));
+
+        // Print the groundtruth of the query
+        cout << "Groundtruth: ";
+        print_vector(nearest_neighbor);
+        cout << endl;
+
+        // Store the vector in the groundtruthData
+        gt_data.push_back(nearest_neighbor);
+
+
+    }
+
+    // Close file
+    groundtruth.close();
+    cout << "Finish Reading Data" << endl;
+
+
+    return gt_data;
+
 }

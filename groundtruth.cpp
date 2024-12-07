@@ -64,9 +64,8 @@ void write_to_bin(ofstream& groundtruth_file, vector<gIndex>& k_nearests){
 
 /* Main Program which calculates the groundtruth of a .bin file*/
 
-
 // To do:: flags arguments
-int main(void){
+int main(void) {
 
     // Read queries from dummy-queries.bin
     map<vector<float>, float> queries_data = read_queries("sift/dummy-queries.bin", 100);  
