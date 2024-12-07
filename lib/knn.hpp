@@ -3,7 +3,7 @@
 
 #include <limits.h>
 #include <numeric>
-#include "../lib/filterGraph.hpp"
+#include "./filterGraph.hpp"
 using namespace std;
 
 

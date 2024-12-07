@@ -377,16 +377,20 @@ template <typename T>
 bool Graph<T>::get_graph_from_bin(string file_prefix) {
     string filename = file_prefix + "_graph.bin";
 
+    // Create/Open file filename_graph.bin
     ifstream file(filename, ios::binary);
     if (!file) {
         cerr << "Error opening file for reading!" << endl;
         return false;
     }
 
+    // For each vertex of the graph
     for (T vertex: vertices) {
+        // Read the count of neighbors
         size_t count;
         file.read(reinterpret_cast<char*>(&count), sizeof(count));
 
+        // Read gIndex of each neighbor
         for (size_t i = 0; i < count; i++) {
             gIndex neighbor_index;
             file.read(reinterpret_cast<char*>(&neighbor_index), sizeof(neighbor_index));
@@ -404,18 +408,22 @@ template <typename T>
 bool Graph<T>::save_graph_to_bin(string file_prefix) {
     string filename = file_prefix + "_graph.bin";
 
+    // Create/Open file filename_graph.bin
     ofstream file(filename, ios::binary);
     if (!file) {
         cerr << "Error opening file for writing!" << endl;
         return false;
     }
 
+    // For each vertex of the graph
     for (T vertex: vertices) {
         vector<gIndex> neighbor_indices = this->get_neighbors(vertex);
-
+        
+        // Save the count of neighbors 
         size_t count = neighbor_indices.size();
         file.write(reinterpret_cast<const char*>(&count), sizeof(count));
 
+        // Save gIndex of each neighbor 
         for (gIndex neighbor_index: neighbor_indices) {
             file.write(reinterpret_cast<const char*>(&neighbor_index), sizeof(neighbor_index));
         }
