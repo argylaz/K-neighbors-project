@@ -334,6 +334,37 @@ void test_get_neighbors() {
 
 }
 
+void test_save_graph_to_bin() {
+
+}
+
+    
+void test_get_graph_from_bin() {
+    Graph<int> G1, G2;
+    for (int i = 0; i < 4; i++) {
+        G1.add_vertex(i);
+        G2.add_vertex(i);
+    }
+
+    G1.add_edge(1, 2);
+    G1.add_edge(1, 0);
+    G1.add_edge(2, 3);
+    G1.add_edge(3, 1);
+    G1.add_edge(0, 3);
+
+    G1.save_graph_to_bin("test");
+
+    G2.get_graph_from_bin("test");
+
+    TEST_ASSERT(G2.get_edge_count() == 5);
+
+    TEST_ASSERT(G2.exist_edge(1, 2));
+    TEST_ASSERT(G2.exist_edge(1, 0));
+    TEST_ASSERT(G2.exist_edge(2, 3));
+    TEST_ASSERT(G2.exist_edge(3, 1));
+    TEST_ASSERT(G2.exist_edge(0, 3));
+}
+
 // List of all tests to be executed
 TEST_LIST = {
     { "graph_create", test_create },
@@ -349,5 +380,9 @@ TEST_LIST = {
     { "get_edge_count", test_get_edge_count},
     { "get_vertices_count", test_get_vertices_count },
     { "get_neighbors", test_get_neighbors},
+    { "save_graph_to_bin", test_save_graph_to_bin },
+
+    { "get_graph_from_bin", test_get_graph_from_bin },
+
     { NULL, NULL }
 };
