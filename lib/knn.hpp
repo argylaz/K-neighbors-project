@@ -450,13 +450,12 @@ T Vamana(Graph<T>& G, int L, int R, float a) {
     Argument F is the set of all filters
 */
 template <typename Type, typename F>
-map<F, gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int threshold){
+map<F, gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int threshold) {
     map<F, gIndex> M;
 
     set<F> Filters = G.get_filters_set(); 
     
-    // Νομίζω ότι εξ αρχής αρχικοποιείται σαν zero map
-    // εναλλακτικά θα πρέπει να κάνουμε αρχικοποίηση σε 0 κάθε στοιχείο του map 
+    // Initialization of zero map T
     map<gIndex, int> T;               // Zero map T is intended as a counter
 
     set<vector<Type>> vertices = G.get_vertices();

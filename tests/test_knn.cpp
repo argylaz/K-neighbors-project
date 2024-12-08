@@ -420,7 +420,7 @@ void test_Find_Medoid() {
 
 
 void test_StichedVamana() {
-    FilterGraph<vector<float>,int> G;
+    FilterGraph<vector<float>, int> G;
     
     /* Float vertices of x.x form for no ambiguity regarding which closest of the nearby points is the closest
     The vertices with each filter are 0:{0,1,2}, 1:{0,2,3}, 2:{0,3,4}, 3:{5,6} to make the corresponding
@@ -433,8 +433,8 @@ void test_StichedVamana() {
     G.add_vertex({5.5}, {3});
     G.add_vertex({6.6}, {3});
 
-
     StichedVamana<vector<float>, int>(G, 2, 2, 2);
+    // G.print_graph();
 
     TEST_ASSERT(G.get_edge_count() == 11);
     TEST_ASSERT(G.exist_edge({0.0}, {1.1}) && G.exist_edge({0.0}, {2.2}));
