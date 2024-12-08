@@ -1,5 +1,4 @@
-#include "utils.hpp"
-// #include <concepts>
+#include "file_io.hpp" // Also includes utils
 
 using namespace std;
 
@@ -26,29 +25,31 @@ public:
 
 
     // Overriding method to also add filters 
-    bool add_vertex(const T v, const vector<F> f);
+    bool add_vertex(const T v, const set<F>& f);
 
     // Method to get the filters of a given vertex
-    vector<F> get_filters(gIndex i);
+    set<F> get_filters(gIndex i);
 
     // Method to get a set with all the discrete filters used in the graph
-    set<vector<F>> get_filters_set();
+    set<F> get_filters_set();
+
+    // Method to get the filter count (number of vertices with the given filter)
+    long get_filter_count(F filter);
+
+    // Destructor doing nothing
+    ~FilterGraph<T,F>();
 
 
 private: 
-    map<gIndex, vector<F>> filters;  // Supports multiple filters
+    map<gIndex, set<F>> filters;  // Supports multiple filters
     
     // Set with all the discrete filters
-    set<vector<F>> filters_set;
+    set<F> filters_set;
+
+    // Map from filters to filter specificity
+    map<F, long> filterCount;
     
 };
-
-// Helper method to check file extention
-bool hasBinExtension(const string& filename) {
-    size_t pos = filename.rfind('.');
-    return pos != string::npos && filename.substr(pos) == ".bin";
-}
-
 
 
 /*------------------------------------------------------METHOD DEFINITIONS---------------------------------------------------------*/
@@ -112,7 +113,7 @@ FilterGraph<T,F>::FilterGraph(const string& filename, int num_dimensions, bool i
 
 // Add_vertex function for adding a vertex with a specific filter in the graph
 template <typename T, typename F>
-bool FilterGraph<T,F>::add_vertex(const T v, const vector<F> f) {
+bool FilterGraph<T,F>::add_vertex(const T v, const set<F>& f) {
 
     // If filter exists, add edge and mapping to filter, 
     if (!f.empty()) {
@@ -120,10 +121,17 @@ bool FilterGraph<T,F>::add_vertex(const T v, const vector<F> f) {
         Graph<T>::add_vertex(v);
 
         // Add mapping to filter
-        filters[this->get_index_from_vertex(v)] = f;
-        // Add filter  to the set with all the discrete filters
-        filters_set.insert(f);
+        // Whenever a duplicate vector is added with another set of filters, we just add the new filters to the set
+        set_union(filters[this->get_index_from_vertex(v)].begin(), filters[this->get_index_from_vertex(v)].end(), f.begin(), f.end(), inserter(filters[this->get_index_from_vertex(v)], filters[this->get_index_from_vertex(v)].begin()));
+        
+        // Increment count of filters
+        for (F filter : f) {
+            filterCount[filter]++;
+        }
 
+        // Add filter  to the set with all the discrete filters
+        set_union(filters_set.begin(), filters_set.end(), f.begin(), f.end(), inserter(filters_set, filters_set.begin()));
+        // filters_set.insert(f);
 
         //     cout << "Filter '"; print_vector(f);
         //     print_vector(v); 
@@ -140,13 +148,21 @@ bool FilterGraph<T,F>::add_vertex(const T v, const vector<F> f) {
 
 // Getter Function for getting the filter of the node with gIndex i
 template <typename T, typename F>
-vector<F> FilterGraph<T,F>:: get_filters(gIndex i){
+set<F> FilterGraph<T,F>:: get_filters(gIndex i){
     return this->filters[i];
 }
 
 template <typename T, typename F>
 // Method to get a set with all the discrete filters used in the graph
-set<vector<F>> FilterGraph<T,F>:: get_filters_set(){
+set<F> FilterGraph<T,F>:: get_filters_set(){
     return this->filters_set;
 }
 
+template <typename T, typename F>
+// Method to get the filter count (number of vertices with the given filter)
+long FilterGraph<T,F>::get_filter_count(F filter) {
+    return this->filterCount[filter];
+}
+
+template<typename T, typename F>
+FilterGraph<T,F>::~FilterGraph() {}

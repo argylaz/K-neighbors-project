@@ -1,5 +1,6 @@
 #include "../lib/acutest.h"			// Unit testing library
 #include "../lib/filterGraph.hpp"
+// #include "../lib/file_io.hpp"
 
 
 /* Testing the constructor with .bin file argument (reading data from .bin file)*/
@@ -24,12 +25,12 @@ void test_read_from_bin() {
 
     // Now test that the graph was created properly
     set<vector<float>> S = G.get_vertices();
-    cout << S.size() << G.get_filters(0)[0];
-    TEST_ASSERT(S.find({0.0f}) != S.end()); TEST_ASSERT(G.get_filters(0)[0] == 1.0f);  // Test that the entry exist with the correct filter
-    TEST_ASSERT(S.find({1.0f}) != S.end()); TEST_ASSERT(G.get_filters(1)[0] == 0.0f);
-    TEST_ASSERT(S.find({2.0f}) != S.end()); TEST_ASSERT(G.get_filters(2)[0] == 0.0f);
-    TEST_ASSERT(S.find({3.0f}) != S.end()); TEST_ASSERT(G.get_filters(3)[0] == 1.0f);
-    TEST_ASSERT(S.find({4.0f}) != S.end()); TEST_ASSERT(G.get_filters(4)[0] == 1.0f);
+    cout << S.size() << *(G.get_filters(0).begin());
+    TEST_ASSERT(S.find({0.0f}) != S.end()); TEST_ASSERT(*(G.get_filters(0).begin()) == 1.0f);  // Test that the entry exist with the correct filter
+    TEST_ASSERT(S.find({1.0f}) != S.end()); TEST_ASSERT(*(G.get_filters(1).begin()) == 0.0f);
+    TEST_ASSERT(S.find({2.0f}) != S.end()); TEST_ASSERT(*(G.get_filters(2).begin()) == 0.0f);
+    TEST_ASSERT(S.find({3.0f}) != S.end()); TEST_ASSERT(*(G.get_filters(3).begin()) == 1.0f);
+    TEST_ASSERT(S.find({4.0f}) != S.end()); TEST_ASSERT(*(G.get_filters(4).begin()) == 1.0f);
 }
 
 void test_get_filters() {
@@ -41,34 +42,45 @@ void test_get_filters() {
     TEST_ASSERT( G.add_vertex({30}, {2}) == true );
     TEST_ASSERT( G.add_vertex({40}, {2}) == true );
     
-    vector<int> filter;
+    set<int> filter;
     filter = G.get_filters(G.get_index_from_vertex({10}));
-    // TEST_ASSERT( filter == {1});
+    TEST_ASSERT( filter == set<int>({1}));
     filter = G.get_filters(G.get_index_from_vertex({20}));
-    // TEST_ASSERT( filter == {1});
+    TEST_ASSERT( filter == set<int>({1}));
     filter = G.get_filters(G.get_index_from_vertex({30}));
-    // TEST_ASSERT( filter == {2});
+    TEST_ASSERT( filter == set<int>({2}));
     filter = G.get_filters(G.get_index_from_vertex({40}));
-    // TEST_ASSERT( filter == {2});
+    TEST_ASSERT( filter == set<int>({2}));
 
 
 };
 
-
+// Also tests get_filter_count
 void test_add_vertex() {
 
-    // First template is Graph data Type, the second tempalet is the Filter data Type 
+    // First template is Graph data Type, the second template is the Filter data Type 
     FilterGraph<vector<int>,char> G(true);
     TEST_ASSERT( G.add_vertex({10}, {'a'}) == true );
     TEST_ASSERT( G.add_vertex({20}, {'b'}) == true );
+    TEST_ASSERT( G.add_vertex({30}, {'a'}) == true );
+
+    // Add 2 more filters to the same vertex to check that they are added properly
+    TEST_ASSERT( G.add_vertex({30}, {'b'}) == true );
     TEST_ASSERT( G.add_vertex({30}, {'c'}) == true );
+    set<char> t = {'a', 'b', 'c'};
+    TEST_ASSERT( G.get_filters(G.get_index_from_vertex({30})) == t );
+
+    // Check that the filter counts are proper (This is also the test for get_filter_count)
+    TEST_ASSERT(G.get_filter_count('a') == 2);
+    TEST_ASSERT(G.get_filter_count('b') == 2);
+    TEST_ASSERT(G.get_filter_count('c') == 1);
 
     TEST_ASSERT(G.get_vertices_count() == 3);
 
     // Empty filter vector --> return false
     TEST_ASSERT( G.add_vertex({30},{}) == false );
 
-
+    
 };
 
 void test_get_filters_set(){
@@ -85,15 +97,15 @@ void test_get_filters_set(){
     TEST_ASSERT( G.add_vertex({80}, {4}) == true );
     TEST_ASSERT( G.add_vertex({90}, {5}) == true );
 
-    set<vector<int>> filters = G.get_filters_set();
+    set<int> filters = G.get_filters_set();
     // The set contains all the discrete values of the filters
     TEST_ASSERT( filters.size() == 5);
     // The set should be filters = {1,2,3,4,5}
-    TEST_ASSERT(filters.find({1}) != filters.end());
-    TEST_ASSERT(filters.find({2}) != filters.end());
-    TEST_ASSERT(filters.find({3}) != filters.end());
-    TEST_ASSERT(filters.find({4}) != filters.end());
-    TEST_ASSERT(filters.find({5}) != filters.end());
+    TEST_ASSERT(filters.find(1) != filters.end());
+    TEST_ASSERT(filters.find(2) != filters.end());
+    TEST_ASSERT(filters.find(3) != filters.end());
+    TEST_ASSERT(filters.find(4) != filters.end());
+    TEST_ASSERT(filters.find(5) != filters.end());
 };
 
 

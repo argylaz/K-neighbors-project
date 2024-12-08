@@ -3,7 +3,7 @@
 
 #include <limits.h>
 #include <numeric>
-#include "../lib/filterGraph.hpp"
+#include "./filterGraph.hpp"
 using namespace std;
 
 
@@ -18,7 +18,7 @@ using namespace std;
 // Returns a pair of sets, the first contains the K-approx NNs and the second contains all the visited nodes
 // if L < k the method returns a pair of empty sets
 template <typename T>
-pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int k, int L);
+pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, const T& start, const T& xquery, int k, int L);
 
 
 
@@ -31,7 +31,9 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int 
 /*  Fq:     The query filters                        */
 // template <typename Type>
 template <typename Type, typename F> 
-pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>& G, set<vector<Type>> S, vector<Type>& xquery, const int k, const int L, vector<F>& Fq);
+
+pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>& G, set<vector<Type>> S, vector<Type>& xquery, const int k, const int L, set<F>& Fq);
+
 
 
 
@@ -42,7 +44,7 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>
 // a is the distance threshold
 // R is the degree bound
 template <typename T>
-void RobustPrune(Graph<T>& G, T point, set<gIndex>& V, float a, int R);
+void RobustPrune(Graph<T>& G, const T& point, set<gIndex>& V, float a, int R);
 
 
 
@@ -53,7 +55,7 @@ void RobustPrune(Graph<T>& G, T point, set<gIndex>& V, float a, int R);
 // a is the distance threshold
 // R is the degree bound
 template <typename T,typename F>
-void FilteredRobustPrune(FilterGraph<T,F>& G, T point, set<gIndex>& V, float a, int R);
+void FilteredRobustPrune(FilterGraph<T,F>& G, const T& point, set<gIndex>& V, float a, int R);
 
 
 
@@ -79,8 +81,20 @@ void FilteredVamana(FilterGraph<vector<Type>,F>& G, int L, int R, float a = 1.2)
     Argument F is the set of all filters
 */
 template <typename Type, typename F>
-map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int threshold);
+map<F , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int threshold);
 
+
+
+
+
+
+
+/* Implementation of the Stiched Vamana Indexing Algorithm */
+// Lsmall is the search list size for the regular Vamana algorithm
+// Rsmall is the degree bound for the regular Vamana algorithm
+// Rstiched is is the degree bound for the
+template <typename T>
+T StichedVamana(Graph<T>& G, int Lsmall, int Rsmall, int Rstiched, float a = 1.2);
 
 
 /*----------------------------------------------------Function Definitions-----------------------------------------------------------*/
@@ -95,7 +109,7 @@ map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int thresho
 // Returns a pair of sets, the first contains the K-approx NNs and the second contains all the visited nodes
 // if L < k the method returns a pair of empty sets
 template <typename T>
-pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int k, int L) {
+pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, const T& start, const T& xquery, int k, int L) {
     
     // First we check that the input values are correct
     if (L < k) { // L >= k
@@ -115,7 +129,6 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int 
 
     // while L_output\V != 0
     while ( !diff_set.empty() ) {
-        // cout<<"c"<< endl;
 
         // Find the vertex with the minimum euclidean distance from the xquery
         T min = find_min_Euclidean(G, diff_set, xquery);
@@ -125,7 +138,6 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int 
         set_union(L_output.begin(), L_output.end(), neighbors.begin(), neighbors.end(), inserter(L_output, L_output.begin()));
 
         V.insert(G.get_index_from_vertex(min));
-        // G.insert_sorted(V, min);
 
         // Upper bound check
         if ( L_output.size() > (long unsigned int) L ) {
@@ -155,8 +167,8 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, T start, T xquery, int 
 /*  Fq:     The query filters                        */
 // template <typename Type>
 template <typename Type, typename F> 
-pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>& G, set<vector<Type>> S,  vector<Type>& xquery, const int k, const int L, vector<F>& Fq) {
-     
+pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>& G, set<vector<Type>> S,  vector<Type>& xquery, const int k, const int L, set<F>& Fq) {
+
 
     // First we check that the input values are correct
     if (L < k) { // L >= k
@@ -178,19 +190,17 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>
     for( vector<Type> s : S ){
             
         /* GET FILTERS FROM GRAPH */
-        vector<F> Fs  = G.get_filters(G.get_index_from_vertex(s)); 
+        set<F> Fs  = G.get_filters(G.get_index_from_vertex(s)); 
 
-        vector<F> Fx = G.get_filters(G.get_index_from_vertex(xquery));
- 
-        // Checking if the intersection of Fs and Fq is empty        
-        for( size_t j = 0 ; j < Fx.size() ; j++ ){
 
-            /* Check if the filters match */
-            if( Fs[j] == Fx[j]){
-                L_output.insert(G.get_index_from_vertex(s));
-                break;                        // We need at least one to match so that the intersection is non-empty
-            }
-        }
+        
+        // Checking if the intersection of Fs and Fq is empty
+        set<F> intersection;
+        set_intersection(Fs.begin(), Fs.end(), Fq.begin(), Fq.end(), inserter(intersection, intersection.begin()));      
+        if (!intersection.empty()) {
+            L_output.insert(G.get_index_from_vertex(s));
+        }        
+
     }
 
     // Subtraction of sets L_output \ V
@@ -208,30 +218,17 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>
         // Line 4 && 5 of pseudocode
         vector<gIndex> neighbors = G.get_neighbors(min);
 
-        // For each one of min's (p*) neighbors
-        for ( gIndex n : neighbors) {
+        // For each one of min's (p*) neighbors p' (p_ in the code)
+        for ( gIndex p_ : neighbors) {
  
             /* GET FILTERS FROM GRAPH */
-            vector<Type> Fs = G.get_filters(n); // !!!
+            set<F> Fp_ = G.get_filters(p_); // !!!
             
-            // Check if the intersection of Fs and Fq is empty
-            bool filter_flag = false;
-            for( size_t j = 0 ; j < Fq.size() ; j++ ) {
-
-                // We need at least one to match for the intersection to be non-empty
-                if( Fq[j] == Fs[j] ){
-                    filter_flag = true;
-                    break;
-                } 
-            }
-            
-            // Check whether the p' exists within V
-            // vector<gIndex>::iterator iter = find(V.begin(), V.end(), n);
-            set<gIndex>:: iterator iter = find(V.begin(), V.end(), n);
-
-
+            // Check if the intersection of Fp_ and Fq is not empty and whether the p' exists within V
             // Inserting straight to L_output instead of making a new set N'out(p*)
-            if( filter_flag && iter == V.end() ) {
+            set<F> intersection;
+            set_intersection(Fp_.begin(), Fp_.end(), Fq.begin(), Fq.end(), inserter(intersection, intersection.begin()));
+            if( !intersection.empty() && V.find(p_) == V.end() ) {
                 L_output.insert(G.get_index_from_vertex(min)); 
             }
 
@@ -259,7 +256,7 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<vector<Type>, F>
 // a is the distance threshold
 // R is the degree bound
 template <typename T>
-void RobustPrune(Graph<T>& G, T point, set<gIndex>& V, float a, int R) {
+void RobustPrune(Graph<T>& G, const T& point, set<gIndex>& V, float a, int R) {
 
     // First we check that the input values are correct
     if (a < 1) { // a >= 1
@@ -274,9 +271,10 @@ void RobustPrune(Graph<T>& G, T point, set<gIndex>& V, float a, int R) {
     // V <- {V U Nout(p)} \ {p}
     set_union(V.begin(), V.end(), neighbors.begin(), neighbors.end(), inserter(V, V.begin()));
     auto k = find(V.begin(), V.end(), G.get_index_from_vertex(point)); 
-    if( k != V.end() ){   // Only remove if it was found within V
+    if ( k != V.end() ) {   // Only remove if it was found within V
         V.erase(k);
     }
+    // V.erase(G.get_index_from_vertex(point));
     
     // Removing all edges leaving the given vertex and selectively adding up to R edges
     for (gIndex j: neighbors) {
@@ -307,7 +305,8 @@ void RobustPrune(Graph<T>& G, T point, set<gIndex>& V, float a, int R) {
             }
         }
         for (gIndex vertex_index: toBeRemoved) {
-            V.erase(find(V.begin(), V.end(), vertex_index));
+            // V.erase(find(V.begin(), V.end(), vertex_index));
+            V.erase(vertex_index);
         }
     }
 }
@@ -319,7 +318,7 @@ void RobustPrune(Graph<T>& G, T point, set<gIndex>& V, float a, int R) {
 // a is the distance threshold
 // R is the degree bound
 template <typename T,typename F>
-void FilteredRobustPrune(FilterGraph<T,F>& G, T point, set<gIndex>& V, float a, int R) {
+void FilteredRobustPrune(FilterGraph<T,F>& G, const T& point, set<gIndex>& V, float a, int R) {
 
     // First we check that the input values are correct
     if (a < 1) { // a >= 1
@@ -364,28 +363,20 @@ void FilteredRobustPrune(FilterGraph<T,F>& G, T point, set<gIndex>& V, float a, 
         for (gIndex vertex_index: V) {
             T vertex = G.get_vertex_from_index(vertex_index);
 
-            // For one filter 
-            vector<F> F_point = G.get_filters(G.get_index_from_vertex(point));      // p
-            vector<F> F_p_min = G.get_filters(G.get_index_from_vertex(p_min));      // p*
-            vector<F> F_vertex = G.get_filters(vertex_index);                       // p'
-            if( F_point == F_vertex && F_point != F_p_min ){
+            set<F> F_vertex = G.get_filters(vertex_index);                       // p'
+            set<F> F_point = G.get_filters(G.get_index_from_vertex(point));      // p
+            set<F> F_p_min = G.get_filters(G.get_index_from_vertex(p_min));      // p*
+
+            set<F> F_intersection; // the intersection of F_vertex and F_point
+            set_intersection(F_vertex.begin(), F_vertex.end(), F_point.begin(), F_point.end(), inserter(F_intersection, F_intersection.begin()));
+
+            // F_intercestion <not subset of> F_p_min   IFF    F_intersection <intersection> F_p_min != F_intersection
+            set<F> temp_intersection;
+            set_intersection(F_intersection.begin(), F_intersection.end(), F_p_min.begin(), F_p_min.end(), inserter(temp_intersection, temp_intersection.begin()));
+
+            if (temp_intersection != F_intersection) {
                 continue;
             }
-
-
-            /*
-            // For many filters
-            vector<F> F_point = G.get_filters(G.get_index_from_vertex(point));      // p
-            vector<F> F_p_min = G.get_filters(G.get_index_from_vertex(p_min));      // p*
-            vector<F> F_vertex = G.get_filters(vertex_index);                       // p'
-            // Assume that all filters have the same size
-            for( size_t i = 0 ; i < F_point.size() ; i++ ){
-                if( F_point[i] == F_vertex[i] && F_point[i] != F_p_min[i]){
-                    continue;
-                }
-            }
-            */
-
 
 
             if (a * Euclidean_Distance(p_min, vertex) <= Euclidean_Distance(point, vertex)) {
@@ -404,15 +395,18 @@ void FilteredRobustPrune(FilterGraph<T,F>& G, T point, set<gIndex>& V, float a, 
 // R is the degree bound
 template <typename T>
 T Vamana(Graph<T>& G, int L, int R, float a) {
-    
+
     int n = G.get_vertices_count();
+
+    if (R >= n) R = n - 1;
+    if (L >= n) L = n - 1;
 
     // Initializing G to a random graph with out-degree = R
     rDirectional(G, R);
 
-
     // Calculating the medoid of the points given
     T s = medoid(G);
+    // T s = G.get_vertex_from_index(8736);
     
     // Getting the vertex indices in a random order. Vector sigma will be the random permutation.
     vector<gIndex> sigma(n);
@@ -563,56 +557,37 @@ void FilteredVamana(FilterGraph<vector<Type>,F>& G, int L, int R, float a){
     Argument F is the set of all filters
 */
 template <typename Type, typename F>
-map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int threshold){
-    map<vector<F> , gIndex> M;
+map<F, gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int threshold) {
+    map<F, gIndex> M;
 
-    set<vector<F>> Filters = G.get_filters_set(); 
+    set<F> Filters = G.get_filters_set(); 
     
-    // Νομίζω ότι εξ αρχής αρχικοποιείται σαν zero map
-    // εναλλακτικά θα πρέπει να κάνουμε αρχικοποίηση σε 0 κάθε στοιχείο του map 
+    // Initialization of zero map T
     map<gIndex, int> T;               // Zero map T is intended as a counter
 
     set<vector<Type>> vertices = G.get_vertices();
  
     // For each filter in the set
-    for( vector<F> f : Filters ){
-
-        // cout << "\nFilter ";
-        // print_vector(f);
-        // cout << endl;
+    for ( F filter : Filters ) {
 
         // contains the gIndices of all points matching filter in question
         vector<gIndex> Pf;
 
-        // Find all the gIndices matching the filter f
-        for( vector<Type> v : vertices ){
+        // Find all the gIndices of vertices matching the filter
+        for ( vector<Type> vertex : vertices ) {
 
-            // int dimension = F[i].first
-            // F value = F[i].second
+            set<F> Fx = G.get_filters(G.get_index_from_vertex(vertex));
 
-            vector<F> filter = G.get_filters(G.get_index_from_vertex(v));              
-            
-            if( filter == f ){
-                Pf.push_back(G.get_index_from_vertex(v));
-                // cout << "Added ";
-                // print_vector(v);
-            }
-
-            // if( v[dimension] == value ){
-            //     Pf.push_back(G.get_index_from_vertex(v));
-            // }      
+            if (Fx.find(filter) != Fx.end()){
+                Pf.push_back(G.get_index_from_vertex(vertex));
+            }   
         }
-
         
 
         // To do :: Check for optimization
         // Let Rf <- threshold randomly sampled data point ids from Pf        
         // Create a vector with all the elements of Pf
-        vector<gIndex> temp_vector;
-        for( gIndex vec : Pf ){
-            temp_vector.push_back(vec);
-        }
-
+        vector<gIndex> temp_vector = vector<gIndex>(Pf);
 
         // To obtain a time-based seed 
         unsigned seed = chrono::system_clock::now().time_since_epoch().count();
@@ -621,7 +596,7 @@ map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int thresho
         shuffle(temp_vector.begin(), temp_vector.end(), default_random_engine(seed));
 
 
-        if( (size_t) threshold >= temp_vector.size() ){
+        if ( (size_t) threshold >= temp_vector.size() ) {
             threshold = temp_vector.size();
         }
 
@@ -632,21 +607,21 @@ map<vector<F> , gIndex> FindMedoid(FilterGraph<vector<Type>, F>& G,  int thresho
         gIndex p_min_index;
 
         p_min_index = Rf[0];
-        for( size_t i = 1 ; i < Rf.size() ; i++ ){
-            if( T[Rf[i]] < T[p_min_index] ){
+        for ( size_t i = 1 ; i < Rf.size() ; i++ ) {
+            if ( T[Rf[i]] < T[p_min_index] ) {
                 p_min_index = Rf[i];
             }
         }
         
-        M[f] = p_min_index;
+        M[filter] = p_min_index;
         T[p_min_index]++;
 
     }
 
-
     return M;
 
 }
+
 
 
 template <typename T, typename F>
@@ -660,4 +635,74 @@ set<T> get_nodes_from_gIndex_map(FilterGraph<T,F>& G, map<vector<F>, gIndex> M){
     }
 
     return nodes;
+}
+
+/* Implementation of the Stiched Vamana Indexing Algorithm */
+// Lsmall is the search list size for the regular Vamana algorithm
+// Rsmall is the degree bound for the regular Vamana algorithm
+// Rstiched is is the degree bound for the
+template <typename T, typename F>
+void StichedVamana(FilterGraph<T, F>& G, int Lsmall, int Rsmall, int Rstiched, float a = 1.2) {
+
+    // int n = G.get_vertices_count();
+    // set<gIndex> V;
+
+    set<F> filters = G.get_filters_set();
+    // int filter_count = filters.size();
+
+    set<T> vertices = G.get_vertices();
+
+    map<F, Graph<T>*> Gf;
+
+    Graph<T>* graph_f;
+
+    for (F filter: filters) {
+
+        // Getting the set Pf of points matching filter f
+        vector<gIndex> Pf;
+        for (T vertex : vertices) {
+            set<F> Fx = G.get_filters(G.get_index_from_vertex(vertex));
+            
+            if (Fx.find(filter) != Fx.end()) {
+                Pf.push_back(G.get_index_from_vertex(vertex));
+            }
+        }
+        // print_vector(Pf);
+
+        // Creating the subgraph Gf with the points of Pf and running Vamana algorithm for them
+        graph_f = new Graph<T>;
+        for (gIndex i: Pf) {
+            graph_f->add_vertex(G.get_vertex_from_index(i));
+        }
+
+        Vamana(*graph_f, Lsmall, Rsmall, a);
+
+        Gf.insert({filter, graph_f});
+    }
+
+    // Merging the Gf subgraphs into G (adding the edges of all )
+    for (F filter: filters) {
+        
+        // Copying all edges of Gf to G
+        set<T> gf_vertices = Gf[filter]->get_vertices();
+        for (T gf_vertex: gf_vertices) {
+            vector<gIndex> gf_neighbor_indices = Gf[filter]->get_neighbors(gf_vertex);
+            for (gIndex gf_neighbor_index: gf_neighbor_indices) {
+                T neighbor = Gf[filter]->get_vertex_from_index(gf_neighbor_index);
+                G.add_edge(gf_vertex, neighbor);
+            }
+        }
+
+        delete Gf[filter];
+    }
+
+    // Filtered Robust Prune to remove excess edges
+    for (T vertex : vertices) {
+        vector<gIndex> neighbor_indices = G.get_neighbors(vertex);
+        set<gIndex> Nout(neighbor_indices.begin(), neighbor_indices.end());
+        FilteredRobustPrune<T, F>(G, vertex, Nout, a, Rstiched);
+    }
+
+    // G.print_graph();
+
 }

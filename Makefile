@@ -23,7 +23,7 @@ TEST_EXEC = $(patsubst $(TEST_DIR)/%.cpp, $(BIN_DIR)/%, $(TEST_SRC))
 # Default target
 .PHONY: all create test clean
 
-all: create $(TEST_EXEC)
+all: clean create $(TEST_EXEC)
 
 # Create Directories
 create:
@@ -39,23 +39,44 @@ $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
 $(BIN_DIR)/%: $(BUILD_DIR)/%.o
 	$(CC) $(CFLAGS) -o $@ $<
 
-run:
+run: clean
 	$(CC) $(CFLAGS) -o bin/main main.cpp
-	time ./bin/main  -f small -k 2 -r 10 -l 10 -a 2
+	time ./bin/main  -f small -k 10 -l 50 -r 50 -a 1.2
 
 
 # Run the test executable
-test: $(TEST_EXEC)
+test: clean $(TEST_EXEC)
 	@for test_exec in $(TEST_EXEC); do \
 		./$$test_exec; \
 	done
 
+
+# Create groundtruth.bin file
+groundtruth:
+	$(CC) $(CFLAGS) -o bin/groundtruth groundtruth.cpp
+	./bin/groundtruth
+
+
+g_test:
+	$(CC) $(CFLAGS) -o bin/groundtruth_reading_test groundtruth_reading_test.cpp
+	./bin/groundtruth_reading_test
+
+
+# Run tests with valgrind
 valgrind: 
-	make
 	valgrind make test 
 
+# Cleaning everything in bin and build folders except *_graph.bin files,
+# which contain saved Graphs made with Filtered, Stiched or Simple Vamana algorithms  
 clean:
-	rm -rf $(BUILD_DIR)/*.o 
+	rm -rf $(BUILD_DIR)/*.o
+	find $(BIN_DIR) -type f ! -name '*_graph.bin' ! -name 'groundtruth.bin' -delete 
+
+# Erase everything in bin and build folders
+erase:
+	rm -rf $(BUILD_DIR)/*.o
 	rm -rf $(BIN_DIR)/*
+	
+
 
 
