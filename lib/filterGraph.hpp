@@ -33,6 +33,9 @@ public:
     // Method to get a set with all the discrete filters used in the graph
     set<F> get_filters_set();
 
+    // Method to get the filter count (number of vertices with the given filter)
+    long get_filter_count(F filter);
+
     // Destructor doing nothing
     ~FilterGraph<T,F>();
 
@@ -42,6 +45,9 @@ private:
     
     // Set with all the discrete filters
     set<F> filters_set;
+
+    // Map from filters to filter specificity
+    map<F, long> filterCount;
     
 };
 
@@ -115,7 +121,13 @@ bool FilterGraph<T,F>::add_vertex(const T v, const set<F>& f) {
         Graph<T>::add_vertex(v);
 
         // Add mapping to filter
-        filters[this->get_index_from_vertex(v)] = f;
+        // Whenever a duplicate vector is added with another set of filters, we just add the new filters to the set
+        set_union(filters[this->get_index_from_vertex(v)].begin(), filters[this->get_index_from_vertex(v)].end(), f.begin(), f.end(), inserter(filters[this->get_index_from_vertex(v)], filters[this->get_index_from_vertex(v)].begin()));
+        
+        // Increment count of filters
+        for (F filter : f) {
+            filterCount[filter]++;
+        }
 
         // Add filter  to the set with all the discrete filters
         set_union(filters_set.begin(), filters_set.end(), f.begin(), f.end(), inserter(filters_set, filters_set.begin()));
@@ -144,6 +156,12 @@ template <typename T, typename F>
 // Method to get a set with all the discrete filters used in the graph
 set<F> FilterGraph<T,F>:: get_filters_set(){
     return this->filters_set;
+}
+
+template <typename T, typename F>
+// Method to get the filter count (number of vertices with the given filter)
+long FilterGraph<T,F>::get_filter_count(F filter) {
+    return this->filterCount[filter];
 }
 
 template<typename T, typename F>

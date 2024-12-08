@@ -55,21 +55,32 @@ void test_get_filters() {
 
 };
 
-
+// Also tests get_filter_count
 void test_add_vertex() {
 
     // First template is Graph data Type, the second template is the Filter data Type 
     FilterGraph<vector<int>,char> G(true);
     TEST_ASSERT( G.add_vertex({10}, {'a'}) == true );
     TEST_ASSERT( G.add_vertex({20}, {'b'}) == true );
+    TEST_ASSERT( G.add_vertex({30}, {'a'}) == true );
+
+    // Add 2 more filters to the same vertex to check that they are added properly
+    TEST_ASSERT( G.add_vertex({30}, {'b'}) == true );
     TEST_ASSERT( G.add_vertex({30}, {'c'}) == true );
+    set<char> t = {'a', 'b', 'c'};
+    TEST_ASSERT( G.get_filters(G.get_index_from_vertex({30})) == t );
+
+    // Check that the filter counts are proper (This is also the test for get_filter_count)
+    TEST_ASSERT(G.get_filter_count('a') == 2);
+    TEST_ASSERT(G.get_filter_count('b') == 2);
+    TEST_ASSERT(G.get_filter_count('c') == 1);
 
     TEST_ASSERT(G.get_vertices_count() == 3);
 
     // Empty filter vector --> return false
     TEST_ASSERT( G.add_vertex({30},{}) == false );
 
-
+    
 };
 
 void test_get_filters_set(){
