@@ -42,3 +42,4 @@
 !/bin/*_medoid_map.bin
 
 test_graph.bin
+test_medoid_map.bin
