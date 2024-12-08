@@ -159,14 +159,28 @@ void test_FilteredGreedySearch() {
     vector<int> xquery = {2};
     set<int> filter = {1};
 
-    auto result = FilteredGreedySearch<int, int>(G, xquery, k, L, filter);
+    // Call find medoid and get the set of starting nodes
+    // int threshold = 2;
+    // set<vector<int>> S = get_nodes_from_gIndex_map(G, FindMedoid(G, threshold));
+    set<vector<int>> S = G.get_vertices();
+
+    // printing S set
+    // for( vector<int> i : S){
+    //     print_vector(i);
+    // }
+
+    auto result = FilteredGreedySearch<int, int>(G, S, xquery, k, L, filter);
     set<gIndex> Lout = result.first;
     set<gIndex> V = result.second;
 
+    // cout << endl;
+    // for( gIndex s : Lout){
+    //     cout << s << endl;
+    // }
+
+    // Printing Graph
     cout << endl;
-    for( gIndex s : Lout){
-        cout << s << endl;
-    }
+    G.print_graph();
 
     // Test that the returned values are the ones expected (L = {1,4}, V = {1,2,4})
     TEST_ASSERT(Lout.size() == 2);
@@ -384,7 +398,32 @@ void test_Vamana() {
 }
 
 
+
+void test_FilteredVamana() {
+    /* Testing the vamana method with a simple example with integers solved by hand */
+    FilterGraph<vector<int>, int> G1;
+
+    // Add vertices 0,1,2,3
+    G1.add_vertex({0},{1}); G1.add_vertex({1},{1}); G1.add_vertex({2},{1}); G1.add_vertex({3},{1});
+
+    // Add edges 0->2, 0->3, 1->2, 1->3, 2->0, 2->1, 3->0, 3->1
+    // just for test because they don't matter because rDirectional will remove them
+    G1.add_edge({0}, {2}); G1.add_edge({0}, {3});
+    G1.add_edge({1}, {2}); G1.add_edge({1}, {3});
+    G1.add_edge({2}, {0}); G1.add_edge({2}, {1});
+    G1.add_edge({3}, {0}); G1.add_edge({3}, {1});
+
+    // Run vamana indexing algorithm with L = 2 and R = 2
+    FilteredVamana<int, int>(G1, 2, 2);
+
+    cout << endl;
+    G1.print_graph();
+
+}
+
+
 void test_Find_Medoid() {
+
     FilterGraph<vector<int>,int> G;
     
     G.add_vertex({10}, {1});
@@ -455,6 +494,7 @@ TEST_LIST = {
     {"RobustPrune", test_RobustPrune},
     {"FilteredRobustPrune", test_FilteredRobustPrune},
     {"Vamana", test_Vamana},
+    {"Filtered Vamana", test_FilteredVamana},
     {"Find_Medoid", test_Find_Medoid },
     {"StichedVamana", test_StichedVamana},
     { NULL, NULL }
