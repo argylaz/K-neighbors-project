@@ -12,7 +12,7 @@
 
 
 # Παραδοτέο 2
-- Ο Στέφανος Φωτόπουλος (1115202100209) ασχολήθηκε με την προσθήκη φίλτρων στην δομή του γράφου (κλάση FilterGraph), με την υλοποίηση των αλγορίθμων Filtered Greedy, Find Medoid και Filtered Robust, με τον υπολογισμό και το διάβασμα του αρχείου groundtruth, καθώς και με την υλοποίηση κάποιων test και βοηθητικών συναρτήσεων (save_medoid_map_to_bin, get_medoid_map_to_bin, κ.ά.). Επιπλέον προσέθεσε λειτουργία χρήσης flags command line arguments (βελτίωση του 1ου παραδοτέου) στο εκτελέσιμο της main.
+- Ο Στέφανος Φωτόπουλος (1115202100209) ασχολήθηκε με την προσθήκη φίλτρων στην δομή του γράφου (κλάση FilterGraph), με την υλοποίηση των αλγορίθμων Filtered Greedy, Find Medoid, Filtered Robust και FilteredVamana, με τον υπολογισμό και το διάβασμα του αρχείου groundtruth, καθώς και με την υλοποίηση κάποιων test και βοηθητικών συναρτήσεων (save_medoid_map_to_bin, get_medoid_map_to_bin, κ.ά.). Επιπλέον προσέθεσε λειτουργία χρήσης flags command line arguments (βελτίωση του 1ου παραδοτέου) στο εκτελέσιμο της main.
 
 - Ο Αργύριος Λαζαρίδης (1115202100083) ασχολήθηκε με την υλοποίηση του FilterGraph, το διάβασμα των .bin αρχείων (query και data), τα τέστ των συναρτήσεων FilteredGreedySearch, FilteredRobustPrune και FilteredVamana, τον υπολογισμό του αρχείου groundtruth. Επιπλέον ασχολήθηκε με την βελτιστοποίηση συναρτήσεων του προηγούμενου παραδοτέου, όπως η Εuclidean_distance, ή find_min_euclidean η add_sorted κτλ.
 
