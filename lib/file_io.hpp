@@ -68,7 +68,7 @@ template <typename F>
 bool get_medoid_map_from_bin(string file_prefix, map<F, gIndex>& medoid_map);
 
 
-/*--------------------------------------Methods used in main.cpp-------------------------------------*/
+/*--------------------------------------------METHOD DEFINITIONS----------------------------------------*/
 
 
 

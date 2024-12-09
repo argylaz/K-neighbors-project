@@ -17,11 +17,13 @@ int get_num_queries(string& query_name) {
     else return -1;  // Signifying wrong query name
 }
 
-/*  */
+/* */
 void results_Greedy(Graph<vector<float>> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<vector<float>>& queries, vector<float> medoid);
 
 /* */
 void results_Filtered_Greedy(FilterGraph<vector<float>, float> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<vector<float>>& queries, vector<float>& queries_filters);
+
+
 
 /* Main method of the project that runs our vamana (from knn.hpp) on a graph (from graph.hpp)
    created from the databases given in fvec files */
