@@ -150,7 +150,7 @@ vector<vector<Type>> read_vecs(string& filename) {
             break;
         }
 
-        cout << "d is " << d << endl;
+        // cout << "d is " << d << endl;
         // Create vector to hold the values and resize to the correct dimension
         vector<Type> v(d); //v.resize(d);
 
@@ -498,16 +498,12 @@ pair< vector<vector<float>> , vector<float>> read_queries(const string& filename
         // v[i] = q;
         v.push_back(q);
         i++;
-        cout << i << endl;
+        // cout << i << endl;
     }
 
     // Close file
     ifs.close();
     cout << "Finish Reading Queries" << endl;
-
-    cout << "v " << v.size();
-    cout << "f " << f.size();
-
 
     return {v, f};
 }
@@ -539,16 +535,16 @@ vector<vector<gIndex>> read_groundtruth(string filename) {
         size_t k;
         groundtruth.read(reinterpret_cast<char*>(&k), sizeof(k));
 
-        cout << "Query " << i + 1 << ": (k neighbors found = " << k << ")"<< endl;
+        // cout << "Query " << i + 1 << ": (k neighbors found = " << k << ")"<< endl;
 
         // Read the vector of dimension k
         vector<gIndex> nearest_neighbor(k);
         groundtruth.read(reinterpret_cast<char*>(nearest_neighbor.data()), k * sizeof(float));
 
-        // Print the groundtruth of the query
-        cout << "Groundtruth: ";
-        print_vector(nearest_neighbor);
-        cout << endl;
+        // // Print the groundtruth of the query
+        // cout << "Groundtruth: ";
+        // print_vector(nearest_neighbor);
+        // cout << endl;
 
         // Store the vector in the groundtruthData
         gt_data.push_back(nearest_neighbor);
@@ -667,6 +663,8 @@ void make_queries(const string& filename, const vector<vector<T>> vectors) {
 }
 
 
+
+
 /* Method to save the medoid map of the graph in a file <prefix>_medoid_map.bin */
 template <typename F>
 bool save_medoid_map_to_bin(string file_prefix, map<F, gIndex> medoid_map) {
@@ -691,6 +689,7 @@ bool save_medoid_map_to_bin(string file_prefix, map<F, gIndex> medoid_map) {
         file.write(reinterpret_cast<const char*>(&starting_node), sizeof(starting_node)); 
     }
 
+    file.close();
 
     return true;
 }
@@ -723,6 +722,8 @@ bool get_medoid_map_from_bin(string file_prefix, map<F, gIndex>& medoid_map) {
 
         medoid_map[filter] = starting_node;
     }
+
+    file.close();
 
     return true;
 }

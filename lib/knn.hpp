@@ -153,6 +153,10 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, const T& start, const T
     // return only the k closests vertices
     retain_closest_points(G, L_output, xquery, k);
 
+    // cout << "V size " << V.size() << endl;
+    // cout << "L_output size " << L_output.size() << endl;
+
+
     return {L_output, V};
 
 }
@@ -194,8 +198,6 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<T, F>& G, set<T>
         /* GET FILTERS FROM GRAPH */
         set<F> Fs  = G.get_filters(G.get_index_from_vertex(s)); 
 
-
-        
         // Checking if the intersection of Fs and Fq is empty
         set<F> intersection;
         set_intersection(Fs.begin(), Fs.end(), Fq.begin(), Fq.end(), inserter(intersection, intersection.begin()));      
@@ -205,7 +207,7 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<T, F>& G, set<T>
 
     }
 
-    cout << "L_output size is " << L_output.size() << endl;
+    // cout << "\nL_output size is " << L_output.size() << endl;
 
     // Subtraction of sets L_output \ V
     set<gIndex> diff_set;  // !!! vector for performance
@@ -222,7 +224,8 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<T, F>& G, set<T>
         // Line 4 && 5 of pseudocode
         vector<gIndex> neighbors = G.get_neighbors(min);
 
-        // For each one of min's (p*) neighbors p' (p_ in the code)
+        // For each one of min's (p*) neighbors p' (p_ in the code
+        set<gIndex> Nout_;
         for ( gIndex p_ : neighbors) {
  
             /* GET FILTERS FROM GRAPH */
@@ -232,11 +235,13 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<T, F>& G, set<T>
             // Inserting straight to L_output instead of making a new set N'out(p*)
             set<F> intersection;
             set_intersection(Fp_.begin(), Fp_.end(), Fq.begin(), Fq.end(), inserter(intersection, intersection.begin()));
-            if( !intersection.empty() && V.find(p_) == V.end() ) {
-                L_output.insert(G.get_index_from_vertex(min)); 
+            if ( !intersection.empty() && V.find(p_) == V.end() ) {
+                Nout_.insert(p_); 
             }
 
         }
+
+        set_union(L_output.begin(), L_output.end(), Nout_.begin(), Nout_.end(), inserter(L_output, L_output.begin()));
 
         // Upper bound check
         if ( L_output.size() > (long unsigned int) L ) {
@@ -251,6 +256,9 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<T, F>& G, set<T>
 
     if( L_output.size() > (size_t)k )
         retain_closest_points(G, L_output, xquery, k);
+
+    // cout << "V size " << V.size() << endl;
+    // cout << "L_output size " << L_output.size() << endl;
 
     return {L_output,V};
 }
