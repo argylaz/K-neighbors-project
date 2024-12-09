@@ -31,13 +31,13 @@ void test_GreedySearch() {
 
 
     // Test that the sets returned contain the correct values (L = {2,4}, V = {0,1,2,4})
-    TEST_ASSERT(find(L.begin(), L.end(), 2) != L.end());
-    TEST_ASSERT(find(L.begin(), L.end(), 4) != L.end());
+    TEST_ASSERT(L.find(2) != L.end());
+    TEST_ASSERT(L.find(4) != L.end());
 
-    TEST_ASSERT(find(V.begin(), V.end(), 0) != V.end());
-    TEST_ASSERT(find(V.begin(), V.end(), 1) != V.end());
-    TEST_ASSERT(find(V.begin(), V.end(), 2) != V.end());
-    TEST_ASSERT(find(V.begin(), V.end(), 4) != V.end());
+    TEST_ASSERT(V.find(0) != V.end());
+    TEST_ASSERT(V.find(1) != V.end());
+    TEST_ASSERT(V.find(2) != V.end());
+    TEST_ASSERT(V.find(4) != V.end());
     TEST_ASSERT(L.size() == 2);
     TEST_ASSERT(V.size() == 4);
 
@@ -73,13 +73,13 @@ void test_GreedySearch() {
     V1 = result1.second;
 
     // Test that the sets returned contain the correct values (L = {2,4}, V = {0,1,2,4})
-    TEST_ASSERT(find(L1.begin(), L1.end(), G1.get_index_from_vertex({2.1})) != L1.end());
-    TEST_ASSERT(find(L1.begin(), L1.end(), G1.get_index_from_vertex({4.1})) != L1.end());
+    TEST_ASSERT(L1.find(2) != L1.end());
+    TEST_ASSERT(L1.find(4) != L1.end());
 
-    TEST_ASSERT(find(V1.begin(), V1.end(), G1.get_index_from_vertex({0.1})) != V1.end());
-    TEST_ASSERT(find(V1.begin(), V1.end(), G1.get_index_from_vertex({1.1})) != V1.end());
-    TEST_ASSERT(find(V1.begin(), V1.end(), G1.get_index_from_vertex({2.1})) != V1.end());
-    TEST_ASSERT(find(V1.begin(), V1.end(), G1.get_index_from_vertex({4.1})) != V1.end());
+    TEST_ASSERT(V1.find(0) != V1.end());
+    TEST_ASSERT(V1.find(1) != V1.end());
+    TEST_ASSERT(V1.find(2) != V1.end());
+    TEST_ASSERT(V1.find(4) != V1.end());
     TEST_ASSERT(L1.size() == 2);
     TEST_ASSERT(V1.size() == 4);
 
@@ -118,13 +118,13 @@ void test_GreedySearch() {
 
 
     // Test that the sets returned contain the correct values (L = {2,4}, V = {1,2,3})
-    TEST_ASSERT(find(L2.begin(), L2.end(), 2) != L2.end());
-    TEST_ASSERT(find(L2.begin(), L2.end(), 4) != L2.end());
+    TEST_ASSERT(L2.find(2) != L2.end());
+    TEST_ASSERT(L2.find(4) != L2.end());
 
-    TEST_ASSERT(find(V2.begin(), V2.end(), 0) != V2.end());
-    TEST_ASSERT(find(V2.begin(), V2.end(), 1) != V2.end());
-    TEST_ASSERT(find(V2.begin(), V2.end(), 2) != V2.end());
-    TEST_ASSERT(find(V2.begin(), V2.end(), 4) != V2.end());
+    TEST_ASSERT(V2.find(0) != V2.end());
+    TEST_ASSERT(V2.find(1) != V2.end());
+    TEST_ASSERT(V2.find(2) != V2.end());
+    TEST_ASSERT(V2.find(4) != V2.end());
     TEST_ASSERT(L2.size() == 2);
     TEST_ASSERT(V2.size() == 4);
 
@@ -136,6 +136,9 @@ void test_GreedySearch() {
     TEST_ASSERT( V2.size() ==  0 );
 
 }
+
+
+
 
 /* Testing FilteredGreedySearch method  using an example solved by hand */
 void test_FilteredGreedySearch() {
@@ -169,7 +172,7 @@ void test_FilteredGreedySearch() {
     //     print_vector(i);
     // }
 
-    auto result = FilteredGreedySearch<int, int>(G, S, xquery, k, L, filter);
+    auto result = FilteredGreedySearch<vector<int>, int>(G, S, xquery, k, L, filter);
     set<gIndex> Lout = result.first;
     set<gIndex> V = result.second;
 
@@ -179,19 +182,22 @@ void test_FilteredGreedySearch() {
     // }
 
     // Printing Graph
-    cout << endl;
-    G.print_graph();
+    // cout << endl;
+    // G.print_graph();
 
     // Test that the returned values are the ones expected (L = {1,4}, V = {1,2,4})
     TEST_ASSERT(Lout.size() == 2);
-    TEST_ASSERT(find(Lout.begin(), Lout.end(), 1) != Lout.end());  // 1 in L
-    TEST_ASSERT(find(Lout.begin(), Lout.end(), 4) != Lout.end());  // 4 in L
+    TEST_ASSERT(Lout.find(1) != Lout.end());  // 1 in L
+    TEST_ASSERT(Lout.find(4) != Lout.end());  // 4 in L
 
     TEST_ASSERT(V.size() == 3);
-    TEST_ASSERT(find(V.begin(), V.end(), 1) != V.end());  // 1 on V
-    TEST_ASSERT(find(V.begin(), V.end(), 2) != V.end());  // 2 in V
-    TEST_ASSERT(find(V.begin(), V.end(), 4) != V.end());  // 4 in V
+    TEST_ASSERT(V.find(1) != V.end());  // 1 on V
+    TEST_ASSERT(V.find(2) != V.end());  // 2 in V
+    TEST_ASSERT(V.find(4) != V.end());  // 4 in V
 }
+
+
+
 
 /* Testing the RobustPrune method */
 void test_RobustPrune() {
@@ -231,7 +237,6 @@ void test_RobustPrune() {
 
     R = 1;
     RobustPrune(G1, {4}, V1, a, R);
-    
 
     // Now check that the algorithm works as intended (edges from 4 to 0 and from 4 to 2 removed)
     TEST_ASSERT(G1.exist_edge({0}, {1}));
@@ -414,7 +419,7 @@ void test_FilteredVamana() {
     G1.add_edge({3}, {0}); G1.add_edge({3}, {1});
 
     // Run vamana indexing algorithm with L = 2 and R = 2
-    FilteredVamana<int, int>(G1, 2, 2);
+    FilteredVamana<vector<int>, int>(G1, 2, 2);
 
     cout << endl;
     G1.print_graph();
@@ -446,14 +451,14 @@ void test_Find_Medoid() {
 
     TEST_ASSERT(MedoidMap1.size() == 5);
 
-    for( int i = 1 ; i <= 5 ; i++ ){
+    for (int i = 1; i <= 5; i++) {
 
         // print_vector(G.get_filters(MedoidMap[{i}]));
         set<int> Fk = G.get_filters( MedoidMap1[i]);
         TEST_ASSERT(Fk.find(i) != Fk.end());
     }
 
-};
+}
 
 
 

@@ -41,5 +41,5 @@
 !/bin/*_graph.bin
 !/bin/*_medoid_map.bin
 
-test_graph.bin
-test_medoid_map.bin
+/bin/test_graph.bin
+/bin/test_medoid_map.bin
