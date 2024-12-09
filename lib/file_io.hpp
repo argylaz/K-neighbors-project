@@ -150,8 +150,9 @@ vector<vector<Type>> read_vecs(string& filename) {
             break;
         }
 
+        cout << "d is " << d << endl;
         // Create vector to hold the values and resize to the correct dimension
-        vector<Type> v; v.resize(d);
+        vector<Type> v(d); //v.resize(d);
 
         // Read the data from file
         file.read(reinterpret_cast<char*>(v.data()), d * sizeof(Type));

@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
 
     vector<vector<gIndex>> groundtruth;
     vector<vector<float>> queries;
-
+    cout << k << " "<< L << " " << R << " " << Rstitched << " " << a << " " << data_set << " " << base_name << " " << query_name << " " << groundtruth_name << " " << vamana_type<<endl;
     // Simple Vamana Case
     if ( vamana_type == "simple" ) {
         cout << "2" << endl;
@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
         // Reading Groundtruth
         groundtruth = read_vecs<int>(groundtruth_name);
         cout << groundtruth.size() << endl;
-        
+        cout << "2.5" << endl;
         // Reading Queries        
         queries = read_vecs<float>(query_name);
 

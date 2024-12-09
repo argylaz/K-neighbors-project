@@ -249,8 +249,8 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<T, F>& G, set<T>
         
     }
 
-    // if( L_output.size() > (size_t)k )
-    retain_closest_points(G, L_output, xquery, k);
+    if( L_output.size() > (size_t)k )
+        retain_closest_points(G, L_output, xquery, k);
 
     return {L_output,V};
 }

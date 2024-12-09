@@ -42,8 +42,8 @@ $(BIN_DIR)/%: $(BUILD_DIR)/%.o
 run: clean
 	$(CC) $(CFLAGS) -o bin/main main.cpp
 # ./bin/main  -f dummy -k 100 -L 120 -R 30 -a 1.2 -v filtered -Rst stitched 
-	# time ./bin/main  -f dummy -k 100 -L 120 -R 30 -a 1.2 -v filtered
-	time ./bin/main  -f small -k 10 -L 10 -R 10 -a 1.2 -v simple
+# time ./bin/main  -f dummy -k 100 -L 120 -R 30 -a 1.2 -v filtered > run.txt
+	time ./bin/main  -f small -k 100 -L 120 -R 30 -a 1.2 -v simple
 
 # Run the test executable
 test: clean $(TEST_EXEC)
