@@ -70,7 +70,7 @@ T Vamana(Graph<T>& G, int L, int R, float a = 1.2);
 // L is the search list size
 // R is the degree bound
 template <typename T, typename F>
-void FilteredVamana(FilterGraph<T, F>& G, int L, int R, float a = 1.2);
+void FilteredVamana(FilterGraph<T, F>& G, int L, int R, map<F, gIndex> MedoidMap, float a = 1.2);
 
 
 
@@ -468,17 +468,12 @@ T Vamana(Graph<T>& G, int L, int R, float a) {
 // L is the search list size
 // R is the degree bound
 template <typename T, typename F>
-void FilteredVamana(FilterGraph<T, F>& G, int L, int R, float a) {
+void FilteredVamana(FilterGraph<T, F>& G, int L, int R, map<F, gIndex> MedoidMap, float a) {
 
     int n = G.get_vertices_count();
-    set<gIndex> V;
+    // set<gIndex> V;
 
     // At the beginning the graph is empty
-
-    // Calculating the medoid of the points given
-    // Threshold is 1                                         ///////////// Maybe this has to be changed
-    map<F, gIndex> MedoidMap = FindMedoid(G, 1);
-    // set<T> Sf = get_nodes_from_gIndex_map(G, MedoidMap);
 
     
     // Getting the vertex indices in a random order. Vector sigma will be the random permutation.

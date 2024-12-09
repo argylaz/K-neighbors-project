@@ -3,7 +3,7 @@
 // #include <bits/stdc++.h>
 #include "utils.hpp"
 
-#define MAX_ARGS 13
+#define MAX_ARGS 15
 
 using namespace std;
 
@@ -27,7 +27,7 @@ set<vector<Type>> read_sets(string& filename);
 
 
 // Function that reads the command line input arguments. Returns 1 or -1
-int get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R, string& data_set, string& base_name, string& query_name, string& groundtruth_name, string& vamana_type);
+bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R, int& Rstitched, string& data_set, string& base_name, string& query_name, string& groundtruth_name, string& vamana_type);
 
 
 // Helper method to check file extention
@@ -228,22 +228,50 @@ set<vector<Type>> read_sets(string& filename) {
 
 
 // Function that reads the command line input arguments. Returns 1 or -1
-int get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R, string& data_set, string& base_name, string& query_name, string& groundtruth_name, string& vamana_type) {
-    // We need at least 8 arguments (Filename, k, L, R and maybe a)
+bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R, int& Rstitched, string& data_set, string& base_name, string& query_name, string& groundtruth_name, string& vamana_type) {
+    // We need at least 8 arguments (Filename, vamana_type, k, L, R and maybe a and Rstitched if we use StitchedVamana)
     
-    if (!(argc == MAX_ARGS || argc == MAX_ARGS - 2)) {     
+    if (!(argc == MAX_ARGS || argc == MAX_ARGS - 2 || argc == MAX_ARGS - 4)) {     
         cerr << "ERROR: Malformed input at command line\n";
-        return -1;
+        return false;
     }
 
     // What is the max argument count, depending on whether the default argument a is given or not  
-    int final_flag = (argc == MAX_ARGS) ? MAX_ARGS - 2 : MAX_ARGS - 4;
+    int final_flag;
+    if (argc == MAX_ARGS) {
+        final_flag = MAX_ARGS - 2;
+    } else if (argc == MAX_ARGS - 2) {
+        final_flag = MAX_ARGS - 4;
+    } else {
+        final_flag = MAX_ARGS - 6;
+    }
 
     bool arg_found = false;
 
+    // Get v argument, the Vamana type
+    // string vamana_type;
+    const char *tempV;
+    arg_found = false;
+    for (int i = 1; i <= final_flag; i += 2) {
+        if (!strcmp(argv[i], "-v")) {
+            tempV = argv[i + 1];
+            arg_found = true;
+        }
+    }
+    if (!arg_found) {
+        cerr << "ERROR: Should include the vamana command line argument like \"-v vamana_type\" (simple/filtered/stitched)\n";
+        return -1;
+    }
+
+    vamana_type = string(tempV);
+    if (vamana_type != "simple" && vamana_type != "filtered" && vamana_type != "stitched") {
+        cerr << "Vamana type should be simple/filtered/stitched\n";
+        return false;
+    }
+
     
     // Get the filename
-    const char* data_set_flag;      // Flag for siftsmall  
+    const char* data_set_flag;      // Flag for dataset used 
     arg_found = false;
     for (int i = 1; i <= final_flag; i += 2) {
         if (!strcmp(argv[i], "-f")) {
@@ -253,7 +281,7 @@ int get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R
     } 
     if (!arg_found) {
         cerr << "ERROR: Should include the file name as command line argument like \"-f filename\"\n";
-        return -1;
+        return false;
     }
 
     data_set = string(data_set_flag);
@@ -287,7 +315,7 @@ int get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R
     }
     else {
         cerr << "ERROR: Should include the file name as command line argument like \"-f small\" or \"-f large\"\n";
-        return -1;
+        return false;
     }
 
 
@@ -303,13 +331,13 @@ int get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R
     }
     if (!arg_found) {
         cerr << "ERROR: Should include the k command line argument like \"-k k_neighbors\"\n";
-        return -1;
+        return false;
     }
 
     k = atoi(tempk);
     if (k <= 0 || !isPositiveInteger(tempk)) {
         cerr << "ERROR: k should be a positive integer number\n";
-        return -1;
+        return false;
     }
 
 
@@ -318,20 +346,20 @@ int get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R
     const char *tempL;
     arg_found = false;
     for (int i = 1; i <= final_flag; i += 2) {
-        if (!strcmp(argv[i], "-l")) {
+        if (!strcmp(argv[i], "-L")) {
             tempL = argv[i + 1];
             arg_found = true;
         }
     }
     if (!arg_found) {
         cerr << "ERROR: Should include the l command line argument like \"-l l_argument\"\n";
-        return -1;
+        return false;
     }
 
     L = atoi(tempL);
     if (L <= 0 || !isPositiveInteger(tempL)) {
         cerr << "ERROR: L argument should be a positive integer number\n";
-        return -1;
+        return false;
     }
 
 
@@ -340,26 +368,27 @@ int get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R
     const char *tempR;
     arg_found = false;
     for (int i = 1; i <= final_flag; i += 2) {
-        if (!strcmp(argv[i], "-r")) {
+        if (!strcmp(argv[i], "-R")) {
             tempR = argv[i + 1];
             arg_found = true;
         }
     }
     if (!arg_found) {
         cerr << "ERROR: Should include the r command line argument like \"-r r_argument\"\n";
-        return -1;
+        return false;
     }
 
     R = atoi(tempR);
     if (R <= 0 || !isPositiveInteger(tempR)) {
         cerr << "ERROR: R argument should be a positive integer number\n";
-        return -1;
+        return false;
     }
 
 
     // Get optional A argument
     // float a;
-    if (argc == MAX_ARGS) {
+    a = 1.2;
+    if ((vamana_type == "stitched" && argc == MAX_ARGS) || (vamana_type != "stitched" && argc == MAX_ARGS - 2)) {
         const char *tempA;
         arg_found = false;
         for (int i = 1; i <= final_flag; i += 2) {
@@ -370,40 +399,42 @@ int get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R
         }
         if (!arg_found) {
             cerr << "ERROR: Should include the a command line argument like \"-a a_argument\"\n";
-            return -1;
+            return false;
         }
     
         a = atof(tempA);
         if (a <= 0 ) {
-            cerr << "ERROR: a argument should be a positive integer number\n";
-            return -1;
+            cerr << "ERROR: a argument should be a positive number\n";
+            return false;
         }
     
     }
 
-
-    // Get v argument, the Vamana type
-    // string vamana_type;
-    const char *tempV;
-    arg_found = false;
-    for (int i = 1; i <= final_flag; i += 2) {
-        if (!strcmp(argv[i], "-v")) {
-            tempV = argv[i + 1];
-            arg_found = true;
+    // Get optional Rstitched argument
+    Rstitched = -1;
+    if (vamana_type == "stitched") {
+        const char *tempRst;
+        arg_found = false;
+        for (int i = 1; i <= final_flag; i += 2) {
+            if (!strcmp(argv[i], "-Rst")) {
+                tempRst = argv[i + 1];
+                arg_found = true;
+            }
         }
-    }
-    if (!arg_found) {
-        cerr << "ERROR: Should include the vamana command line argument like \"-v vamana_type\" (simple/filtered/stitched)\n";
-        return -1;
+        if (!arg_found) {
+            cerr << "ERROR: Should include the Rstitched command line argument like \"-Rst Rstitched_argument\"\n";
+            return false;
+        }
+    
+        Rstitched = atoi(tempRst);
+        if (Rstitched <= 0 || !isPositiveInteger(tempRst)) {
+            cerr << "ERROR: Rstitched argument should be a positive integer number\n";
+            return false;
+        }
+    
     }
 
-    vamana_type = string(tempV);
-    if (vamana_type != "simple" && vamana_type != "filtered" && vamana_type != "stitched") {
-        cerr << "Vamana type should be simple/filtered/stitched\n";
-        return -1;
-    }
-
-    return 1;
+    return true;
 }
 
 
