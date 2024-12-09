@@ -106,7 +106,7 @@ int main(void) {
             filter_temp.insert(queries_filter[q]);
 
             // The point in question is one of the k-nearest neighbors only if has the same filter as the query
-            if ( filter_temp == filters_min  || queries_filter[q] == -1) {       // If the query has no categorical attribute (== -1) then ignore the filter
+            if ( filter_temp == filters_min  || queries_filter[q] == -1.0f) {       // If the query has no categorical attribute (== -1) then ignore the filter
                 // --------------
                 // print_vector(min);
                 // cout << " with filter ";
