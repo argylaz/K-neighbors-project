@@ -205,6 +205,8 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<T, F>& G, set<T>
 
     }
 
+    cout << "L_output size is " << L_output.size() << endl;
+
     // Subtraction of sets L_output \ V
     set<gIndex> diff_set;  // !!! vector for performance
     set_difference(L_output.begin(), L_output.end(), V.begin(), V.end(), inserter(diff_set, diff_set.begin()));
@@ -247,10 +249,11 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<T, F>& G, set<T>
         
     }
 
+    // if( L_output.size() > (size_t)k )
     retain_closest_points(G, L_output, xquery, k);
 
     return {L_output,V};
-} 
+}
 
 
 

@@ -469,8 +469,9 @@ pair< vector<vector<float>> , vector<float>> read_queries(const string& filename
 
     // Initialise buffer and map
     vector<float> buff(num_dimensions + 4);
-    vector<vector<float>> v;                             // Holds all the query vector data
-    vector<float> f(num_queries);                     // Holds all the equivalent query filter data (categorical attributes)
+    vector<vector<float>> v;                    // Holds all the query vector data
+    vector<float> f;                            // Holds all the equivalent query filter data (categorical attributes)
+
 
     // Read query data repetitively
     int i = 0;
@@ -481,7 +482,7 @@ pair< vector<vector<float>> , vector<float>> read_queries(const string& filename
 
         // Casting and storing the filter (categorical attribute)
         float filter = static_cast<float>(buff[1]);
-        f[i] = filter;
+        f.push_back(filter);
 
 
         /* Ignoring timestamps (buff[2] and buff[3]) */
@@ -502,6 +503,9 @@ pair< vector<vector<float>> , vector<float>> read_queries(const string& filename
     // Close file
     ifs.close();
     cout << "Finish Reading Queries" << endl;
+
+    cout << "v " << v.size();
+    cout << "f " << f.size();
 
 
     return {v, f};

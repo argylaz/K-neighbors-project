@@ -7,12 +7,12 @@ using namespace std;
 
 /* Returns the number of queries for the given query dataset ()*/
 int get_num_queries(string& query_name) {
-    if (query_name == "dummy-data.bin") {
+    if (query_name == "sift/dummy-queries.bin") {
+        return 100;
+    } else if (query_name == "sift/contest-queries-release-1m.bin") {
         return 10000;
-    } else if (query_name == "contest-data-release-1m.bin") {
-        return 1000000;
-    } else if (query_name == "contest-data-release-10m.bin") {
-        return 10000000;
+    } else if (query_name == "sift/contest-queries-release-10m.bin") {
+        return 4000000;
     }
     else return -1;  // Signifying wrong query name
 }
@@ -40,6 +40,8 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
+    cout << "1" << endl;
+
     
     string prefix = vamana_type + "_" + data_set + "_" + to_string(k) + "_" + to_string(L) + "_" + to_string(R);
     if (vamana_type == "stitched") prefix += "_" + to_string(Rstitched);
@@ -49,6 +51,7 @@ int main(int argc, char* argv[]) {
 
     // Simple Vamana Case
     if ( vamana_type == "simple" ) {
+        cout << "2" << endl;
 
         // Reading Groundtruth
         groundtruth = read_vecs<int>(groundtruth_name);
@@ -57,12 +60,13 @@ int main(int argc, char* argv[]) {
         // Reading Queries        
         queries = read_vecs<float>(query_name);
 
+        cout << "3" << endl;
         // Reading Base and creating Graph
         Graph<vector<float>> *G = new Graph<vector<float>>(true);
         vec_to_graph<float>(base_name, *G);
 
         cout << G->get_vertices_count() << " points loaded\n";
-
+        cout << "4" << endl;
         // If the .bin graph file already exists we read it and recreate the graph, otherwise we have to make the graph and save it in the .bin file
         vector<float> medoid;
         if (!(G->get_graph_from_bin(prefix, medoid))) {
@@ -71,12 +75,13 @@ int main(int argc, char* argv[]) {
             medoid = Vamana<vector<float>>(*G, L, R, a);
             G->save_graph_to_bin(prefix);
         }        
-
+        cout << "5" << endl;
         cout << "Graph has " << G->get_edge_count() << " edges\n\n"; 
 
 
         results_Greedy<vector<float>>(G, k, L, groundtruth, queries, medoid);
 
+        
         
         delete(G);
         
@@ -87,7 +92,7 @@ int main(int argc, char* argv[]) {
         // Reading Groundtruth
         // Check whether the file has been provided or calculated in advance (exists in sift/ )
         if (fopen(groundtruth_name.c_str(), "r")) {
-            groundtruth = read_groundtruth("groundtruth_name");
+            groundtruth = read_groundtruth(groundtruth_name);
         } else {
             cerr << "The groundtruth file for the requested datasets has not been provided!" << endl;
             cerr << "Results cannot be properly evaluated!" << endl;
@@ -97,9 +102,12 @@ int main(int argc, char* argv[]) {
 
         // Reading Queries
         int num_queries = get_num_queries(query_name);
+        cout << "Num Queries: " << num_queries << endl;
         pair< vector<vector<float>>, vector<float> > queries_data = read_queries(query_name, num_queries, NUM_DIMENSIONS);
         queries = queries_data.first;
         vector<float> queries_filters = queries_data.second;
+
+        cout << "Queries Size " << queries_data.first.size() << endl;
         
 
         // Reading Base and creating Graph
@@ -215,14 +223,18 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
     auto n = queries.begin();
     auto f = queries_filters.begin();
 
+
+    cout << "Queries Size " << queries.size() << endl;
+
     // Calculate and print recall for given queries
     float total_recall = 0.0f;
+    int query_count = 1;
     int count = 0;
     while ( m != groundtruth.end() && n != queries.end() && f != queries_filters.end()) {
         // For each query
         vector<float> q = *n;
         
-        cout << "\nQuery: ";
+        cout << "\nQuery no." << query_count << " : ";
         print_vector<float>(q);
         cout << "\n";
 
@@ -231,7 +243,16 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
         set<T> Sf_q;
         for (F filter: Fq) {
             Sf_q.insert(G->get_vertex_from_index(MedoidMap[filter]));
+            cout << "filter Fq " << filter;
         }
+
+
+        // cout << "\nSf q size " << Sf_q.size();
+        cout << endl;
+        print_vector(q);
+        cout << "\nk " << k << endl;
+        cout << "L " << L << endl;
+        cout << Fq.size();
 
         pair<set<gIndex>, set<gIndex>> res = FilteredGreedySearch(*G, Sf_q, q, k, L, Fq);
         set<gIndex> X = res.first;
@@ -246,10 +267,14 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
         set_intersection(X.begin(), X.end(), T_.begin(), T_.end(), inserter(V_intersec, V_intersec.begin()));
 
         cout << "\nIntersection size is:" << V_intersec.size();
+        cout << "\nX size is:" << X.size();
         cout << "\nT size is:" << T_.size();
-        
+
+        float recall = 0;     
         // Calculate recall and add to total
-        float recall = V_intersec.size() / ((float) X.size());
+        
+        recall = (float)V_intersec.size() / ((float) X.size());
+        
         cout << "\nRecall is: " << recall << endl;
         total_recall += recall;
         count++;
@@ -261,6 +286,7 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
         m++;
         n++;
         f++;
+        query_count++;
     }
     
     total_recall = total_recall / count;
