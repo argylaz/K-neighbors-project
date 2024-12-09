@@ -423,7 +423,6 @@ void test_medoid_map_bin() {
     TEST_ASSERT( medoid_map_res[3.5] == 30 );
     TEST_ASSERT( medoid_map_res[4.5] == 40 );
 
-    
 }
 
 

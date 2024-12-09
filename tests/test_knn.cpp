@@ -405,26 +405,21 @@ void test_Vamana() {
 
 
 void test_FilteredVamana() {
+    
     /* Testing the vamana method with a simple example with integers solved by hand */
     FilterGraph<vector<int>, int> G;
 
-    // Add vertices 0,1,2,3
-    G.add_vertex({0},{1}); G.add_vertex({1},{1}); G.add_vertex({2},{1}); G.add_vertex({3},{1});
-
-    // Add edges 0->2, 0->3, 1->2, 1->3, 2->0, 2->1, 3->0, 3->1
-    // just for test because they don't matter because rDirectional will remove them
-    G.add_edge({0}, {2}); G.add_edge({0}, {3});
-    G.add_edge({1}, {2}); G.add_edge({1}, {3});
-    G.add_edge({2}, {0}); G.add_edge({2}, {1});
-    G.add_edge({3}, {0}); G.add_edge({3}, {1});
+    // Add vertices 0,1,2,3, 4 with filters 0,1,1,0,1 equivalently
+    G.add_vertex({0},{0}); G.add_vertex({1},{1}); G.add_vertex({2},{1}); G.add_vertex({3},{0}); G.add_vertex({4},{1});
 
     map<int, gIndex> MedoidMap = FindMedoid(G, 4);
     // Run vamana indexing algorithm with L = 2 and R = 2
-    FilteredVamana<vector<int>, int>(G, 2, 2, MedoidMap);
+    FilteredVamana<vector<int>, int>(G, 3, 2, MedoidMap, 2);
 
-    cout << endl;
-    G.print_graph();
-
+    // Check that the only edges that exist are the following: 0->3, 3->0, 1->2, 2->1, 2->4, 4->2
+    TEST_ASSERT(G.exist_edge({0},{3})); TEST_ASSERT(G.exist_edge({3},{0}));
+    TEST_ASSERT(G.exist_edge({1},{2})); TEST_ASSERT(G.exist_edge({2},{1}));
+    TEST_ASSERT(G.exist_edge({2},{4})); TEST_ASSERT(G.exist_edge({4},{2}));
 }
 
 
