@@ -1,3 +1,4 @@
+
 # Compiler
 CC = g++
 
@@ -39,11 +40,25 @@ $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
 $(BIN_DIR)/%: $(BUILD_DIR)/%.o
 	$(CC) $(CFLAGS) -o $@ $<
 
+run_simple: clean
+	$(CC) $(CFLAGS) -o bin/main main.cpp
+	time ./bin/main  -f small -k 100 -L 120 -R 30 -a 1.2 -v simple
+
+run_filtered: clean
+	$(CC) $(CFLAGS) -o bin/main main.cpp
+	time ./bin/main  -f dummy -k 100 -L 150 -R 42 -a 1.2 -v filtered 
+
+
+run_stitched: clean
+	$(CC) $(CFLAGS) -o bin/main main.cpp
+	time ./bin/main  -f dummy -k 100 -L 150 -R 42 -a 1.2 -v stitched -Rst 96
+
+
 run: clean
 	$(CC) $(CFLAGS) -o bin/main main.cpp
-# ./bin/main  -f dummy -k 100 -L 120 -R 30 -a 1.2 -v filtered -Rst stitched 
-# time ./bin/main  -f dummy -k 100 -L 120 -R 30 -a 1.2 -v filtered > run.txt
-	time ./bin/main  -f small -k 100 -L 120 -R 30 -a 1.2 -v simple
+	time ./bin/main  -f dummy -k 100 -L 120 -R 30 -a 1.2 -v filtered 
+# time ./bin/main  -f dummy -k 50 -L 60 -R 30 -a 1.2 -v stitched -Rst 2
+# time ./bin/main  -f small -k 100 -L 120 -R 30 -a 1.2 -v simple
 
 # Run the test executable
 test: clean $(TEST_EXEC)
@@ -71,7 +86,7 @@ valgrind:
 # which contain saved Graphs made with Filtered, Stiched or Simple Vamana algorithms  
 clean:
 	rm -rf $(BUILD_DIR)/*.o
-	find $(BIN_DIR) -type f ! -name '*_graph.bin' ! -name 'groundtruth.bin' -delete 
+	find $(BIN_DIR) -type f ! -name '*_graph.bin' ! -name 'groundtruth.bin' ! -name '*_medoid_map.bin' -delete 
 
 # Erase everything in bin and build folders
 erase:
