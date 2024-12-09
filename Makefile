@@ -29,6 +29,7 @@ all: clean create $(TEST_EXEC)
 create:
 	mkdir -p $(BIN_DIR)
 	mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) -o bin/main main.cpp
 
 # Rule to compile test source files into object files
 $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
