@@ -406,23 +406,24 @@ void test_Vamana() {
 
 void test_FilteredVamana() {
     /* Testing the vamana method with a simple example with integers solved by hand */
-    FilterGraph<vector<int>, int> G1;
+    FilterGraph<vector<int>, int> G;
 
     // Add vertices 0,1,2,3
-    G1.add_vertex({0},{1}); G1.add_vertex({1},{1}); G1.add_vertex({2},{1}); G1.add_vertex({3},{1});
+    G.add_vertex({0},{1}); G.add_vertex({1},{1}); G.add_vertex({2},{1}); G.add_vertex({3},{1});
 
     // Add edges 0->2, 0->3, 1->2, 1->3, 2->0, 2->1, 3->0, 3->1
     // just for test because they don't matter because rDirectional will remove them
-    G1.add_edge({0}, {2}); G1.add_edge({0}, {3});
-    G1.add_edge({1}, {2}); G1.add_edge({1}, {3});
-    G1.add_edge({2}, {0}); G1.add_edge({2}, {1});
-    G1.add_edge({3}, {0}); G1.add_edge({3}, {1});
+    G.add_edge({0}, {2}); G.add_edge({0}, {3});
+    G.add_edge({1}, {2}); G.add_edge({1}, {3});
+    G.add_edge({2}, {0}); G.add_edge({2}, {1});
+    G.add_edge({3}, {0}); G.add_edge({3}, {1});
 
+    map<int, gIndex> MedoidMap = FindMedoid(G, 4);
     // Run vamana indexing algorithm with L = 2 and R = 2
-    FilteredVamana<vector<int>, int>(G1, 2, 2);
+    FilteredVamana<vector<int>, int>(G, 2, 2, MedoidMap);
 
     cout << endl;
-    G1.print_graph();
+    G.print_graph();
 
 }
 

@@ -41,7 +41,7 @@ $(BIN_DIR)/%: $(BUILD_DIR)/%.o
 
 run: clean
 	$(CC) $(CFLAGS) -o bin/main main.cpp
-	time ./bin/main  -f small -k 10 -l 50 -r 50 -a 1.2
+	time ./bin/main  -f small -k 100 -L 120 -R 30 -a 1.1 -v simple
 
 
 # Run the test executable

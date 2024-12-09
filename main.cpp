@@ -17,11 +17,15 @@ int get_num_queries(string& query_name) {
     else return -1;  // Signifying wrong query name
 }
 
-/* */
-void results_Greedy(Graph<vector<float>> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<vector<float>>& queries, vector<float> medoid);
+
+/*  */
+template <typename T>
+void results_Greedy(Graph<T> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<T>& queries, T medoid);
+
 
 /* */
-void results_Filtered_Greedy(FilterGraph<vector<float>, float> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<vector<float>>& queries, vector<float>& queries_filters);
+template <typename T, typename F>
+void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<T>& queries, vector<F>& queries_filters, map<F, gIndex>& MedoidMap);
 
 
 
@@ -29,14 +33,16 @@ void results_Filtered_Greedy(FilterGraph<vector<float>, float> *G, int k, int L,
    created from the databases given in fvec files */
 int main(int argc, char* argv[]) {
 
-    int k, L, R;
+    int k, L, R, Rstitched;
     float a = 1.2;    // Default value 
     string data_set, base_name, query_name, groundtruth_name, vamana_type; // get arguments figures out the correct dataset files
-    if ( get_arguments(argc, (const char**)argv, k, L, a, R, data_set, base_name, query_name, groundtruth_name, vamana_type) == -1) {
+    if ( !get_arguments(argc, (const char**)argv, k, L, a, R, Rstitched, data_set, base_name, query_name, groundtruth_name, vamana_type) ) {
         return -1;
     }
 
-
+    
+    string prefix = vamana_type + "_" + data_set + "_" + to_string(k) + "_" + to_string(L) + "_" + to_string(R);
+    if (vamana_type == "stitched") prefix += "_" + to_string(Rstitched);
 
     vector<vector<gIndex>> groundtruth;
     vector<vector<float>> queries;
@@ -57,19 +63,19 @@ int main(int argc, char* argv[]) {
 
         cout << G->get_vertices_count() << " points loaded\n";
 
+        // If the .bin graph file already exists we read it and recreate the graph, otherwise we have to make the graph and save it in the .bin file
         vector<float> medoid;
-        if (!(G->get_graph_from_bin("simple" + data_set, medoid))) {
+        if (!(G->get_graph_from_bin(prefix, medoid))) {
 
             // Running Vamana indexing algorithm
             medoid = Vamana<vector<float>>(*G, L, R, a);
-            G->save_graph_to_bin("simple" + data_set);
+            G->save_graph_to_bin(prefix);
         }        
-
 
         cout << "Graph has " << G->get_edge_count() << " edges\n\n"; 
 
 
-        results_Greedy(G, k, L, groundtruth, queries, medoid);
+        results_Greedy<vector<float>>(G, k, L, groundtruth, queries, medoid);
 
         
         delete(G);
@@ -104,21 +110,20 @@ int main(int argc, char* argv[]) {
 
         vector<float> dummy;
         map<float,gIndex> MedoidMap;
-        string prefix = vamana_type + data_set;
         
+        // If the .bin graph file already exists we read it and recreate the graph, otherwise we have to make the graph and save it in the .bin file
         if (!(G->get_graph_from_bin(prefix, dummy))) {
             // Find Medoid Map
             MedoidMap = FindMedoid(*G, (int)floor(0.1 * G->get_vertices_count()) );
             
             if ( vamana_type == "filtered" ) {
                 // Running Filtered Vamana indexing algorithm
-                // FilteredVamana<>();
+                FilteredVamana<vector<float>, float>(*G, L, R, MedoidMap, a);
             }
             // Stiched Graph
             else if ( vamana_type == "stitched" ) {
                 // Running Stiched Vamana indexing algorithm
-                StichedVamana<vector<float>, float>(*G, 2, 2, 2);   
-
+                StichedVamana<vector<float>, float>(*G, L, R, Rstitched, a);   
             }
             
             // Create two .bin files with the Graph and the Medoid Map
@@ -134,8 +139,7 @@ int main(int argc, char* argv[]) {
         cout << "Graph has " << G->get_edge_count() << " edges\n\n";
         
         
-        
-        results_Filtered_Greedy(G, k, L, groundtruth, queries, queries_filters);
+        results_Filtered_Greedy<vector<float>, float>(G, k, L, groundtruth, queries, queries_filters, MedoidMap);
 
 
         delete(G);
@@ -150,7 +154,10 @@ int main(int argc, char* argv[]) {
 
 
 
-void results_Greedy(Graph<vector<float>> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<vector<float>>& queries, vector<float> medoid) {
+
+
+template <typename T>
+void results_Greedy(Graph<T> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<T>& queries, T medoid) {
     // Initialize iterators
     auto m = groundtruth.begin();
     auto n = queries.begin();
@@ -166,22 +173,20 @@ void results_Greedy(Graph<vector<float>> *G, int k, int L, vector<vector<gIndex>
         print_vector<float>(q);
         cout << "\n";
 
-        set<gIndex> X;
-        pair<set<gIndex>, set<gIndex>> res;
     
         // Run GreedySearch to get the k nearest neighbors
-        res = GreedySearch(*G, medoid, q, k, L);
-        X = res.first;
+        pair<set<gIndex>, set<gIndex>> res = GreedySearch(*G, medoid, q, k, L);
+        set<gIndex> X = res.first;
         
         // Get ground truth
-        set<gIndex> T( (*m).begin(), (*m).begin() + k);
+        set<gIndex> T_( (*m).begin(), (*m).begin() + k);
         
         // Calculate intersection for recall
         set<gIndex> V_intersec;
-        set_intersection(X.begin(), X.end(), T.begin(), T.end(), inserter(V_intersec, V_intersec.begin()));
+        set_intersection(X.begin(), X.end(), T_.begin(), T_.end(), inserter(V_intersec, V_intersec.begin()));
 
         cout << "\nIntersection size is:" << V_intersec.size();
-        cout << "\nT size is:" << T.size();
+        cout << "\nT size is:" << T_.size();
         
         // Calculate recall and add to total
         float recall = V_intersec.size() / ((float) X.size());
@@ -199,7 +204,11 @@ void results_Greedy(Graph<vector<float>> *G, int k, int L, vector<vector<gIndex>
 }
 
 
-void results_Filtered_Greedy(FilterGraph<vector<float>, float> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<vector<float>>& queries, vector<float>& queries_filters) {
+
+
+
+template <typename T, typename F>
+void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<T>& queries, vector<F>& queries_filters, map<F, gIndex>& MedoidMap) {
 
     // Initialize iterators
     auto m = groundtruth.begin();
@@ -217,24 +226,27 @@ void results_Filtered_Greedy(FilterGraph<vector<float>, float> *G, int k, int L,
         print_vector<float>(q);
         cout << "\n";
 
-        set<gIndex> X;
-        pair<set<gIndex>, set<gIndex>> res;
+        set<F> Fq = {*f}; // even with one element
 
+        set<T> Sf_q;
+        for (F filter: Fq) {
+            Sf_q.insert(G->get_vertex_from_index(MedoidMap[filter]));
+        }
 
-        // res = FilteredGreedySearch(*G, q, k, L, Fq);
-        X = res.first;
+        pair<set<gIndex>, set<gIndex>> res = FilteredGreedySearch(*G, Sf_q, q, k, L, Fq);
+        set<gIndex> X = res.first;
 
 
 
         // Get ground truth
-        set<gIndex> T( (*m).begin(), (*m).begin() + k);
+        set<gIndex> T_( (*m).begin(), (*m).begin() + k);
         
         // Calculate intersection for recall
         set<gIndex> V_intersec;
-        set_intersection(X.begin(), X.end(), T.begin(), T.end(), inserter(V_intersec, V_intersec.begin()));
+        set_intersection(X.begin(), X.end(), T_.begin(), T_.end(), inserter(V_intersec, V_intersec.begin()));
 
         cout << "\nIntersection size is:" << V_intersec.size();
-        cout << "\nT size is:" << T.size();
+        cout << "\nT size is:" << T_.size();
         
         // Calculate recall and add to total
         float recall = V_intersec.size() / ((float) X.size());
