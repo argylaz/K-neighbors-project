@@ -36,7 +36,7 @@ void write_to_bin(ofstream& groundtruth_file, vector<gIndex>& k_nearests){
 int main(void) {
 
     // Read queries from dummy-queries.bin
-    pair<vector<vector<float>>, vector<float>> queries_data = read_queries("sift/dummy-queries.bin", 10000, 100);  
+    pair<vector<vector<float>>, vector<float>> queries_data = read_queries("sift/dummy-queries.bin", 100, 100);  
     vector<vector<float>> queries = queries_data.first;
     vector<float> queries_filter = queries_data.second;
 
