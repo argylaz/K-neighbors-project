@@ -348,10 +348,11 @@ void test_graph_bin() {
     G1.add_edge(2, 3);
     G1.add_edge(3, 1);
     G1.add_edge(0, 3);
+    
+    TEST_ASSERT(G1.save_graph_to_bin("test"));
 
-    TEST_ASSERT(G1.save_graph_to_bin("./bin/test"));
-
-    TEST_ASSERT(G2.get_graph_from_bin("./bin/test"));
+    int dummy;
+    TEST_ASSERT(G2.get_graph_from_bin("test", dummy));
 
     TEST_ASSERT(G2.get_edge_count() == 5);
 

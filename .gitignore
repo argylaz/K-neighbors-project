@@ -6,6 +6,7 @@
 *.fvecs
 *.ivecs
 *.bin
+!sift/groundtruth.bin
 
 # Compiled Object files
 *.slo
@@ -38,3 +39,7 @@
 *.app
 /bin/*
 !/bin/*_graph.bin
+!/bin/*_medoid_map.bin
+
+/bin/test_graph.bin
+/bin/test_medoid_map.bin

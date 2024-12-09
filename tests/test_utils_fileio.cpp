@@ -1,4 +1,3 @@
-// #include "../lib/utils.hpp"			// Unit testing library
 #include "../lib/acutest.h"
 #include "../lib/file_io.hpp"
 
@@ -226,30 +225,52 @@ void test_isPositiveInteger() {
 
 void test_get_arguments() {
     
-    int argc = 11; 
-    float a = 2;    // Default Value
-    const char* argv[] = { "main",  "-f", "small", "-k", "2", "-r", "10", "-l", "10", "-a", "1.2"};
-    int k, L, R;
-    string base_name, query_name, groundtruth_name;
+    int argc = 13; 
+    float a;    // Non-Default Value
+    const char* argv[] = { "main",  "-f", "small", "-k", "2", "-R", "10", "-L", "10", "-a", "2", "-v", "filtered"};
+    int k, L, R, Rstitched;
+    string data_set, base_name, query_name, groundtruth_name, vamana_type;
 
-    TEST_ASSERT( get_arguments(argc, argv, k, L, a, R, base_name, query_name, groundtruth_name) == 1);
+    TEST_ASSERT( get_arguments(argc, argv, k, L, a, R, Rstitched, data_set, base_name, query_name, groundtruth_name, vamana_type) == 1);
 
     TEST_ASSERT(base_name == "sift/siftsmall_base.fvecs");
     TEST_ASSERT(query_name == "sift/siftsmall_query.fvecs");
     TEST_ASSERT(groundtruth_name == "sift/siftsmall_groundtruth.ivecs");
-    TEST_ASSERT(k == 2 && R == 10 && a == (float)1.2);
+    TEST_ASSERT(k == 2 && R == 10 && a == 2.0f);
 
 
-    int k1, L1, R1;
-    string base_name1, query_name1, groundtruth_name1;
-    float a1 = 2;  // Default value
-    const char* argv1[] = { "main",  "-k", "10", "-f", "large", "-l", "10", "-r", "10"};
-    argc = 9;
-    TEST_ASSERT(get_arguments(argc, argv1, k1, L1, a1, R1, base_name1, query_name1, groundtruth_name1));
+    int k1, L1, R1, Rstitched1;
+    string data_set1, base_name1, query_name1, groundtruth_name1, vamana_type1;
+    float a1;  // Default value
+    const char* argv1[] = { "main",  "-k", "40", "-v", "stitched", "-f", "large", "-L", "10", "-R", "20", "-Rst", "10"};
+    argc = 13;
+    TEST_ASSERT(get_arguments(argc, argv1, k1, L1, a1, R1, Rstitched1, data_set1, base_name1, query_name1, groundtruth_name1, vamana_type1));
     TEST_ASSERT(base_name1 == "sift/sift_base.fvecs");
     TEST_ASSERT(query_name1 == "sift/sift_query.fvecs");
     TEST_ASSERT(groundtruth_name1 == "sift/sift_groundtruth.ivecs");
-    TEST_ASSERT(k1 == 10 && R1 == 10 && a1 == 2);
+    TEST_ASSERT(k1 == 40 && R1 == 20 && a1 == 1.2f);
+
+    int k2, L2, R2, Rstitched2;
+    string data_set2, base_name2, query_name2, groundtruth_name2, vamana_type2;
+    float a2;  // Non-Default value
+    const char* argv2[] = { "main",  "-k", "20", "-a", "1.3", "-v", "stitched", "-f", "dummy", "-L", "10", "-R", "30", "-Rst", "10" };
+    argc = 15;
+    TEST_ASSERT(get_arguments(argc, argv2, k2, L2, a2, R2, Rstitched2, data_set2, base_name2, query_name2, groundtruth_name2, vamana_type2));
+    TEST_ASSERT(base_name2 == "sift/dummy-data.bin");
+    TEST_ASSERT(query_name2 == "sift/dummy-queries.bin");
+    TEST_ASSERT(groundtruth_name2 == "sift/groundtruth.bin");
+    TEST_ASSERT(k2 == 20 && R2 == 30 && a2 == 1.3f);
+
+    int k3, L3, R3, Rstitched3;
+    string data_set3, base_name3, query_name3, groundtruth_name3, vamana_type3;
+    float a3;  // Default value
+    const char* argv3[] = { "main",  "-k", "50", "-v", "simple", "-f", "small", "-L", "10", "-R", "100"};
+    argc = 11;
+    TEST_ASSERT(get_arguments(argc, argv3, k3, L3, a3, R3, Rstitched3, data_set3, base_name3, query_name3, groundtruth_name3, vamana_type3));
+    TEST_ASSERT(base_name3 == "sift/siftsmall_base.fvecs");
+    TEST_ASSERT(query_name3 == "sift/siftsmall_query.fvecs");
+    TEST_ASSERT(groundtruth_name3 == "sift/siftsmall_groundtruth.ivecs");
+    TEST_ASSERT(k3 == 50 && R3 == 100 && a3 == 1.2f);
 
 }
 
@@ -332,6 +353,78 @@ void test_ivec_to_graph() {
     TEST_ASSERT(l->at(0).at(0) == 7 && l->at(0).at(1) == 8 && l->at(0).at(2) == 9 && l->size() == 1);
 }
 
+void test_read_queries() {
+    // Create vector of vectors with data
+    vector<vector<float>> vectors = { 
+    /*  | C   |  F  |  T  |  T  | Data */
+        {0.0f, 1.0f, 0.0f, 0.0f, 0.0f},                   // second entry is always 0 (timestamp that is ignored)
+        {0.0f, 4.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f, 2.0f},
+        {0.0f, 1.0f, 0.0f, 0.0f, 3.0f},
+        {0.0f, 1.0f, 0.0f, 0.0f, 4.0f},
+        {0.0f, 1.0f, 0.0f, 0.0f, 5.0f},
+        {0.0f, 2.0f, 0.0f, 0.0f, 6.0f},
+        {0.0f, 2.0f, 0.0f, 0.0f, 7.0f},
+        {0.0f, 3.0f, 0.0f, 0.0f, 8.0f},
+        {0.0f, 3.0f, 0.0f, 0.0f, 9.0f},
+        {0.0f,-1.0f, 0.0f, 0.0f, 10.0f},
+    };
+
+    /* Create a .bin file with the expected format */
+    try {
+        make_queries<float>("sift/test_data.bin", vectors);
+    } catch (const exception& e) {
+        cerr << "Error: " << e.what() << '\n';
+    }
+
+
+    // Call read_queries and get returned values
+    cout << "Before reading data" << endl;
+    pair<vector<vector<float>>, vector<float>> p = read_queries("sift/test_data.bin", 11, 1);
+    vector<vector<float>> v = p.first;
+    vector<float> f = p.second;
+    cout << "After reading data" << endl;
+
+
+    // Check that the values were read properly
+    TEST_ASSERT(v[0][0] == 0.0f);  TEST_ASSERT(f[0] == 1.0);
+    TEST_ASSERT(v[1][0] == 1.0f);  TEST_ASSERT(f[1] == 4.0);
+    TEST_ASSERT(v[2][0] == 2.0f);  TEST_ASSERT(f[2] == 0.0);
+    TEST_ASSERT(v[3][0] == 3.0f);  TEST_ASSERT(f[3] == 1.0);
+    TEST_ASSERT(v[4][0] == 4.0f);  TEST_ASSERT(f[4] == 1.0);
+    TEST_ASSERT(v[5][0] == 5.0f);  TEST_ASSERT(f[5] == 1.0);
+    TEST_ASSERT(v[6][0] == 6.0f);  TEST_ASSERT(f[6] == 2.0);
+    TEST_ASSERT(v[7][0] == 7.0f);  TEST_ASSERT(f[7] == 2.0);
+    TEST_ASSERT(v[8][0] == 8.0f);  TEST_ASSERT(f[8] == 3.0);
+    TEST_ASSERT(v[9][0] == 9.0f);  TEST_ASSERT(f[9] == 3.0);
+    TEST_ASSERT(v[10][0] == 10.0f); TEST_ASSERT(f[10] == -1.0);
+}
+
+
+
+
+void test_medoid_map_bin() {
+    
+
+    map<float, int> medoid_map;
+    medoid_map[1.5] = 10;
+    medoid_map[2.5] = 20;
+    medoid_map[3.5] = 30;
+    medoid_map[4.5] = 40;
+    
+    TEST_ASSERT(save_medoid_map_to_bin("test", medoid_map));
+
+    
+    map<float, int> medoid_map_res;
+    TEST_ASSERT(get_medoid_map_from_bin("test", medoid_map_res));
+    TEST_ASSERT( medoid_map_res.size() == 4 );
+    TEST_ASSERT( medoid_map_res[1.5] == 10 );
+    TEST_ASSERT( medoid_map_res[2.5] == 20 );
+    TEST_ASSERT( medoid_map_res[3.5] == 30 );
+    TEST_ASSERT( medoid_map_res[4.5] == 40 );
+
+}
+
 
 // List of all tests to be executed
 TEST_LIST = {
@@ -344,5 +437,10 @@ TEST_LIST = {
     { "get_arguments", test_get_arguments},
     { "fvec to graph", test_fvec_to_graph },
     { "ivec to graph", test_ivec_to_graph },
+    { "read queries", test_read_queries},
+    { "read medoid map_bin", test_medoid_map_bin},
     { NULL, NULL }
 };
+
+
+

@@ -58,10 +58,10 @@ public:
     inline set<T> get_vertices() const;
 
     /* Method to save the adjacency list of the graph in a file <prefix>_graph.bin */
-    bool save_graph_to_bin(string file_prefix);
+    bool save_graph_to_bin(string file_prefix, gIndex medoid_index = -1);
 
     /* Method to get the adjacency list of the graph from a file <prefix>_graph.bin */
-    bool get_graph_from_bin(string file_prefix);
+    bool get_graph_from_bin(string file_prefix, T& medoid);
 
 
 protected:
@@ -376,16 +376,24 @@ inline set<T> Graph<T>::get_vertices() const {
 
 
 
-/* Method to get the adjacency list of the graph from a file <prefix>_graph.bin */
+/* Method to get the adjacency list of the graph from a file <prefix>_graph.bin.
+Medoid is a dummy variable for algorithms with filters.
+If the file exists, the method adds the edges to the current graph*/
 template <typename T>
-bool Graph<T>::get_graph_from_bin(string file_prefix) {
-    string filename = file_prefix + "_graph.bin";
+bool Graph<T>::get_graph_from_bin(string file_prefix, T& medoid) {
+    string filename = "./bin/" + file_prefix + "_graph.bin";
 
     // Create/Open file filename_graph.bin
     ifstream file(filename, ios::binary);
     if (!file) {
-        cerr << "Error opening file for reading!" << endl;
+        cerr << "Could not find existing graph file to recreate with prefix " << file_prefix << endl;
         return false;
+    }
+
+    gIndex medoid_index;
+    file.read(reinterpret_cast<char*>(&medoid_index), sizeof(medoid_index));
+    if (medoid_index != -1) {
+        medoid = this->get_vertex_from_index(medoid_index);
     }
 
     // For each vertex of the graph
@@ -407,10 +415,10 @@ bool Graph<T>::get_graph_from_bin(string file_prefix) {
 
 
 
-/* Method to save the adjacency list of the graph in a file <prefix>_graph.bin */
+/* Method to save the adjacency list of the graph in a file <prefix>_graph.bin, (and its medoid if needed) */
 template <typename T>
-bool Graph<T>::save_graph_to_bin(string file_prefix) {
-    string filename = file_prefix + "_graph.bin";
+bool Graph<T>::save_graph_to_bin(string file_prefix, gIndex medoid_index ) {
+    string filename = "./bin/" + file_prefix + "_graph.bin";
 
     // Create/Open file filename_graph.bin
     ofstream file(filename, ios::binary);
@@ -418,6 +426,8 @@ bool Graph<T>::save_graph_to_bin(string file_prefix) {
         cerr << "Error opening file for writing!" << endl;
         return false;
     }
+
+    file.write(reinterpret_cast<const char*>(&medoid_index), sizeof(medoid_index));
 
     // For each vertex of the graph
     for (T vertex: vertices) {
