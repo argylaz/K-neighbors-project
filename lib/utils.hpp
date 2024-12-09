@@ -176,9 +176,9 @@ vector<Type> medoid(Graph<vector<Type>>& G){
     }
 
     // Print the medoid
-    cout << "Medoid point ";  
-    print_vector(medoid_vertice);
-    cout << "\nFound at index " << G.get_index_from_vertex(medoid_vertice) << endl;
+    // cout << "Medoid point ";  
+    // print_vector(medoid_vertice);
+    // cout << "\nFound at index " << G.get_index_from_vertex(medoid_vertice) << endl;
 
     return medoid_vertice;
 }
