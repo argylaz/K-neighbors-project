@@ -35,8 +35,8 @@ int main(int argc, char* argv[]) {
 
     int k, L, R, Rstitched;
     float a = 1.2;    // Default value 
-    string data_set, base_name, query_name, groundtruth_name, vamana_type; // get arguments figures out the correct dataset files
-    if ( !get_arguments(argc, (const char**)argv, k, L, a, R, Rstitched, data_set, base_name, query_name, groundtruth_name, vamana_type) ) {
+    string data_set, base_name, query_name, groundtruth_name, vamana_type, execution_direction; // get arguments figures out the correct dataset files
+    if ( !get_arguments(argc, (const char**)argv, k, L, a, R, Rstitched, data_set, base_name, query_name, groundtruth_name, vamana_type, execution_direction) ) {
         return -1;
     }
 
@@ -76,6 +76,11 @@ int main(int argc, char* argv[]) {
         
         cout << "Graph has " << G->get_edge_count() << " edges\n\n"; 
 
+        // If the execution direction is create, terminate the program before calling GreedySearch for the queries  
+        if( execution_direction == "create" ){
+            delete G;
+            return 0;
+        }
 
         results_Greedy<vector<float>>(G, k, L, groundtruth, queries, medoid);
 
@@ -139,6 +144,14 @@ int main(int argc, char* argv[]) {
             if ( !save_medoid_map_to_bin<float>(prefix, MedoidMap) ){
                 cerr << "ERROR: Can't save Medoid Map to _medoid_map.bin file\n";
             }
+
+
+            // If the execution direction is create, terminate the program before calling GreedySearch for the queries  
+            if( execution_direction == "create" ){
+                delete G;
+                return 0;
+            }
+
             
             
             
@@ -234,13 +247,16 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
     cout << "Queries Size " << queries.size() << endl;
 
     // Calculate and print recall for given queries
+    float total_recall_filtered = 0.0f;
+    float total_recall_unfiltered = 0.0f;
     float total_recall = 0.0f;
-    int count = 0;
+    int count_unfiltered = 0;
+    int count_filtered = 0;
     while ( m != groundtruth.end() && n != queries.end() && f != queries_filters.end()) {
         // For each query
         vector<float> q = *n;
         
-        cout << "\nQuery no." << count + 1<< endl;
+        cout << "\nQuery no." << count_filtered + count_unfiltered + 1<< endl;
         // print_vector<float>(q);
         // cout << "\n";
 
@@ -252,8 +268,15 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
 
         set<T> Sf_q;
         for (F filter: Fq) {
-            Sf_q.insert(G->get_vertex_from_index(MedoidMap[filter]));
-            // cout << "filter Fq " << filter;
+            
+            if (*f == -1.0f ) {
+                set<T> starting = {G->get_vertex_from_index(MedoidMap[filter])};
+                set<F> temp_filter = {filter};
+                auto res = FilteredGreedySearch(*G, starting, q, 1, L, temp_filter);
+                Sf_q.insert(G->get_vertex_from_index(*(res.first.begin())));
+            } else {
+                Sf_q.insert(G->get_vertex_from_index(MedoidMap[filter]));
+            }
         }
         
         cout << "\nk " << k << endl;
@@ -262,8 +285,8 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
 
         // GreedySearch(*G, medoid, q, k, L);
         pair<set<gIndex>, set<gIndex>> res = FilteredGreedySearch(*G, Sf_q, q, k, L, Fq);
+        
         set<gIndex> X = res.first;
-
 
 
         // Get ground truth
@@ -273,18 +296,21 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
         set<gIndex> V_intersec;
         set_intersection(X.begin(), X.end(), T_.begin(), T_.end(), inserter(V_intersec, V_intersec.begin()));
 
-        // cout << "\nIntersection size is:" << V_intersec.size();
-        // cout << "\nX size is:" << X.size();
-        // cout << "\nT size is:" << T_.size();
-
         // Calculate recall and add to total
         float recall = 0;     
         if( X.size() > 0 )
             recall = (float)V_intersec.size() / ((float) X.size());
         
         cout << "\nRecall is: " << recall << endl;
-        total_recall += recall;
-        count++;
+        if(*f == -1){
+            total_recall_unfiltered += recall;
+            count_unfiltered++;
+        }
+        else{
+            total_recall_filtered += recall;
+            count_filtered++;
+        }
+        // count++;
 
         // Calculate speciificity and print
         float specificity = (float)G->get_filter_count(*f) / ((float)G->get_vertices_count());
@@ -297,7 +323,15 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
 
     // G->print_graph();
     
-    total_recall = total_recall / count;
+    total_recall_filtered = total_recall_filtered / count_filtered;
+    cout << "\nTotal Recall for filtered is " << total_recall_filtered * 100 <<"%\n" << endl;
+    cout << "From " << count_filtered << " filtered queries" << endl;
+
+    total_recall_unfiltered = total_recall_unfiltered / count_unfiltered;
+    cout << "\nTotal Recall for unfiltered is " << total_recall_unfiltered * 100 <<"%\n" << endl;
+    cout << "From " << count_unfiltered << " unfiltered queries" << endl;
+
+    total_recall = (count_filtered * total_recall_filtered + count_unfiltered*total_recall_unfiltered) / (count_filtered + count_unfiltered);
     cout << "\nTotal Recall is " << total_recall * 100 <<"%\n" << endl;
     
     cout << "Filters in the Graph\n";
@@ -307,5 +341,8 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
         // G->get_filter_count(f);
     // }
 
-    
+    cout << "edges: "<< G->get_edge_count()<< endl;
+
+
+
 }

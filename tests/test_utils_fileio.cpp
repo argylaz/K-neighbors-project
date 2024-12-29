@@ -225,50 +225,54 @@ void test_isPositiveInteger() {
 
 void test_get_arguments() {
     
-    int argc = 13; 
+    int argc = 15; 
     float a;    // Non-Default Value
-    const char* argv[] = { "main",  "-f", "small", "-k", "2", "-R", "10", "-L", "10", "-a", "2", "-v", "filtered"};
+    const char* argv[] = { "main",  "-f", "small", "-k", "2", "-R", "10", "-L", "10", "-a", "2","-x", "run", "-v", "filtered"};
     int k, L, R, Rstitched;
-    string data_set, base_name, query_name, groundtruth_name, vamana_type;
+    string data_set, base_name, query_name, groundtruth_name, vamana_type, execution_direction;
 
-    TEST_ASSERT( get_arguments(argc, argv, k, L, a, R, Rstitched, data_set, base_name, query_name, groundtruth_name, vamana_type) == 1);
+    TEST_ASSERT( get_arguments(argc, argv, k, L, a, R, Rstitched, data_set, base_name, query_name, groundtruth_name, vamana_type, execution_direction) == 1);
 
     TEST_ASSERT(base_name == "sift/siftsmall_base.fvecs");
     TEST_ASSERT(query_name == "sift/siftsmall_query.fvecs");
     TEST_ASSERT(groundtruth_name == "sift/siftsmall_groundtruth.ivecs");
+    TEST_ASSERT(execution_direction == "run");
     TEST_ASSERT(k == 2 && R == 10 && a == 2.0f);
 
 
     int k1, L1, R1, Rstitched1;
-    string data_set1, base_name1, query_name1, groundtruth_name1, vamana_type1;
+    string data_set1, base_name1, query_name1, groundtruth_name1, vamana_type1, execution_direction1;
     float a1;  // Default value
-    const char* argv1[] = { "main",  "-k", "40", "-v", "stitched", "-f", "large", "-L", "10", "-R", "20", "-Rst", "10"};
-    argc = 13;
-    TEST_ASSERT(get_arguments(argc, argv1, k1, L1, a1, R1, Rstitched1, data_set1, base_name1, query_name1, groundtruth_name1, vamana_type1));
+    const char* argv1[] = { "main",  "-k", "40", "-v", "stitched", "-f", "large", "-L", "10", "-R", "20","-x", "create", "-Rst", "10"};
+    argc = 15;
+    TEST_ASSERT(get_arguments(argc, argv1, k1, L1, a1, R1, Rstitched1, data_set1, base_name1, query_name1, groundtruth_name1, vamana_type1, execution_direction1));
     TEST_ASSERT(base_name1 == "sift/sift_base.fvecs");
     TEST_ASSERT(query_name1 == "sift/sift_query.fvecs");
+    TEST_ASSERT(execution_direction1 == "create");
     TEST_ASSERT(groundtruth_name1 == "sift/sift_groundtruth.ivecs");
     TEST_ASSERT(k1 == 40 && R1 == 20 && a1 == 1.2f);
 
     int k2, L2, R2, Rstitched2;
-    string data_set2, base_name2, query_name2, groundtruth_name2, vamana_type2;
+    string data_set2, base_name2, query_name2, groundtruth_name2, vamana_type2, execution_direction2;
     float a2;  // Non-Default value
-    const char* argv2[] = { "main",  "-k", "20", "-a", "1.3", "-v", "stitched", "-f", "dummy", "-L", "10", "-R", "30", "-Rst", "10" };
-    argc = 15;
-    TEST_ASSERT(get_arguments(argc, argv2, k2, L2, a2, R2, Rstitched2, data_set2, base_name2, query_name2, groundtruth_name2, vamana_type2));
+    const char* argv2[] = { "main",  "-k", "20", "-a", "1.3", "-v", "stitched", "-f", "dummy", "-L", "10", "-R", "30", "-Rst", "10", "-x", "create" };
+    argc = 17;
+    TEST_ASSERT(get_arguments(argc, argv2, k2, L2, a2, R2, Rstitched2, data_set2, base_name2, query_name2, groundtruth_name2, vamana_type2, execution_direction2));
     TEST_ASSERT(base_name2 == "sift/dummy-data.bin");
     TEST_ASSERT(query_name2 == "sift/dummy-queries.bin");
     TEST_ASSERT(groundtruth_name2 == "sift/groundtruth.bin");
+    TEST_ASSERT(execution_direction2 == "create");
     TEST_ASSERT(k2 == 20 && R2 == 30 && a2 == 1.3f);
 
     int k3, L3, R3, Rstitched3;
-    string data_set3, base_name3, query_name3, groundtruth_name3, vamana_type3;
+    string data_set3, base_name3, query_name3, groundtruth_name3, vamana_type3, execution_direction3;
     float a3;  // Default value
-    const char* argv3[] = { "main",  "-k", "50", "-v", "simple", "-f", "small", "-L", "10", "-R", "100"};
-    argc = 11;
-    TEST_ASSERT(get_arguments(argc, argv3, k3, L3, a3, R3, Rstitched3, data_set3, base_name3, query_name3, groundtruth_name3, vamana_type3));
+    const char* argv3[] = { "main",  "-k", "50", "-v", "simple", "-f", "small", "-x", "run", "-L", "10", "-R", "100"};
+    argc = 13;
+    TEST_ASSERT(get_arguments(argc, argv3, k3, L3, a3, R3, Rstitched3, data_set3, base_name3, query_name3, groundtruth_name3, vamana_type3, execution_direction3));
     TEST_ASSERT(base_name3 == "sift/siftsmall_base.fvecs");
     TEST_ASSERT(query_name3 == "sift/siftsmall_query.fvecs");
+    TEST_ASSERT(execution_direction3 == "run");
     TEST_ASSERT(groundtruth_name3 == "sift/siftsmall_groundtruth.ivecs");
     TEST_ASSERT(k3 == 50 && R3 == 100 && a3 == 1.2f);
 

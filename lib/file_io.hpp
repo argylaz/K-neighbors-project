@@ -3,7 +3,7 @@
 // #include <bits/stdc++.h>
 #include "utils.hpp"
 
-#define MAX_ARGS 15
+#define MAX_ARGS 17
 
 using namespace std;
 
@@ -27,7 +27,7 @@ set<vector<Type>> read_sets(string& filename);
 
 
 // Function that reads the command line input arguments. Returns 1 or -1
-bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R, int& Rstitched, string& data_set, string& base_name, string& query_name, string& groundtruth_name, string& vamana_type);
+bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R, int& Rstitched, string& data_set, string& base_name, string& query_name, string& groundtruth_name, string& vamana_type, string& execution_direction);
 
 
 // Helper method to check file extention
@@ -229,7 +229,7 @@ set<vector<Type>> read_sets(string& filename) {
 
 
 // Function that reads the command line input arguments. Returns 1 or -1
-bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R, int& Rstitched, string& data_set, string& base_name, string& query_name, string& groundtruth_name, string& vamana_type) {
+bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& R, int& Rstitched, string& data_set, string& base_name, string& query_name, string& groundtruth_name, string& vamana_type, string& execution_direction) {
     // We need at least 8 arguments (Filename, vamana_type, k, L, R and maybe a and Rstitched if we use StitchedVamana)
     
     if (!(argc == MAX_ARGS || argc == MAX_ARGS - 2 || argc == MAX_ARGS - 4)) {     
@@ -305,13 +305,13 @@ bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& 
         groundtruth_name = "sift/groundtruth.bin";
     }
     else if (data_set == "contest1m") {
-        base_name =  "contest-data-release-1m.bin";
-        query_name = "contest-queries-release-1m.bin";
+        base_name =  "sift/contest-data-release-1m.bin";
+        query_name = "sift/contest-queries-release-1m.bin";
         groundtruth_name = "sift/groundtruth1m.bin";
     }
     else if (data_set == "contest10m") {
-        base_name =  "contest-data-release-10m.bin";
-        query_name = "contest-queries-release-10m.bin";
+        base_name =  "sift/contest-data-release-10m.bin";
+        query_name = "sift/contest-queries-release-10m.bin";
         groundtruth_name = "sift/groundtruth10m.bin";
     }
     else {
@@ -385,6 +385,28 @@ bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& 
         return false;
     }
 
+    // Get x argument
+    // int x;
+    const char *tempX;
+    arg_found = false;
+    for (int i = 1; i <= final_flag; i += 2) {
+        if (!strcmp(argv[i], "-x")) {
+            tempX = argv[i + 1];
+            arg_found = true;
+        }
+    }
+    if (!arg_found) {
+        cerr << "ERROR: Should include the x command line argument like \"-x x_argument\"\n";
+        return false;
+    }
+
+    // R = atoi(tempR);
+    if ( strcmp(tempX,"create") != 0 && strcmp(tempX,"run")!= 0 && strcmp(tempX,"default")!= 0) {
+        cerr << "ERROR: X argument should be a either create or run\n";
+        return false;
+    }
+
+    execution_direction = string(tempX);
 
     // Get optional A argument
     // float a;

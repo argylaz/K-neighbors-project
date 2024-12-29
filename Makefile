@@ -41,23 +41,48 @@ $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
 $(BIN_DIR)/%: $(BUILD_DIR)/%.o
 	$(CC) $(CFLAGS) -o $@ $<
 
+
+# Rule to create the simple Vamana Graph
+create_simple: 
+
+
+# Rule to create the Filtered Vamana Graph
+create_filtered:
+
+
+# Rule to create the Stitched Vamana Graph
+create_stitched:
+
+create_simple: clean
+	$(CC) $(CFLAGS) -o bin/main main.cpp
+	time ./bin/main  -f small -k 100 -L 120 -R 30 -a 1.2 -v simple -x create
+
+create_filtered: clean
+	$(CC) $(CFLAGS) -o bin/main main.cpp
+	time ./bin/main  -f dummy -k 100 -L 150 -R 42 -a 1.2 -v filtered -x create
+
+
+create_stitched: clean
+	$(CC) $(CFLAGS) -o bin/main main.cpp
+	time ./bin/main  -f dummy -k 100 -L 150 -R 42 -a 1.2 -v stitched -Rst 96 -x create
+
+
 run_simple: clean
 	$(CC) $(CFLAGS) -o bin/main main.cpp
-	time ./bin/main  -f small -k 100 -L 120 -R 30 -a 1.2 -v simple
+	time ./bin/main  -f small -k 100 -L 120 -R 30 -a 1.2 -v simple -x run
 
 run_filtered: clean
 	$(CC) $(CFLAGS) -o bin/main main.cpp
-	time ./bin/main  -f dummy -k 100 -L 150 -R 42 -a 1.2 -v filtered 
-
+	time ./bin/main  -f dummy -k 100 -L 150 -R 42 -a 1.2 -v filtered -x run
 
 run_stitched: clean
 	$(CC) $(CFLAGS) -o bin/main main.cpp
-	time ./bin/main  -f dummy -k 100 -L 150 -R 42 -a 1.2 -v stitched -Rst 96
+	time ./bin/main  -f dummy -k 100 -L 150 -R 42 -a 1.2 -v stitched -Rst 96 -x run
 
 
 run: clean
 	$(CC) $(CFLAGS) -o bin/main main.cpp
-	time ./bin/main  -f dummy -k 100 -L 120 -R 30 -a 1.2 -v filtered 
+	time ./bin/main  -f dummy -k 100 -L 120 -R 30 -a 1.2 -v filtered -x default
 # time ./bin/main  -f dummy -k 50 -L 60 -R 30 -a 1.2 -v stitched -Rst 2
 # time ./bin/main  -f small -k 100 -L 120 -R 30 -a 1.2 -v simple
 
