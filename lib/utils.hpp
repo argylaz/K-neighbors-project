@@ -188,10 +188,10 @@ vector<Type> medoid(Graph<vector<Type>>& G){
 /* Method which adds randomly exactly R outgoing neighbors to each vertex of the graph */
 template <typename T>
 void rDirectional(Graph<T>& G, int R) {
-    
+    const long int vertex_count = G.get_vertices_count();
     
     // Check if R is larger than the number of vertices (task impossible)
-    if ( R > G.get_vertices_count() ) {
+    if ( R > vertex_count ) {
         cerr << "R-Directional Graph initialization failed...\n" << endl;
         return;
     }
@@ -209,33 +209,28 @@ void rDirectional(Graph<T>& G, int R) {
                 G.remove_edge(vertex, G.get_vertex_from_index(neighborIndex));
             }
         }
-        
     }
 
+    // Random number generator setup
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    default_random_engine rng(seed);
+    uniform_int_distribution<int> dist(0, vertex_count - 1);
+
     // For each vertex of the graph
-    for ( T v : vertices ) {
-        
-        // Create a vector with all the elements of the graph
-        vector<T> shuffled_vertices(vertices.begin(), vertices.end());
-
-        // To obtain a time-based seed 
-        unsigned seed = chrono::system_clock::now().time_since_epoch().count();
-        
-        // Shuffle the vector 
-        shuffle(shuffled_vertices.begin(), shuffled_vertices.end(), default_random_engine(seed));
-
+    for (T v : vertices) {
+        unordered_set<T> chosen_neighbors; // Track selected neighbors to ensure no duplicates
 
         // Add R random outgoing neighbors
-        int i = 0;
-        int count = 0;
-        while ( count < R ) {
-            if ( shuffled_vertices[i] != v ) {
-                G.add_edge(v, shuffled_vertices[i]);  
-                count++;  
-            }
-            i++;
-        }
+        while (chosen_neighbors.size() < static_cast<size_t>(R)) {
+            auto it = vertices.begin();
+            advance(it, dist(rng)); // Get a random vertex
+            T random_neighbor = *it;
 
+            // Ensure the random neighbor is not the current vertex and hasn't been chosen already
+            if (random_neighbor != v && chosen_neighbors.insert(random_neighbor).second) {
+                G.add_edge(v, random_neighbor); // Add edge
+            }
+        }
     }
 
 }
