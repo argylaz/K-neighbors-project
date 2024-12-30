@@ -218,18 +218,17 @@ void rDirectional(Graph<T>& G, int R) {
 
     // For each vertex of the graph
     for (T v : vertices) {
-        unordered_set<T> chosen_neighbors; // Track selected neighbors to ensure no duplicates
+        gIndex v_index = G.get_index_from_vertex(v); // Get the index of the current vertex
+        unordered_set<gIndex> chosen_neighbors; // Track selected neighbors to ensure no duplicates
 
         // Add R random outgoing neighbors
         while (chosen_neighbors.size() < static_cast<size_t>(R)) {
-            auto it = vertices.begin();
-            advance(it, dist(rng)); // Get a random vertex
-            T random_neighbor = *it;
+            gIndex random_index = dist(rng) % G.get_vertices_count(); // Get a random index
 
             // Ensure the random neighbor is not the current vertex and hasn't been chosen already
-            if (random_neighbor != v && chosen_neighbors.insert(random_neighbor).second) {
-                G.add_edge(v, random_neighbor); // Add edge
-            }
+            if (random_index != v_index && chosen_neighbors.insert(random_index).second) {
+                G.add_edge(v, G.get_vertex_from_index(random_index)); // Add edge using indices
+            }   
         }
     }
 
