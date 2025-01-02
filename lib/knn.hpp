@@ -558,6 +558,10 @@ map<F, gIndex> FindMedoid(FilterGraph<T, F>& G,  int threshold) {
     map<gIndex, int> T_;               // Zero map T is intended as a counter
 
     set<T> vertices = G.get_vertices();
+
+    // Initialising random number generator
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    default_random_engine rng(seed);
  
     // For each filter in the set
     for ( F filter : Filters ) {
@@ -574,31 +578,29 @@ map<F, gIndex> FindMedoid(FilterGraph<T, F>& G,  int threshold) {
                 Pf.push_back(G.get_index_from_vertex(vertex));
             }   
         }
+
+        // If Pf is empty, skip this filter
+        if (Pf.empty()) {
+            continue;
+        }
         
+        // Maximum threshold value should be he size of Pf
+        threshold = min(threshold, static_cast<int>(Pf.size()));
 
-        // To do :: Check for optimization
-        // Let Rf <- threshold randomly sampled data point ids from Pf        
-        // Create a vector with all the elements of Pf
-        vector<gIndex> temp_vector = vector<gIndex>(Pf);
+        // Randomly sample `threshold` unique elements from Pf
+        unordered_set<int> selected_indices;
+        vector<gIndex> Rf;
+        uniform_int_distribution<int> dist(0, Pf.size() - 1);
 
-        // To obtain a time-based seed 
-        unsigned seed = chrono::system_clock::now().time_since_epoch().count();
-        
-        // Shuffle the temp vector Pf
-        shuffle(temp_vector.begin(), temp_vector.end(), default_random_engine(seed));
-
-
-        if ( (size_t) threshold >= temp_vector.size() ) {
-            threshold = temp_vector.size();
+        while (Rf.size() < static_cast<size_t>(threshold)) {
+            int random_index = dist(rng);
+            if (selected_indices.insert(random_index).second) {
+                Rf.push_back(Pf[random_index]);
+            }
         }
 
-        // Keep the first threshold items of the shuffled vector
-        vector<gIndex> Rf(temp_vector.begin(), temp_vector.begin() + threshold);
-
         // Finding p_min point, where p_min is min{T[p], for each p in Rf};
-        gIndex p_min_index;
-
-        p_min_index = Rf[0];
+        gIndex p_min_index = Rf[0];
         for ( size_t i = 1 ; i < Rf.size() ; i++ ) {
             if ( T_[Rf[i]] < T_[p_min_index] ) {
                 p_min_index = Rf[i];
