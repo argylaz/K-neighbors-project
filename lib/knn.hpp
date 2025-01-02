@@ -640,55 +640,80 @@ set<T> get_nodes_from_gIndex_map(FilterGraph<T, F>& G, map<F, gIndex> M){
 template <typename T, typename F>
 void StichedVamana(FilterGraph<T, F>& G, int Lsmall, int Rsmall, int Rstiched, float a) {
 
-    // int n = G.get_vertices_count();
-    // set<gIndex> V;
-
     set<F> filters = G.get_filters_set();
-    // int filter_count = filters.size();
-
     set<T> vertices = G.get_vertices();
 
     map<F, Graph<T>*> Gf;
+    mutex graph_mutex;
 
-    Graph<T>* graph_f;
-
-    for (F filter: filters) {
-
-        // Getting the set Pf of points matching filter f
+    // Lambda for asynchronous subgraphs construction
+    auto process_filter = [&](const F& filter) {
+        // Getting the vertices that have the filter
         vector<gIndex> Pf;
-        for (T vertex : vertices) {
+        for (const T& vertex : vertices) {
             set<F> Fx = G.get_filters(G.get_index_from_vertex(vertex));
-            
             if (Fx.find(filter) != Fx.end()) {
                 Pf.push_back(G.get_index_from_vertex(vertex));
             }
         }
-        // print_vector(Pf);
 
-        // Creating the subgraph Gf with the points of Pf and running Vamana algorithm for them
-        graph_f = new Graph<T>;
-        for (gIndex i: Pf) {
+        // Creating the subgraph
+        Graph<T>* graph_f = new Graph<T>;
+        for (gIndex i : Pf) {
             graph_f->add_vertex(G.get_vertex_from_index(i));
         }
 
+        // Running Vamana Indexing Algorithm on the subgraph
         Vamana(*graph_f, Lsmall, Rsmall, a);
 
-        Gf.insert({filter, graph_f});
+        // Critical area for adding the subgraph to the shared map
+        {
+            lock_guard<mutex> lock(graph_mutex);
+            Gf[filter] = graph_f;
+        }
+    };
+
+    // Parallelize subgraph construction
+    vector<thread> threads;
+    for (const F& filter : filters) {
+        threads.emplace_back(process_filter, filter);
     }
 
-    // Merging the Gf subgraphs into G (adding the edges of all )
-    for (F filter: filters) {
+    // Join all threads
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
+    // // Merging the Gf subgraphs into G (adding the edges of all )
+    // for (F filter: filters) {
         
-        // Copying all edges of Gf to G
+    //     // Copying all edges of Gf to G
+    //     set<T> gf_vertices = Gf[filter]->get_vertices();
+    //     for (T gf_vertex: gf_vertices) {
+    //         vector<gIndex> gf_neighbor_indices = Gf[filter]->get_neighbors(gf_vertex);
+    //         for (gIndex gf_neighbor_index: gf_neighbor_indices) {
+    //             T neighbor = Gf[filter]->get_vertex_from_index(gf_neighbor_index);
+    //             G.add_edge(gf_vertex, neighbor);
+    //         }
+    //     }
+
+    //     delete Gf[filter];
+    // }
+
+    // Merging the Gf subgraphs into G
+    for (const F& filter : filters) {
         set<T> gf_vertices = Gf[filter]->get_vertices();
-        for (T gf_vertex: gf_vertices) {
+        for (const T& gf_vertex : gf_vertices) {
             vector<gIndex> gf_neighbor_indices = Gf[filter]->get_neighbors(gf_vertex);
-            for (gIndex gf_neighbor_index: gf_neighbor_indices) {
+            for (gIndex gf_neighbor_index : gf_neighbor_indices) {
                 T neighbor = Gf[filter]->get_vertex_from_index(gf_neighbor_index);
-                G.add_edge(gf_vertex, neighbor);
+                // Technically, this is a critical area, but it is not necessary to lock it
+                {
+                    std::lock_guard<std::mutex> lock(graph_mutex);
+                    G.add_edge(gf_vertex, neighbor);
+                }
             }
         }
-
         delete Gf[filter];
     }
 
@@ -698,7 +723,4 @@ void StichedVamana(FilterGraph<T, F>& G, int Lsmall, int Rsmall, int Rstiched, f
         set<gIndex> Nout(neighbor_indices.begin(), neighbor_indices.end());
         FilteredRobustPrune<T, F>(G, vertex, Nout, a, Rstiched);
     }
-
-    // G.print_graph();
-
 }
