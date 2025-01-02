@@ -3,7 +3,7 @@
 CC = g++
 
 # Flags
-CFLAGS = -Wall -g -O3
+CFLAGS = -Wall -g -O3 -std=c++17 -pthread
 
 
 # Directories

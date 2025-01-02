@@ -2,6 +2,9 @@
 #include <ctype.h>
 #include <string.h>
 
+#include <thread>
+#include <mutex>
+
 #include "./graph.hpp"
 
 
@@ -157,22 +160,51 @@ vector<Type> medoid(Graph<vector<Type>>& G){
         return {};  // Returns an empty vector
     }
 
-    // Iterate through all the vertices of the graph(dataset)
+    // Get the vertices
     set<vector<Type>> vertices = G.get_vertices();
-    for (vector<Type> vertex : vertices) {
+    vector<vector<Type>> vertex_list(vertices.begin(), vertices.end());
+    int n = vertex_list.size();
 
-        // Calculate the sum of the Euclidean Distances of this vertex with all the others 
-        float sum = 0;
-        for (vector<Type> x : vertices) {
-            sum += Euclidean_Distance<Type>(vertex, x);
+    // Thread function to compute the sum for a range of vertices
+    auto compute_sum = [&](int start, int end, float& local_min, vector<Type>& local_medoid) {
+        for (int i = start; i < end; ++i) {
+            float sum = 0;
+            for (const auto& x : vertex_list) {
+                sum += Euclidean_Distance<Type>(vertex_list[i], x);
+            }
+            // The section below is critical, so we need to protect it with a mutex
+            std::lock_guard<std::mutex> lock(mutex);  // Protect shared variables (one thread at a time)
+            if (sum < local_min) {
+                local_min = sum;
+                local_medoid = vertex_list[i];
+            }
         }
+    };
 
-        // Check if this sum is the minimum
-        if ( sum < min ) {
-            min = sum;
-            medoid_vertice = vertex;
+    // Create threads
+    int num_threads = std::thread::hardware_concurrency(); // Get the number of threads
+    vector<std::thread> threads;
+    vector<float> local_mins(num_threads, numeric_limits<float>::max()); // One local_min for each thread
+    vector<vector<Type>> local_medoids(num_threads);
+
+    int chunk_size = (n + num_threads - 1) / num_threads; // Divide into chunks of size ceil(count_vertices/num_threads) chunks
+    for (int t = 0; t < num_threads; ++t) {
+        int start = t * chunk_size;
+        int end = std::min(start + chunk_size, n);
+        threads.emplace_back(compute_sum, start, end, std::ref(local_mins[t]), std::ref(local_medoids[t]));
+    }
+
+    // Join threads
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
+    // Find the global minimum by comparing the results of each thread
+    for (int t = 0; t < num_threads; ++t) {
+        if (local_mins[t] < min) {
+            min = local_mins[t];
+            medoid_vertice = local_medoids[t];
         }
-
     }
 
     // Print the medoid
