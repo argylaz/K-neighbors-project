@@ -550,66 +550,87 @@ void FilteredVamana(FilterGraph<T, F>& G, int L, int R, map<F, gIndex> MedoidMap
 */
 template <typename T, typename F>
 map<F, gIndex> FindMedoid(FilterGraph<T, F>& G,  int threshold) {
-    map<F, gIndex> M;
+    map<F, gIndex> M;             // Final mapping of filters to medoid vertices
+    map<gIndex, int> T_;          // Counter for gIndices
 
-    set<F> Filters = G.get_filters_set(); 
+    std::mutex mtx_M;             // Mutex for M
+    std::mutex mtx_T;             // Mutex for T_
     
-    // Initialization of zero map T
-    map<gIndex, int> T_;               // Zero map T is intended as a counter
-
+    set<F> Filters = G.get_filters_set();
     set<T> vertices = G.get_vertices();
 
-    // Initialising random number generator
-    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     default_random_engine rng(seed);
  
-    // For each filter in the set
-    for ( F filter : Filters ) {
-
-        // contains the gIndices of all points matching filter in question
+    auto process_filter = [&](F filter, default_random_engine rng) {
         vector<gIndex> Pf;
 
-        // Find all the gIndices of vertices matching the filter
-        for ( T vertex : vertices ) {
-
+        // Finding all gIndices of vertices matching the filter
+        for (T vertex : vertices) {
             set<F> Fx = G.get_filters(G.get_index_from_vertex(vertex));
-
-            if (Fx.find(filter) != Fx.end()){
+            if (Fx.find(filter) != Fx.end()) {
                 Pf.push_back(G.get_index_from_vertex(vertex));
-            }   
+            }
         }
 
-        // If Pf is empty, skip this filter
-        if (Pf.empty()) {
-            continue;
-        }
-        
-        // Maximum threshold value should be he size of Pf
-        threshold = min(threshold, static_cast<int>(Pf.size()));
+        if (Pf.empty()) return; // Skip empty filters
 
-        // Randomly sample `threshold` unique elements from Pf
+        // Adjusting threshold
+        int local_threshold = min(threshold, static_cast<int>(Pf.size()));
+
+        // Random sampling
         unordered_set<int> selected_indices;
         vector<gIndex> Rf;
         uniform_int_distribution<int> dist(0, Pf.size() - 1);
 
-        while (Rf.size() < static_cast<size_t>(threshold)) {
+        while (Rf.size() < static_cast<size_t>(local_threshold)) {
             int random_index = dist(rng);
             if (selected_indices.insert(random_index).second) {
                 Rf.push_back(Pf[random_index]);
             }
         }
 
-        // Finding p_min point, where p_min is min{T[p], for each p in Rf};
+        // Find p_min point
         gIndex p_min_index = Rf[0];
-        for ( size_t i = 1 ; i < Rf.size() ; i++ ) {
-            if ( T_[Rf[i]] < T_[p_min_index] ) {
+        for (size_t i = 1; i < Rf.size(); ++i) {
+            std::lock_guard<std::mutex> lock(mtx_T); // Protect T_
+            if (T_[Rf[i]] < T_[p_min_index]) {
                 p_min_index = Rf[i];
             }
         }
-        
-        M[filter] = p_min_index;
-        T_[p_min_index]++;
 
+        {
+            std::lock_guard<std::mutex> lock_m(mtx_M); // Protect M
+            M[filter] = p_min_index;
+        }
+        
+        {
+            std::lock_guard<std::mutex> lock_t(mtx_T); // Protect T_
+            T_[p_min_index]++;
+        }
+    };
+
+    // Creating threads
+    vector<std::thread> threads;                                              // Vector of threads
+    vector<F> filters_vec(Filters.begin(), Filters.end()); /                  // Vector of filters
+    size_t num_threads = std::thread::hardware_concurrency();                 // Number of threads
+    size_t chunk_size = (filters_vec.size() + num_threads - 1) / num_threads; // Chunk size
+
+    for (size_t t = 0; t < num_threads; ++t) {
+        size_t start = t * chunk_size;
+        size_t end = std::min(start + chunk_size, filters_vec.size());
+
+        threads.emplace_back([&, start, end]() {
+            default_random_engine rng(seed + t); // Unique seed for each thread
+            for (size_t i = start; i < end; ++i) {
+                process_filter(filters_vec[i], rng);
+            }
+        });
+    }
+
+    // Joining threads
+    for (auto& thread : threads) {
+        thread.join();
     }
 
     return M;
