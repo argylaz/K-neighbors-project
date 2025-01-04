@@ -191,7 +191,7 @@ vector<Type> medoid(Graph<vector<Type>>& G){
     for (int t = 0; t < num_threads; ++t) {
         int start = t * chunk_size;
         int end = std::min(start + chunk_size, n);
-        threads.emplace_back(compute_sum, start, end, std::ref(local_mins[t]), std::ref(local_medoids[t]));
+        threads.emplace_back(compute_sum, start, end, ref(local_mins[t]), ref(local_medoids[t]));
     }
 
     // Join threads
@@ -206,11 +206,6 @@ vector<Type> medoid(Graph<vector<Type>>& G){
             medoid_vertice = local_medoids[t];
         }
     }
-
-    // Print the medoid
-    // cout << "Medoid point ";  
-    // print_vector(medoid_vertice);
-    // cout << "\nFound at index " << G.get_index_from_vertex(medoid_vertice) << endl;
 
     return medoid_vertice;
 }
