@@ -190,8 +190,8 @@ vector<Type> medoid(Graph<vector<Type>>& G){
     int chunk_size = (n + num_threads - 1) / num_threads; // Divide into chunks of size ceil(count_vertices/num_threads) chunks
     for (int t = 0; t < num_threads; ++t) {
         int start = t * chunk_size;
-        int end = std::min(start + chunk_size, n);
-        threads.emplace_back(compute_sum, start, end, std::ref(local_mins[t]), std::ref(local_medoids[t]));
+        int end = min(start + chunk_size, n);
+        threads.emplace_back(compute_sum, start, end, ref(local_mins[t]), ref(local_medoids[t]));
     }
 
     // Join threads

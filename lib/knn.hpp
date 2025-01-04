@@ -684,21 +684,6 @@ void StichedVamana(FilterGraph<T, F>& G, int Lsmall, int Rsmall, int Rstiched, f
         thread.join();
     }
 
-    // // Merging the Gf subgraphs into G (adding the edges of all )
-    // for (F filter: filters) {
-        
-    //     // Copying all edges of Gf to G
-    //     set<T> gf_vertices = Gf[filter]->get_vertices();
-    //     for (T gf_vertex: gf_vertices) {
-    //         vector<gIndex> gf_neighbor_indices = Gf[filter]->get_neighbors(gf_vertex);
-    //         for (gIndex gf_neighbor_index: gf_neighbor_indices) {
-    //             T neighbor = Gf[filter]->get_vertex_from_index(gf_neighbor_index);
-    //             G.add_edge(gf_vertex, neighbor);
-    //         }
-    //     }
-
-    //     delete Gf[filter];
-    // }
 
     // Merging the Gf subgraphs into G
     for (const F& filter : filters) {
@@ -709,13 +694,14 @@ void StichedVamana(FilterGraph<T, F>& G, int Lsmall, int Rsmall, int Rstiched, f
                 T neighbor = Gf[filter]->get_vertex_from_index(gf_neighbor_index);
                 // Technically, this is a critical area, but it is not necessary to lock it
                 {
-                    std::lock_guard<std::mutex> lock(graph_mutex);
+                    // std::lock_guard<std::mutex> lock(graph_mutex);
                     G.add_edge(gf_vertex, neighbor);
                 }
             }
         }
         delete Gf[filter];
     }
+
 
     // Filtered Robust Prune to remove excess edges
     for (T vertex : vertices) {
