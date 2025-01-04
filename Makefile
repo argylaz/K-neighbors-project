@@ -3,7 +3,7 @@
 CC = g++
 
 # Flags
-CFLAGS = -Wall -g -O3
+CFLAGS = -Wall -g -O3 -fopenmp
 
 
 # Directories
@@ -106,7 +106,9 @@ g_test:
 
 # Run tests with valgrind
 valgrind: 
-	valgrind make test 
+	@for test_exec in $(TEST_EXEC); do \
+		valgrind ./$$test_exec; \
+	done 
 
 # Cleaning everything in bin and build folders except *_graph.bin files,
 # which contain saved Graphs made with Filtered, Stiched or Simple Vamana algorithms  

@@ -1,7 +1,8 @@
 #include <cmath>
 #include <ctype.h>
 #include <string.h>
-
+#include <omp.h>
+#include <limits.h>
 #include "./graph.hpp"
 
 
@@ -81,16 +82,21 @@ inline float Euclidean_Distance(vector<Type> a, vector<Type> b) {
     vector<Type> temp;
     temp.resize(a.size());
 
-    // Calculate vector (a - b)^2
-    for(size_t i = 0; i < a.size(); i++) {
-        temp[i] = a[i] - b[i];
-        temp[i] = temp[i] * temp[i];
-    }
+    // // Calculate vector (a - b)^2
+    // for(size_t i = 0; i < a.size(); i++) {
+    //     temp[i] = a[i] - b[i];
+    //     temp[i] = temp[i] * temp[i];
+    // }
 
     // Find the sum of the calculated vector
     float sum = 0.0f;
+    #pragma omp simd reduction(+:sum) // Enable SIMD with reduction for parallel summation
     for(size_t i = 0; i < a.size(); i++) {
-        sum += temp[i];
+        ////////////////
+        float diff = a[i] - b[i];
+        sum += diff * diff;
+        /////////////////
+        // sum += temp[i];
     }
 
     // Get the square root of the sum
@@ -103,7 +109,40 @@ inline float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 template <typename Type>
 inline vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<gIndex>& S, vector<Type> xquery) {
     
-    // Find the element with the minimum Euclidean distance from xquery
+    // // Initialize the min as infinity
+    // double min = numeric_limits<double>::max();
+    // gIndex min_index = -1;
+
+    // #pragma omp parallel
+    // {
+    //     // Local min variabe for parallel calculations
+    //     double local_min_distance = numeric_limits<double>::max();
+    //     gIndex local_min_index = -1;
+
+    //     // Parallel Iteration of the set
+    //     for( auto v = S.begin() ; v != S.end() ; v++ ){
+    //         gIndex index = *v;
+    //         double d = Euclidean_Distance<Type>(G.get_vertex_from_index(index),xquery);
+    //         if( d < local_min_distance ){
+    //             local_min_distance = d;
+    //             local_min_index = index; 
+    //         }
+    //     }
+
+
+    //     // Combine results
+    //     #pragma omp critical
+    //     {
+    //         if (local_min_distance < min) {
+    //             min = local_min_distance;
+    //             min_index = local_min_index;
+    //         }
+    //     }
+    // }
+
+    // return G.get_vertex_from_index(min_index);
+
+    // Find the element with the minimum Euclidean distance from xquer
     gIndex min_index = *min_element(S.begin(), S.end(), 
                         [&xquery, &G](const gIndex a, const gIndex b) {
                             return Euclidean_Distance<Type>(G.get_vertex_from_index(a), xquery) < Euclidean_Distance<Type>(G.get_vertex_from_index(b), xquery);
