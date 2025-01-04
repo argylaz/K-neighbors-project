@@ -1,6 +1,10 @@
 #include <cmath>
 #include <ctype.h>
 #include <string.h>
+
+#include <thread>
+#include <mutex>
+
 #include <omp.h>
 #include <limits.h>
 #include "./graph.hpp"
@@ -109,38 +113,68 @@ inline float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 template <typename Type>
 inline vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<gIndex>& S, vector<Type> xquery) {
     
-    // // Initialize the min as infinity
-    // double min = numeric_limits<double>::max();
-    // gIndex min_index = -1;
+    //////////////////////////////////////////////////////////////////////////////////////////
 
-    // #pragma omp parallel
-    // {
-    //     // Local min variabe for parallel calculations
-    //     double local_min_distance = numeric_limits<double>::max();
+
+    // Initialize global minimum
+    // double global_min = numeric_limits<double>::max();
+    // gIndex global_min_index = -1;
+
+    // // Convert set to vector
+    // vector<gIndex> S_vec(S.begin(), S.end());
+    // int n = S_vec.size();
+
+    // // Determine the number of threads and chunk size
+    // int num_threads = thread::hardware_concurrency();
+    // int chunk_size = (n + num_threads - 1) / num_threads;
+
+    // // Vectors to hold per-thread results
+    // vector<double> local_mins(num_threads, std::numeric_limits<double>::max());
+    // vector<gIndex> local_min_indices(num_threads, -1);
+
+    // // Thread function to find local minimum
+    // auto find_local_min = [&](int thread_id, int start, int end) {
+    //     double local_min = numeric_limits<double>::max();
     //     gIndex local_min_index = -1;
 
-    //     // Parallel Iteration of the set
-    //     for( auto v = S.begin() ; v != S.end() ; v++ ){
-    //         gIndex index = *v;
-    //         double d = Euclidean_Distance<Type>(G.get_vertex_from_index(index),xquery);
-    //         if( d < local_min_distance ){
-    //             local_min_distance = d;
-    //             local_min_index = index; 
+    //     for (int i = start; i < end; ++i) {
+    //         double d = Euclidean_Distance<Type>(G.get_vertex_from_index(S_vec[i]), xquery);
+    //         if (d < local_min) {
+    //             local_min = d;
+    //             local_min_index = S_vec[i];
     //         }
     //     }
 
+    //     // Store results in the thread's slot
+    //     local_mins[thread_id] = local_min;
+    //     local_min_indices[thread_id] = local_min_index;
+    // };
 
-    //     // Combine results
-    //     #pragma omp critical
-    //     {
-    //         if (local_min_distance < min) {
-    //             min = local_min_distance;
-    //             min_index = local_min_index;
-    //         }
+    // // Launch threads
+    // vector<thread> threads;
+    // for (int t = 0; t < num_threads; ++t) {
+    //     int start = t * chunk_size;
+    //     int end = std::min(start + chunk_size, n);
+    //     threads.emplace_back(find_local_min, t, start, end);
+    // }
+
+    // // Join threads
+    // for (auto& thread : threads) {
+    //     thread.join();
+    // }
+
+    // // Final reduction to find the global minimum
+    // for (int t = 0; t < num_threads; ++t) {
+    //     if (local_mins[t] < global_min) {
+    //         global_min = local_mins[t];
+    //         global_min_index = local_min_indices[t];
     //     }
     // }
 
-    // return G.get_vertex_from_index(min_index);
+    // return G.get_vertex_from_index(global_min_index);
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
 
     // Find the element with the minimum Euclidean distance from xquer
     gIndex min_index = *min_element(S.begin(), S.end(), 
