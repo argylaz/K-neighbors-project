@@ -694,7 +694,7 @@ void StichedVamana(FilterGraph<T, F>& G, int Lsmall, int Rsmall, int Rstiched, f
                 T neighbor = Gf[filter]->get_vertex_from_index(gf_neighbor_index);
                 // Technically, this is a critical area, but it is not necessary to lock it
                 {
-                    // std::lock_guard<std::mutex> lock(graph_mutex);
+                    std::lock_guard<std::mutex> lock(graph_mutex);
                     G.add_edge(gf_vertex, neighbor);
                 }
             }
@@ -703,10 +703,31 @@ void StichedVamana(FilterGraph<T, F>& G, int Lsmall, int Rsmall, int Rstiched, f
     }
 
 
-    // Filtered Robust Prune to remove excess edges
-    for (T vertex : vertices) {
-        vector<gIndex> neighbor_indices = G.get_neighbors(vertex);
-        set<gIndex> Nout(neighbor_indices.begin(), neighbor_indices.end());
-        FilteredRobustPrune<T, F>(G, vertex, Nout, a, Rstiched);
+    // Parallelized Filtered Robust Prune
+    auto robust_prune = [&](int start, int end) {
+        auto it = vertices.begin();
+        std::advance(it, start);
+        for (int i = start; i < end; ++i, ++it) {
+            T vertex = *it;
+            vector<gIndex> neighbor_indices = G.get_neighbors(vertex);
+            set<gIndex> Nout(neighbor_indices.begin(), neighbor_indices.end());
+            FilteredRobustPrune<T, F>(G, vertex, Nout, a, Rstiched);
+        }
+    };
+
+    // Divide vertices into chunks for pruning
+    int num_threads = std::thread::hardware_concurrency();
+    int chunk_size = (vertices.size() + num_threads - 1) / num_threads;
+
+    threads.clear();
+    for (int t = 0; t < num_threads; ++t) {
+        int start = t * chunk_size;
+        int end = std::min(start + chunk_size, (int)vertices.size());
+        threads.emplace_back(robust_prune, start, end);
+    }
+
+    // Join all pruning threads
+    for (auto& thread : threads) {
+        thread.join();
     }
 }
