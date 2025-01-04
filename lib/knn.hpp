@@ -612,7 +612,7 @@ map<F, gIndex> FindMedoid(FilterGraph<T, F>& G,  int threshold) {
 
     // Creating threads
     vector<std::thread> threads;                                              // Vector of threads
-    vector<F> filters_vec(Filters.begin(), Filters.end()); /                  // Vector of filters
+    vector<F> filters_vec(Filters.begin(), Filters.end());                    // Vector of filters
     size_t num_threads = std::thread::hardware_concurrency();                 // Number of threads
     size_t chunk_size = (filters_vec.size() + num_threads - 1) / num_threads; // Chunk size
 
