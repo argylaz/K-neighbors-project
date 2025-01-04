@@ -18,12 +18,12 @@ int get_num_queries(string& query_name) {
 }
 
 
-/*  */
+/* Method that runs the queries with Greedy Search and calculates the recall */
 template <typename T>
 void results_Greedy(Graph<T> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<T>& queries, T medoid);
 
 
-/* */
+/* Method that runs the queries with Filtered Greedy Search and calculates the recall */
 template <typename T, typename F>
 void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<T>& queries, vector<F>& queries_filters, map<F, gIndex>& MedoidMap);
 
@@ -186,28 +186,31 @@ int main(int argc, char* argv[]) {
 
 template <typename T>
 void results_Greedy(Graph<T> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<T>& queries, T medoid) {
-    // Initialize iterators
-    auto m = groundtruth.begin();
-    auto n = queries.begin();
-
+    
     // Calculate and print recall for given queries
     float total_recall = 0.0f;
     int count = 0;
-    while ( m != groundtruth.end() && n != queries.end() ) {
+
+    size_t total_queries = queries.size();
+
+    #pragma omp parallel for reduction(+:total_recall) schedule(dynamic)
+    for (size_t i = 0; i < total_queries; i++) {
         // For each query
-        vector<float> q = *n;
+
+        const vector<float>& query = queries[i];
+        const vector<gIndex>& gt = groundtruth[i];
+
         
         // cout << "\nQuery: ";
-        // print_vector<float>(q);
+        // print_vector<float>(query);
         // cout << "\n";
 
-    
         // Run GreedySearch to get the k nearest neighbors
-        pair<set<gIndex>, set<gIndex>> res = GreedySearch(*G, medoid, q, k, L);
+        pair<set<gIndex>, set<gIndex>> res = GreedySearch(*G, medoid, query, k, L);
         set<gIndex> X = res.first;
         
         // Get ground truth
-        set<gIndex> T_( (*m).begin(), (*m).begin() + k);
+        set<gIndex> T_( (gt).begin(), (gt).begin() + k);
         
         // Calculate intersection for recall
         set<gIndex> V_intersec;
@@ -217,17 +220,19 @@ void results_Greedy(Graph<T> *G, int k, int L, vector<vector<gIndex>>& groundtru
         // cout << "\nT size is:" << T_.size();
         
         // Calculate recall and add to total
-        float recall = V_intersec.size() / ((float) X.size());
-        cout << "\nRecall is: " << recall << endl;
+        float recall = static_cast<float>(V_intersec.size()) / ((float) X.size());
+        // #pragma omp critical
+        // {
+        //     std::cout << "\nRecall for query " << i << " is: " << recall << std::endl;
+        // }
         total_recall += recall;
         count++;
 
-        m++;
-        n++;
     }
 
     total_recall = total_recall / count;
     cout << "\nTotal Recall is " << total_recall * 100 <<"%\n" << endl;
+    
 
 }
 
