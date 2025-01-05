@@ -179,7 +179,7 @@ int main(int argc, char* argv[]) {
     chrono::duration<double> elapsed = end_time - start_time;
 
     // Print elapsed time
-    cout << " " << elapsed.count();
+    cout << " " << elapsed.count() << endl;
     
     return 0;
 }
@@ -236,7 +236,7 @@ void results_Greedy(Graph<T> *G, int k, int L, vector<vector<gIndex>>& groundtru
     }
 
     total_recall = total_recall / count;
-    cout << total_recall * 100 << endl; // Printing total recall
+    cout << " " <<  total_recall * 100; // Printing total recall
     
 
 }
@@ -337,7 +337,7 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
     // cout << "From " << count_unfiltered << " unfiltered queries" << endl;
 
     // total_recall = (count_filtered * total_recall_filtered + count_unfiltered*total_recall_unfiltered) / (count_filtered + count_unfiltered);
-    cout << " " << total_recall * 100 << endl;
+    cout << " " << total_recall * 100;
     
     // cout << "Filters in the Graph\n";
     set<F> F_ = G->get_filters_set();
