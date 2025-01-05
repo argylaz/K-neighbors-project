@@ -131,11 +131,6 @@ bool FilterGraph<T,F>::add_vertex(const T v, const set<F>& f) {
 
         // Add filter  to the set with all the discrete filters
         set_union(filters_set.begin(), filters_set.end(), f.begin(), f.end(), inserter(filters_set, filters_set.begin()));
-        // filters_set.insert(f);
-
-        //     cout << "Filter '"; print_vector(f);
-        //     print_vector(v); 
-        //     cout << "' added to vertex " << v << ".\n"; // !!!
     }
     else {
         cerr << "Can't add vertex without filter!!!" << endl;

@@ -147,18 +147,12 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, const T& start, const T
         diff_set.clear();
         // Recalculate the difference of the sets for the next loop
         set_difference(L_output.begin(), L_output.end(), V.begin(), V.end(), inserter(diff_set, diff_set.begin()));
-        // diff_set.erase(min);
     }
 
     // return only the k closests vertices
     retain_closest_points(G, L_output, xquery, k);
 
-    // cout << "V size " << V.size() << endl;
-    // cout << "L_output size " << L_output.size() << endl;
-
-
     return {L_output, V};
-
 }
 
 
@@ -183,10 +177,6 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<T, F>& G, set<T>
         return {{},{}};
     }
 
-
-    // Get the set of vertices from the graph
-    // set<T> S = G.get_vertices();
-
     // Initialize set L_output = {} and V = {}
     set<gIndex> L_output;
     set<gIndex> V;
@@ -207,7 +197,6 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<T, F>& G, set<T>
 
     }
 
-    // cout << "\nL_output size is " << L_output.size() << endl;
 
     // Subtraction of sets L_output \ V
     set<gIndex> diff_set;  // !!! vector for performance
@@ -257,9 +246,6 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<T, F>& G, set<T>
     if( L_output.size() > (size_t)k )
         retain_closest_points(G, L_output, xquery, k);
 
-    // cout << "V size " << V.size() << endl;
-    // cout << "L_output size " << L_output.size() << endl;
-
     return {L_output,V};
 }
 
@@ -290,7 +276,6 @@ void RobustPrune(Graph<T>& G, const T& point, set<gIndex>& V, float a, int R) {
     if ( k != V.end() ) {   // Only remove if it was found within V
         V.erase(k);
     }
-    // V.erase(G.get_index_from_vertex(point));
     
     // Removing all edges leaving the given vertex and selectively adding up to R edges
     for (gIndex j: neighbors) {
@@ -321,7 +306,6 @@ void RobustPrune(Graph<T>& G, const T& point, set<gIndex>& V, float a, int R) {
             }
         }
         for (gIndex vertex_index: toBeRemoved) {
-            // V.erase(find(V.begin(), V.end(), vertex_index));
             V.erase(vertex_index);
         }
     }
@@ -424,7 +408,6 @@ T Vamana(Graph<T>& G, int L, int R, float a) {
 
     // Calculating the medoid of the points given
     T s = medoid(G);
-    // T s = G.get_vertex_from_index(8736);
     
     // Getting the vertex indices in a random order. Vector sigma will be the random permutation.
     vector<gIndex> sigma(n);
@@ -444,7 +427,6 @@ T Vamana(Graph<T>& G, int L, int R, float a) {
         set<gIndex> V = result.second;
         
         // First calling RobustPrune for the vertex
-        // float a = 1.2; // !!!        
         RobustPrune<T>(G, vertex, V, a, R);
 
         // For each neighbor j of the vertex
@@ -482,10 +464,6 @@ template <typename T, typename F>
 void FilteredVamana(FilterGraph<T, F>& G, int L, int R, map<F, gIndex> MedoidMap, float a) {
 
     int n = G.get_vertices_count();
-    // set<gIndex> V;
-
-    // At the beginning the graph is empty
-
     
     // Getting the vertex indices in a random order. Vector sigma will be the random permutation.
     vector<gIndex> sigma(n);
@@ -512,34 +490,14 @@ void FilteredVamana(FilterGraph<T, F>& G, int L, int R, map<F, gIndex> MedoidMap
         pair<set<gIndex>, set<gIndex>> result = FilteredGreedySearch<T, F>(G, Sf_x, vertex, 0, L, Fx);
 
         set<gIndex> V_vertex = result.second;
-        
-        // set_union(V.begin(), V.end(). V_vertex.begin(), V_vertex.end(), inserter(V, V.begin()));
-        
+                
 
         // First calling RobustPrune for the vertex
-        // float a = 1.2; // !!!        
         FilteredRobustPrune<T, F>(G, vertex, V_vertex, a, R);
 
         // For each neighbor j of the vertex
         vector<gIndex> neighbors = G.get_neighbors(vertex);
-        // ------------------------------------------------
-        // for (gIndex j: neighbors) {
-            
-        //     T neighbor = G.get_vertex_from_index(j);
-
-        //     // We add an edge from the neighbor j to the vertex itself
-        //     G.add_edge(neighbor, vertex);
-            
-        //     // Getting the neighbors of the neighbor j (including the vertex itself)
-        //     vector<gIndex> j_neighbors = G.get_neighbors(neighbor);
-
-        //     if ( j_neighbors.size() > (long unsigned int) R) {
-        //         set<gIndex> set_j_neighbors(j_neighbors.begin(), j_neighbors.end());
-        //         FilteredRobustPrune<T, F>(G, neighbor, set_j_neighbors, a, R);
-        //     }
-   
-        // }
-        // --------------------------------------------------
+       
         std::mutex g_mutex; // Shared mutex for thread safety
         size_t n_size = neighbors.size();
         #pragma omp parallel for

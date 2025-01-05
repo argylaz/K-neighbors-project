@@ -84,21 +84,14 @@ inline float Euclidean_Distance(vector<Type> a, vector<Type> b) {
     vector<Type> temp;
     temp.resize(a.size());
 
-    // // Calculate vector (a - b)^2
-    // for(size_t i = 0; i < a.size(); i++) {
-    //     temp[i] = a[i] - b[i];
-    //     temp[i] = temp[i] * temp[i];
-    // }
-
     // Find the sum of the calculated vector
     float sum = 0.0f;
     #pragma omp simd reduction(+:sum) // Enable SIMD with reduction for parallel summation
     for(size_t i = 0; i < a.size(); i++) {
-        ////////////////
+
         float diff = a[i] - b[i];
         sum += diff * diff;
-        /////////////////
-        // sum += temp[i];
+
     }
 
     // Get the square root of the sum
@@ -111,69 +104,6 @@ inline float Euclidean_Distance(vector<Type> a, vector<Type> b) {
 template <typename Type>
 inline vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<gIndex>& S, vector<Type> xquery) {
     
-    //////////////////////////////////////////////////////////////////////////////////////////
-
-
-    // Initialize global minimum
-    // double global_min = numeric_limits<double>::max();
-    // gIndex global_min_index = -1;
-
-    // // Convert set to vector
-    // vector<gIndex> S_vec(S.begin(), S.end());
-    // int n = S_vec.size();
-
-    // // Determine the number of threads and chunk size
-    // int num_threads = thread::hardware_concurrency();
-    // int chunk_size = (n + num_threads - 1) / num_threads;
-
-    // // Vectors to hold per-thread results
-    // vector<double> local_mins(num_threads, std::numeric_limits<double>::max());
-    // vector<gIndex> local_min_indices(num_threads, -1);
-
-    // // Thread function to find local minimum
-    // auto find_local_min = [&](int thread_id, int start, int end) {
-    //     double local_min = numeric_limits<double>::max();
-    //     gIndex local_min_index = -1;
-
-    //     for (int i = start; i < end; ++i) {
-    //         double d = Euclidean_Distance<Type>(G.get_vertex_from_index(S_vec[i]), xquery);
-    //         if (d < local_min) {
-    //             local_min = d;
-    //             local_min_index = S_vec[i];
-    //         }
-    //     }
-
-    //     // Store results in the thread's slot
-    //     local_mins[thread_id] = local_min;
-    //     local_min_indices[thread_id] = local_min_index;
-    // };
-
-    // // Launch threads
-    // vector<thread> threads;
-    // for (int t = 0; t < num_threads; ++t) {
-    //     int start = t * chunk_size;
-    //     int end = std::min(start + chunk_size, n);
-    //     threads.emplace_back(find_local_min, t, start, end);
-    // }
-
-    // // Join threads
-    // for (auto& thread : threads) {
-    //     thread.join();
-    // }
-
-    // // Final reduction to find the global minimum
-    // for (int t = 0; t < num_threads; ++t) {
-    //     if (local_mins[t] < global_min) {
-    //         global_min = local_mins[t];
-    //         global_min_index = local_min_indices[t];
-    //     }
-    // }
-
-    // return G.get_vertex_from_index(global_min_index);
-
-
-    //////////////////////////////////////////////////////////////////////////////////////////////
-
     // Find the element with the minimum Euclidean distance from xquer
     gIndex min_index = *min_element(S.begin(), S.end(), 
                         [&xquery, &G](const gIndex a, const gIndex b) {
@@ -188,8 +118,7 @@ inline vector<Type> find_min_Euclidean(Graph<vector<Type>>& G, set<gIndex>& S, v
 template <typename Type>
 inline void retain_closest_points(Graph<vector<Type>>& G , set<gIndex> &output_set, vector<Type> xquery, int L) {
 
-    // cout <<"I"<< endl;
-    // // Erasing the vertex itself from the set in order to avoid mistaking it for a neighbor
+    // Erasing the vertex itself from the set in order to avoid mistaking it for a neighbor
     // gIndex xquery_index = G.get_index_from_vertex(xquery);
     // output_vec.erase(find(output_vec.begin(), output_vec.end(), xquery_index)); 
 

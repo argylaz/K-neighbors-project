@@ -150,7 +150,6 @@ vector<vector<Type>> read_vecs(string& filename) {
             break;
         }
 
-        // cout << "d is " << d << endl;
         // Create vector to hold the values and resize to the correct dimension
         vector<Type> v(d); //v.resize(d);
 
@@ -493,9 +492,6 @@ pair< vector<vector<float>> , vector<float>> read_queries(const string& filename
     // Read query data repetitively
     int i = 0;
     while (ifs.read((char *)buff.data(), (num_dimensions + 4) * sizeof(float)) && i < num_queries) {
-        
-        // Casting and storing query value (not used)
-        // int query_value = static_cast<float>(buff[0]);
 
         // Casting and storing the filter (categorical attribute)
         float filter = static_cast<float>(buff[1]);
@@ -504,6 +500,7 @@ pair< vector<vector<float>> , vector<float>> read_queries(const string& filename
 
         /* Ignoring timestamps (buff[2] and buff[3]) */
 
+
         // Casting query vector data to float
         vector<float> q(num_dimensions);
         for (int d = 0; d < num_dimensions; d++) {
@@ -511,10 +508,8 @@ pair< vector<vector<float>> , vector<float>> read_queries(const string& filename
         }
 
         /* ADDING ENTRY TO RETURN VECTOR */
-        // v[i] = q;
         v.push_back(q);
         i++;
-        // cout << i << endl;
     }
 
     // Close file
@@ -540,6 +535,7 @@ vector<vector<gIndex>> read_groundtruth(string filename) {
     cout << "# of points: " << N << endl;
 
     int num_dimensions = 1;
+
     // Initialize buffer
     vector<gIndex> buff(num_dimensions);
     
@@ -551,21 +547,12 @@ vector<vector<gIndex>> read_groundtruth(string filename) {
         size_t k;
         groundtruth.read(reinterpret_cast<char*>(&k), sizeof(k));
 
-        // cout << "Query " << i + 1 << ": (k neighbors found = " << k << ")"<< endl;
-
         // Read the vector of dimension k
         vector<gIndex> nearest_neighbor(k);
         groundtruth.read(reinterpret_cast<char*>(nearest_neighbor.data()), k * sizeof(float));
 
-        // // Print the groundtruth of the query
-        // cout << "Groundtruth: ";
-        // print_vector(nearest_neighbor);
-        // cout << endl;
-
         // Store the vector in the groundtruthData
         gt_data.push_back(nearest_neighbor);
-
-
     }
 
     // Close file
@@ -574,7 +561,6 @@ vector<vector<gIndex>> read_groundtruth(string filename) {
 
 
     return gt_data;
-
 }
 
 
@@ -657,10 +643,10 @@ void make_queries(const string& filename, const vector<vector<T>> vectors) {
 
     // Write data from vectors to .bin file
     for (const auto& vector : vectors) {      
-        float query_type = vector[0];                                         // Query Type
+        float query_type = vector[0];                                          // Query Type
         file.write(reinterpret_cast<const char*>(&query_type), sizeof(float));  
         
-        float filter = vector[1];                                             // Filter
+        float filter = vector[1];                                              // Filter
         file.write(reinterpret_cast<const char*>(&filter), sizeof(float));
        
         float timestamp1 = vector[2];                                          // Timestamp1

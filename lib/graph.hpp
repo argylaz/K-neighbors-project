@@ -162,15 +162,6 @@ void Graph<T>::insert_sorted_in_adj_list(vector<T>& adj, T key) {
         copy_backward(adj.begin() + insertPos, adj.end() - 1, adj.end());
         adj[insertPos] = key;
     }
-
-    // // Find the correct position to insert using binary search (comparing by equivalent gIndex value)
-    // auto insertPos = std::lower_bound(adj.begin(), adj.end() - 1, key, 
-    //                                   [this](const T& l, const T& r) {
-    //                                       return v_index[l] < v_index[r];
-    //                                   });
-    
-    // // Insert key(vertex) at position
-    // adj.insert(insertPos, key);
 }
 
 
@@ -272,7 +263,6 @@ void Graph<T>::print_graph(void) {
         int v_pos = v_index[*ver];
         /* The first element of each row is the is the vertex itself */
         for( size_t j = 1 ; j < adjacencyList[v_pos].size() ; j++){
-            // cout << " -> " << adjacencyList[v_pos][j];
             if( j != 1)
                 cout << " -> ";
             print_vector(adjacencyList[v_pos][j]);
