@@ -185,7 +185,7 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<T, F>& G, set<T>
 
 
     // Get the set of vertices from the graph
-    // set<T> S = G.get_vertices();
+    // unordered_set<T, OptimizedVectorHash<T>> S = G.get_vertices();
 
     // Initialize set L_output = {} and V = {}
     set<gIndex> L_output;
@@ -553,13 +553,13 @@ map<F, gIndex> FindMedoid(FilterGraph<T, F>& G,  int threshold) {
     map<F, gIndex> M;             // Final mapping of filters to medoid vertices
     map<gIndex, int> T_;          // Counter for gIndices
 
-    std::mutex mtx_M;             // Mutex for M
-    std::mutex mtx_T;             // Mutex for T_
+    mutex mtx_M;             // Mutex for M
+    mutex mtx_T;             // Mutex for T_
     
     set<F> Filters = G.get_filters_set();
-    set<T> vertices = G.get_vertices();
+    unordered_set<T, OptimizedVectorHash<T>> vertices = G.get_vertices();
 
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
     default_random_engine rng(seed);
  
     auto process_filter = [&](F filter, default_random_engine rng) {
@@ -593,7 +593,7 @@ map<F, gIndex> FindMedoid(FilterGraph<T, F>& G,  int threshold) {
         // Find p_min point
         gIndex p_min_index = Rf[0];
         for (size_t i = 1; i < Rf.size(); ++i) {
-            std::lock_guard<std::mutex> lock(mtx_T); // Protect T_
+            lock_guard<std::mutex> lock(mtx_T); // Protect T_
             if (T_[Rf[i]] < T_[p_min_index]) {
                 p_min_index = Rf[i];
             }
@@ -613,12 +613,12 @@ map<F, gIndex> FindMedoid(FilterGraph<T, F>& G,  int threshold) {
     // Creating threads
     vector<std::thread> threads;                                              // Vector of threads
     vector<F> filters_vec(Filters.begin(), Filters.end());                    // Vector of filters
-    size_t num_threads = std::thread::hardware_concurrency();                 // Number of threads
+    size_t num_threads = thread::hardware_concurrency();                 // Number of threads
     size_t chunk_size = (filters_vec.size() + num_threads - 1) / num_threads; // Chunk size
 
     for (size_t t = 0; t < num_threads; ++t) {
         size_t start = t * chunk_size;
-        size_t end = std::min(start + chunk_size, filters_vec.size());
+        size_t end = min(start + chunk_size, filters_vec.size());
 
         threads.emplace_back([&, start, end]() {
             default_random_engine rng(seed + t); // Unique seed for each thread
@@ -662,7 +662,7 @@ template <typename T, typename F>
 void StichedVamana(FilterGraph<T, F>& G, int Lsmall, int Rsmall, int Rstiched, float a) {
 
     set<F> filters = G.get_filters_set();
-    set<T> vertices = G.get_vertices();
+    unordered_set<T, OptimizedVectorHash<T>> vertices = G.get_vertices();
 
     map<F, Graph<T>*> Gf;
     mutex graph_mutex;
@@ -708,7 +708,7 @@ void StichedVamana(FilterGraph<T, F>& G, int Lsmall, int Rsmall, int Rstiched, f
 
     // Merging the Gf subgraphs into G
     for (const F& filter : filters) {
-        set<T> gf_vertices = Gf[filter]->get_vertices();
+        unordered_set<T, OptimizedVectorHash<T>> gf_vertices = Gf[filter]->get_vertices();
         for (const T& gf_vertex : gf_vertices) {
             vector<gIndex> gf_neighbor_indices = Gf[filter]->get_neighbors(gf_vertex);
             for (gIndex gf_neighbor_index : gf_neighbor_indices) {

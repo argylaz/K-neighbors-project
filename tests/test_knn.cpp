@@ -140,10 +140,10 @@ void test_GreedySearch() {
 
 
 
-/* Testing FilteredGreedySearch method  using an example solved by hand */
+/* Testing FilteredGreedySearch method using an example solved by hand */
 void test_FilteredGreedySearch() {
     
-    FilterGraph<vector<int>,int> G(true);
+    FilterGraph<vector<int>, int> G(true);
 
     // added some random filters
     // Adding vertices 0,1,2,3,4
@@ -163,14 +163,11 @@ void test_FilteredGreedySearch() {
     set<int> filter = {1};
 
     // Call find medoid and get the set of starting nodes
-    // int threshold = 2;
-    // set<vector<int>> S = get_nodes_from_gIndex_map(G, FindMedoid(G, threshold));
-    set<vector<int>> S = G.get_vertices();
+    int threshold = 2;
+    set<vector<int>> S = get_nodes_from_gIndex_map(G, FindMedoid(G, threshold));
+    // unordered_set<vector<int>, OptimizedVectorHash<vector<int>>> S = G.get_vertices();
 
-    // printing S set
-    // for( vector<int> i : S){
-    //     print_vector(i);
-    // }
+    
 
     auto result = FilteredGreedySearch<vector<int>, int>(G, S, xquery, k, L, filter);
     set<gIndex> Lout = result.first;
@@ -473,8 +470,12 @@ void test_StichedVamana() {
     G.add_vertex({5.5}, {3});
     G.add_vertex({6.6}, {3});
 
+    cout << "dfg\ndfg\ndfg\ndfg\n" << endl;
+
     StichedVamana<vector<float>, int>(G, 2, 2, 2);
     // G.print_graph();
+
+    cout << "dfgwe\ndfgwwe\ndfgwewe\ndfg\n" << endl;
 
     TEST_ASSERT(G.get_edge_count() == 11);
     TEST_ASSERT(G.exist_edge({0.0}, {1.1}) && G.exist_edge({0.0}, {2.2}));

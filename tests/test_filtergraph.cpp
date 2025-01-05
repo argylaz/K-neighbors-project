@@ -24,7 +24,7 @@ void test_read_from_bin() {
     FilterGraph<vector<float>, float> G("sift/test.bin", 1);   // num of dimensions of the vectors is 1 (+2 filters)
 
     // Now test that the graph was created properly
-    set<vector<float>> S = G.get_vertices();
+    unordered_set<vector<float>, OptimizedVectorHash<vector<float>>> S = G.get_vertices();
     cout << S.size() << *(G.get_filters(0).begin());
     TEST_ASSERT(S.find({0.0f}) != S.end()); TEST_ASSERT(*(G.get_filters(0).begin()) == 1.0f);  // Test that the entry exist with the correct filter
     TEST_ASSERT(S.find({1.0f}) != S.end()); TEST_ASSERT(*(G.get_filters(1).begin()) == 0.0f);

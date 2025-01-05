@@ -7,6 +7,29 @@ using namespace std;
 
 typedef int gIndex;
 
+
+template <typename T> 
+class OptimizedVectorHash {
+public:
+    size_t operator()(const T& v) const {
+        const size_t k = 5; // Number of elements to hash from both ends
+        size_t hashValue = 0;
+        hash<float> hasher;
+
+        // Hash the first k elements
+        for (size_t i = 0; i < min(k, v.size()); ++i) {
+            hashValue ^= hasher(v[i]) + 0x9e3779b9 + (hashValue << 6) + (hashValue >> 2);
+        }
+
+        // Hash the last k elements
+        for (size_t i = max<int>(0, v.size() - k); i < v.size(); ++i) {
+            hashValue ^= hasher(v[i]) + 0x9e3779b9 + (hashValue << 6) + (hashValue >> 2);
+        }
+
+        return hashValue;
+    }
+};
+
 template <typename T>              // Template T to make the graph generic
 class Graph {
 public:
@@ -55,7 +78,7 @@ public:
     inline bool exist_edge(T vertex_a, T vertex_b);
 
     /* Getter method for the set of vertices*/
-    inline set<T> get_vertices() const;
+    inline unordered_set<T, OptimizedVectorHash<T>> get_vertices() const;
 
     /* Method to save the adjacency list of the graph in a file <prefix>_graph.bin */
     bool save_graph_to_bin(string file_prefix, gIndex medoid_index = -1);
@@ -72,7 +95,7 @@ protected:
     bool isDirected;                        // True if the graph is directed
 
     
-    set<T> vertices;                        // A set of the graphs vertices
+    unordered_set<T, OptimizedVectorHash<T>> vertices;                        // A set of the graphs vertices
     map<T, gIndex> v_index;                 // Mapping from T to indices
 
     /* Adjacency list (vector of vectors)                      */
@@ -369,7 +392,7 @@ inline bool Graph<T>::exist_edge(T vertex_a, T vertex_b) {
 
 
 template <typename T>
-inline set<T> Graph<T>::get_vertices() const {
+inline unordered_set<T, OptimizedVectorHash<T>> Graph<T>::get_vertices() const {
     // Just returns the private attribute
     return vertices;
 }

@@ -302,12 +302,11 @@ void test_fvec_to_graph() {
     TEST_ASSERT(G.get_edge_count() == 0);       // And 0 edges 
     TEST_ASSERT(G.is_directed() == true);       // All the graphs for our prject are directed
     
-    // Test that the deata is in the graph the way it should be
-    set<vector<float>> vertices = G.get_vertices();
-    auto v = vertices.begin();
-    TEST_ASSERT(v->at(0) == 1.1f && v->at(1) == 2.2f && v->at(2) == 3.3f); v++;
-    TEST_ASSERT(v->at(0) == 4.4f && v->at(1) == 5.5f && v->at(2) == 6.6f); v++;
-    TEST_ASSERT(v->at(0) == 7.7f && v->at(1) == 8.8f && v->at(2) == 9.9f); 
+    // Test that the data is in the graph the way it should be
+    unordered_set<vector<float>, OptimizedVectorHash<vector<float>>> vertices = G.get_vertices();
+    TEST_ASSERT(vertices.count({1.1f, 2.2f, 3.3f}) == 1);
+    TEST_ASSERT(vertices.count({4.4f, 5.5f, 6.6f}) == 1);
+    TEST_ASSERT(vertices.count({7.7f, 8.8f, 9.9f}) == 1);
     
     // Test that the adjacency list is as it should be
     vector<vector<vector<float>>> L = G.get_private_adjacency_list();
@@ -333,7 +332,7 @@ void test_ivec_to_graph() {
 
     // cout << "File " << filename << " has been created for testing.";
 
-    // Then we create the graph and test it was created properlys
+    // Then we create the graph and test it was created properly
     TestGraph<vector<int>> G;
 
     vec_to_graph<int>(filename, G);
@@ -343,11 +342,10 @@ void test_ivec_to_graph() {
     TEST_ASSERT(G.is_directed() == true);       // All the graphs for our prject are directed
     
     // Test that the deata is in the graph the way it should be
-    set<vector<int>> vertices = G.get_vertices();
-    auto v = vertices.begin();
-    TEST_ASSERT(v->at(0) == 1 && v->at(1) == 2 && v->at(2) == 3); v++;
-    TEST_ASSERT(v->at(0) == 4 && v->at(1) == 5 && v->at(2) == 6); v++;
-    TEST_ASSERT(v->at(0) == 7 && v->at(1) == 8 && v->at(2) == 9);
+    unordered_set<vector<int>, OptimizedVectorHash<vector<int>>> vertices = G.get_vertices();
+    TEST_ASSERT(vertices.count({1, 2, 3}) == 1);
+    TEST_ASSERT(vertices.count({4, 5, 6}) == 1);
+    TEST_ASSERT(vertices.count({7, 8, 9}) == 1);
 
     // Test that the adjacency list is as it should be
     vector<vector<vector<int>>> L = G.get_private_adjacency_list();

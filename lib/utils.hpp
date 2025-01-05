@@ -226,7 +226,7 @@ vector<Type> medoid(Graph<vector<Type>>& G){
     }
 
     // Get the vertices
-    set<vector<Type>> vertices = G.get_vertices();
+    unordered_set<vector<Type>, OptimizedVectorHash<vector<Type>>> vertices = G.get_vertices();
     vector<vector<Type>> vertex_list(vertices.begin(), vertices.end());
     int n = vertex_list.size();
 
@@ -289,7 +289,7 @@ void rDirectional(Graph<T>& G, int R) {
     }
 
     // Get vertices
-    set<T> vertices = G.get_vertices();
+    unordered_set<T, OptimizedVectorHash<T>> vertices = G.get_vertices();
 
     // If the graph already has edges, remove them and construct the graph from the beginning 
     if (G.get_edge_count() > 0) {
