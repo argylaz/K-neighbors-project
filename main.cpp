@@ -29,6 +29,7 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
 
 
 
+
 /* Main method of the project that runs our vamana (from knn.hpp) on a graph (from graph.hpp)
    created from the databases given in fvec files */
 int main(int argc, char* argv[]) {
@@ -42,7 +43,7 @@ int main(int argc, char* argv[]) {
 
 
     
-    string prefix = vamana_type + "_" + data_set + "_" + to_string(k) + "_" + to_string(L) + "_" + to_string(R) + "_" + to_string(a);
+    string prefix = vamana_type + "_" + data_set + "_" + to_string(k) + "_" + to_string(L) + "_" + to_string(R) + "_" + to_string_trimmed(a);
     if (vamana_type == "stitched") prefix += "_" + to_string(Rstitched);
 
     vector<vector<gIndex>> groundtruth;

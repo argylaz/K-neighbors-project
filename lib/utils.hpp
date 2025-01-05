@@ -61,6 +61,9 @@ void rDirectional(Graph<T>& G, int R);
 // Function that checks if a string is a positive integer (for checking the command line arguments)
 bool isPositiveInteger(char *str);
 
+// Function that returns the float as string without excess decimal zeros
+string to_string_trimmed(float value);
+
 
 /*----------------------------------------------------Function Definitions-----------------------------------------------------------*/
 
@@ -336,6 +339,22 @@ bool isPositiveInteger(const char *str) {
     return 1;
 }
 
+// Function that returns the float as string without excess decimal zeros 
+string to_string_trimmed(float value) {
+    ostringstream oss;
+    oss << fixed << setprecision(5) << value; // Set a high precision
+    string result = oss.str();
+
+    // Remove trailing zeros
+    result.erase(result.find_last_not_of('0') + 1);
+
+    // Remove the decimal point if it ends up being the last character
+    if (result.back() == '.') {
+        result.pop_back();
+    }
+
+    return result;
+}
 
 
 /*---------------------------Utility functions and classes for the tests-----------------------------------*/
