@@ -550,64 +550,87 @@ void FilteredVamana(FilterGraph<T, F>& G, int L, int R, map<F, gIndex> MedoidMap
 */
 template <typename T, typename F>
 map<F, gIndex> FindMedoid(FilterGraph<T, F>& G,  int threshold) {
-    map<F, gIndex> M;
+    map<F, gIndex> M;             // Final mapping of filters to medoid vertices
+    map<gIndex, int> T_;          // Counter for gIndices
 
-    set<F> Filters = G.get_filters_set(); 
+    std::mutex mtx_M;             // Mutex for M
+    std::mutex mtx_T;             // Mutex for T_
     
-    // Initialization of zero map T
-    map<gIndex, int> T_;               // Zero map T is intended as a counter
-
+    set<F> Filters = G.get_filters_set();
     set<T> vertices = G.get_vertices();
- 
-    // For each filter in the set
-    for ( F filter : Filters ) {
 
-        // contains the gIndices of all points matching filter in question
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    default_random_engine rng(seed);
+ 
+    auto process_filter = [&](F filter, default_random_engine rng) {
         vector<gIndex> Pf;
 
-        // Find all the gIndices of vertices matching the filter
-        for ( T vertex : vertices ) {
-
+        // Finding all gIndices of vertices matching the filter
+        for (T vertex : vertices) {
             set<F> Fx = G.get_filters(G.get_index_from_vertex(vertex));
-
-            if (Fx.find(filter) != Fx.end()){
+            if (Fx.find(filter) != Fx.end()) {
                 Pf.push_back(G.get_index_from_vertex(vertex));
-            }   
-        }
-        
-
-        // To do :: Check for optimization
-        // Let Rf <- threshold randomly sampled data point ids from Pf        
-        // Create a vector with all the elements of Pf
-        vector<gIndex> temp_vector = vector<gIndex>(Pf);
-
-        // To obtain a time-based seed 
-        unsigned seed = chrono::system_clock::now().time_since_epoch().count();
-        
-        // Shuffle the temp vector Pf
-        shuffle(temp_vector.begin(), temp_vector.end(), default_random_engine(seed));
-
-
-        if ( (size_t) threshold >= temp_vector.size() ) {
-            threshold = temp_vector.size();
+            }
         }
 
-        // Keep the first threshold items of the shuffled vector
-        vector<gIndex> Rf(temp_vector.begin(), temp_vector.begin() + threshold);
+        if (Pf.empty()) return; // Skip empty filters
 
-        // Finding p_min point, where p_min is min{T[p], for each p in Rf};
-        gIndex p_min_index;
+        // Adjusting threshold
+        int local_threshold = min(threshold, static_cast<int>(Pf.size()));
 
-        p_min_index = Rf[0];
-        for ( size_t i = 1 ; i < Rf.size() ; i++ ) {
-            if ( T_[Rf[i]] < T_[p_min_index] ) {
+        // Random sampling
+        unordered_set<int> selected_indices;
+        vector<gIndex> Rf;
+        uniform_int_distribution<int> dist(0, Pf.size() - 1);
+
+        while (Rf.size() < static_cast<size_t>(local_threshold)) {
+            int random_index = dist(rng);
+            if (selected_indices.insert(random_index).second) {
+                Rf.push_back(Pf[random_index]);
+            }
+        }
+
+        // Find p_min point
+        gIndex p_min_index = Rf[0];
+        for (size_t i = 1; i < Rf.size(); ++i) {
+            std::lock_guard<std::mutex> lock(mtx_T); // Protect T_
+            if (T_[Rf[i]] < T_[p_min_index]) {
                 p_min_index = Rf[i];
             }
         }
-        
-        M[filter] = p_min_index;
-        T_[p_min_index]++;
 
+        {
+            std::lock_guard<std::mutex> lock_m(mtx_M); // Protect M
+            M[filter] = p_min_index;
+        }
+        
+        {
+            std::lock_guard<std::mutex> lock_t(mtx_T); // Protect T_
+            T_[p_min_index]++;
+        }
+    };
+
+    // Creating threads
+    vector<std::thread> threads;                                              // Vector of threads
+    vector<F> filters_vec(Filters.begin(), Filters.end());                    // Vector of filters
+    size_t num_threads = std::thread::hardware_concurrency();                 // Number of threads
+    size_t chunk_size = (filters_vec.size() + num_threads - 1) / num_threads; // Chunk size
+
+    for (size_t t = 0; t < num_threads; ++t) {
+        size_t start = t * chunk_size;
+        size_t end = std::min(start + chunk_size, filters_vec.size());
+
+        threads.emplace_back([&, start, end]() {
+            default_random_engine rng(seed + t); // Unique seed for each thread
+            for (size_t i = start; i < end; ++i) {
+                process_filter(filters_vec[i], rng);
+            }
+        });
+    }
+
+    // Joining threads
+    for (auto& thread : threads) {
+        thread.join();
     }
 
     return M;
@@ -638,65 +661,94 @@ set<T> get_nodes_from_gIndex_map(FilterGraph<T, F>& G, map<F, gIndex> M){
 template <typename T, typename F>
 void StichedVamana(FilterGraph<T, F>& G, int Lsmall, int Rsmall, int Rstiched, float a) {
 
-    // int n = G.get_vertices_count();
-    // set<gIndex> V;
-
     set<F> filters = G.get_filters_set();
-    // int filter_count = filters.size();
-
     set<T> vertices = G.get_vertices();
 
     map<F, Graph<T>*> Gf;
+    mutex graph_mutex;
 
-    Graph<T>* graph_f;
-
-    for (F filter: filters) {
-
-        // Getting the set Pf of points matching filter f
+    // Lambda for asynchronous subgraphs construction
+    auto process_filter = [&](const F& filter) {
+        // Getting the vertices that have the filter
         vector<gIndex> Pf;
-        for (T vertex : vertices) {
+        for (const T& vertex : vertices) {
             set<F> Fx = G.get_filters(G.get_index_from_vertex(vertex));
-            
             if (Fx.find(filter) != Fx.end()) {
                 Pf.push_back(G.get_index_from_vertex(vertex));
             }
         }
-        // print_vector(Pf);
 
-        // Creating the subgraph Gf with the points of Pf and running Vamana algorithm for them
-        graph_f = new Graph<T>;
-        for (gIndex i: Pf) {
+        // Creating the subgraph
+        Graph<T>* graph_f = new Graph<T>;
+        for (gIndex i : Pf) {
             graph_f->add_vertex(G.get_vertex_from_index(i));
         }
 
+        // Running Vamana Indexing Algorithm on the subgraph
         Vamana(*graph_f, Lsmall, Rsmall, a);
 
-        Gf.insert({filter, graph_f});
+        // Critical area for adding the subgraph to the shared map
+        {
+            lock_guard<mutex> lock(graph_mutex);
+            Gf[filter] = graph_f;
+        }
+    };
+
+    // Parallelize subgraph construction
+    vector<thread> threads;
+    for (const F& filter : filters) {
+        threads.emplace_back(process_filter, filter);
     }
 
-    // Merging the Gf subgraphs into G (adding the edges of all )
-    for (F filter: filters) {
-        
-        // Copying all edges of Gf to G
+    // Join all threads
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
+
+    // Merging the Gf subgraphs into G
+    for (const F& filter : filters) {
         set<T> gf_vertices = Gf[filter]->get_vertices();
-        for (T gf_vertex: gf_vertices) {
+        for (const T& gf_vertex : gf_vertices) {
             vector<gIndex> gf_neighbor_indices = Gf[filter]->get_neighbors(gf_vertex);
-            for (gIndex gf_neighbor_index: gf_neighbor_indices) {
+            for (gIndex gf_neighbor_index : gf_neighbor_indices) {
                 T neighbor = Gf[filter]->get_vertex_from_index(gf_neighbor_index);
-                G.add_edge(gf_vertex, neighbor);
+                // Technically, this is a critical area, but it is not necessary to lock it
+                {
+                    std::lock_guard<std::mutex> lock(graph_mutex);
+                    G.add_edge(gf_vertex, neighbor);
+                }
             }
         }
-
         delete Gf[filter];
     }
 
-    // Filtered Robust Prune to remove excess edges
-    for (T vertex : vertices) {
-        vector<gIndex> neighbor_indices = G.get_neighbors(vertex);
-        set<gIndex> Nout(neighbor_indices.begin(), neighbor_indices.end());
-        FilteredRobustPrune<T, F>(G, vertex, Nout, a, Rstiched);
+
+    // Parallelized Filtered Robust Prune
+    auto robust_prune = [&](int start, int end) {
+        auto it = vertices.begin();
+        std::advance(it, start);
+        for (int i = start; i < end; ++i, ++it) {
+            T vertex = *it;
+            vector<gIndex> neighbor_indices = G.get_neighbors(vertex);
+            set<gIndex> Nout(neighbor_indices.begin(), neighbor_indices.end());
+            FilteredRobustPrune<T, F>(G, vertex, Nout, a, Rstiched);
+        }
+    };
+
+    // Divide vertices into chunks for pruning
+    int num_threads = std::thread::hardware_concurrency();
+    int chunk_size = (vertices.size() + num_threads - 1) / num_threads;
+
+    threads.clear();
+    for (int t = 0; t < num_threads; ++t) {
+        int start = t * chunk_size;
+        int end = std::min(start + chunk_size, (int)vertices.size());
+        threads.emplace_back(robust_prune, start, end);
     }
 
-    // G.print_graph();
-
+    // Join all pruning threads
+    for (auto& thread : threads) {
+        thread.join();
+    }
 }

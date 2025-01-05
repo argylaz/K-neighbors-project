@@ -2,11 +2,6 @@
 #include <ctype.h>
 #include <string.h>
 
-#include <thread>
-#include <mutex>
-
-#include <omp.h>
-#include <limits.h>
 #include "./graph.hpp"
 
 
@@ -230,28 +225,52 @@ vector<Type> medoid(Graph<vector<Type>>& G){
         return {};  // Returns an empty vector
     }
 
-    // Iterate through all the vertices of the graph(dataset)
+    // Get the vertices
     set<vector<Type>> vertices = G.get_vertices();
-    for (vector<Type> vertex : vertices) {
+    vector<vector<Type>> vertex_list(vertices.begin(), vertices.end());
+    int n = vertex_list.size();
 
-        // Calculate the sum of the Euclidean Distances of this vertex with all the others 
-        float sum = 0;
-        for (vector<Type> x : vertices) {
-            sum += Euclidean_Distance<Type>(vertex, x);
+    // Thread function to compute the sum for a range of vertices
+    auto compute_sum = [&](int start, int end, float& local_min, vector<Type>& local_medoid) {
+        for (int i = start; i < end; ++i) {
+            float sum = 0;
+            for (const auto& x : vertex_list) {
+                sum += Euclidean_Distance<Type>(vertex_list[i], x);
+            }
+            // The section below is critical, so we need to protect it with a mutex
+            std::lock_guard<std::mutex> lock(mutex);  // Protect shared variables (one thread at a time)
+            if (sum < local_min) {
+                local_min = sum;
+                local_medoid = vertex_list[i];
+            }
         }
+    };
 
-        // Check if this sum is the minimum
-        if ( sum < min ) {
-            min = sum;
-            medoid_vertice = vertex;
-        }
+    // Create threads
+    int num_threads = std::thread::hardware_concurrency(); // Get the number of threads
+    vector<std::thread> threads;
+    vector<float> local_mins(num_threads, numeric_limits<float>::max()); // One local_min for each thread
+    vector<vector<Type>> local_medoids(num_threads);
 
+    int chunk_size = (n + num_threads - 1) / num_threads; // Divide into chunks of size ceil(count_vertices/num_threads) chunks
+    for (int t = 0; t < num_threads; ++t) {
+        int start = t * chunk_size;
+        int end = std::min(start + chunk_size, n);
+        threads.emplace_back(compute_sum, start, end, ref(local_mins[t]), ref(local_medoids[t]));
     }
 
-    // Print the medoid
-    // cout << "Medoid point ";  
-    // print_vector(medoid_vertice);
-    // cout << "\nFound at index " << G.get_index_from_vertex(medoid_vertice) << endl;
+    // Join threads
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
+    // Find the global minimum by comparing the results of each thread
+    for (int t = 0; t < num_threads; ++t) {
+        if (local_mins[t] < min) {
+            min = local_mins[t];
+            medoid_vertice = local_medoids[t];
+        }
+    }
 
     return medoid_vertice;
 }
@@ -261,10 +280,10 @@ vector<Type> medoid(Graph<vector<Type>>& G){
 /* Method which adds randomly exactly R outgoing neighbors to each vertex of the graph */
 template <typename T>
 void rDirectional(Graph<T>& G, int R) {
-    
+    const long int vertex_count = G.get_vertices_count();
     
     // Check if R is larger than the number of vertices (task impossible)
-    if ( R > G.get_vertices_count() ) {
+    if ( R > vertex_count ) {
         cerr << "R-Directional Graph initialization failed...\n" << endl;
         return;
     }
@@ -282,33 +301,27 @@ void rDirectional(Graph<T>& G, int R) {
                 G.remove_edge(vertex, G.get_vertex_from_index(neighborIndex));
             }
         }
-        
     }
 
+    // Random number generator setup
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    default_random_engine rng(seed);
+    uniform_int_distribution<int> dist(0, vertex_count - 1);
+
     // For each vertex of the graph
-    for ( T v : vertices ) {
-        
-        // Create a vector with all the elements of the graph
-        vector<T> shuffled_vertices(vertices.begin(), vertices.end());
-
-        // To obtain a time-based seed 
-        unsigned seed = chrono::system_clock::now().time_since_epoch().count();
-        
-        // Shuffle the vector 
-        shuffle(shuffled_vertices.begin(), shuffled_vertices.end(), default_random_engine(seed));
-
+    for (T v : vertices) {
+        gIndex v_index = G.get_index_from_vertex(v); // Get the index of the current vertex
+        unordered_set<gIndex> chosen_neighbors; // Track selected neighbors to ensure no duplicates
 
         // Add R random outgoing neighbors
-        int i = 0;
-        int count = 0;
-        while ( count < R ) {
-            if ( shuffled_vertices[i] != v ) {
-                G.add_edge(v, shuffled_vertices[i]);  
-                count++;  
-            }
-            i++;
-        }
+        while (chosen_neighbors.size() < static_cast<size_t>(R)) {
+            gIndex random_index = dist(rng) % G.get_vertices_count(); // Get a random index
 
+            // Ensure the random neighbor is not the current vertex and hasn't been chosen already
+            if (random_index != v_index && chosen_neighbors.insert(random_index).second) {
+                G.add_edge(v, G.get_vertex_from_index(random_index)); // Add edge using indices
+            }   
+        }
     }
 
 }
