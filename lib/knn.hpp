@@ -523,19 +523,53 @@ void FilteredVamana(FilterGraph<T, F>& G, int L, int R, map<F, gIndex> MedoidMap
         // For each neighbor j of the vertex
         vector<gIndex> neighbors = G.get_neighbors(vertex);
         // ------------------------------------------------
-        for (gIndex j: neighbors) {
+        // for (gIndex j: neighbors) {
             
-            T neighbor = G.get_vertex_from_index(j);
+        //     T neighbor = G.get_vertex_from_index(j);
 
-            // We add an edge from the neighbor j to the vertex itself
-            G.add_edge(neighbor, vertex);
+        //     // We add an edge from the neighbor j to the vertex itself
+        //     G.add_edge(neighbor, vertex);
             
-            // Getting the neighbors of the neighbor j (including the vertex itself)
-            vector<gIndex> j_neighbors = G.get_neighbors(neighbor);
+        //     // Getting the neighbors of the neighbor j (including the vertex itself)
+        //     vector<gIndex> j_neighbors = G.get_neighbors(neighbor);
+
+        //     if ( j_neighbors.size() > (long unsigned int) R) {
+        //         set<gIndex> set_j_neighbors(j_neighbors.begin(), j_neighbors.end());
+        //         FilteredRobustPrune<T, F>(G, neighbor, set_j_neighbors, a, R);
+        //     }
+   
+        // }
+        // --------------------------------------------------
+        std::mutex g_mutex; // Shared mutex for thread safety
+        size_t n_size = neighbors.size();
+        #pragma omp parallel for
+        for (size_t i = 0 ; i < n_size ; i++) {
+            
+            T neighbor;
+            {           
+                std::lock_guard<std::mutex> lock(g_mutex);
+                neighbor = G.get_vertex_from_index(neighbors[i]);
+            }
+
+            {
+                std::lock_guard<std::mutex> lock(g_mutex);        
+                // We add an edge from the neighbor j to the vertex itself
+                G.add_edge(neighbor, vertex);
+            }
+
+            vector<gIndex> j_neighbors;
+            {
+                std::lock_guard<std::mutex> lock(g_mutex);
+                // Getting the neighbors of the neighbor j (including the vertex itself)
+                j_neighbors = G.get_neighbors(neighbor);
+            }
 
             if ( j_neighbors.size() > (long unsigned int) R) {
                 set<gIndex> set_j_neighbors(j_neighbors.begin(), j_neighbors.end());
-                FilteredRobustPrune<T, F>(G, neighbor, set_j_neighbors, a, R);
+                {
+                    std::lock_guard<std::mutex> lock(g_mutex);
+                    FilteredRobustPrune<T, F>(G, neighbor, set_j_neighbors, a, R);
+                }
             }
    
         }

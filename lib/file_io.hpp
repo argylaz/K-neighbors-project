@@ -250,7 +250,6 @@ bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& 
     bool arg_found = false;
 
     // Get v argument, the Vamana type
-    // string vamana_type;
     const char *tempV;
     arg_found = false;
     for (int i = 1; i <= final_flag; i += 2) {
@@ -286,9 +285,7 @@ bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& 
     }
 
     data_set = string(data_set_flag);
-    // string base_name;
-    // string groundtruth_name;
-    // string query_name;
+    
     if (data_set == "small") {
         base_name =  "sift/siftsmall_base.fvecs";
         query_name = "sift/siftsmall_query.fvecs";
@@ -321,7 +318,6 @@ bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& 
 
 
     // Get K argument
-    // int k;
     const char *tempk;
     arg_found = false;
     for (int i = 1; i <= final_flag; i += 2) {
@@ -343,7 +339,6 @@ bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& 
 
 
     // Get L argument
-    // int L;
     const char *tempL;
     arg_found = false;
     for (int i = 1; i <= final_flag; i += 2) {
@@ -365,7 +360,6 @@ bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& 
 
 
     // Get R argument
-    // int R;
     const char *tempR;
     arg_found = false;
     for (int i = 1; i <= final_flag; i += 2) {
@@ -385,8 +379,8 @@ bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& 
         return false;
     }
 
+
     // Get x argument
-    // int x;
     const char *tempX;
     arg_found = false;
     for (int i = 1; i <= final_flag; i += 2) {
@@ -400,7 +394,6 @@ bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& 
         return false;
     }
 
-    // R = atoi(tempR);
     if ( strcmp(tempX,"create") != 0 && strcmp(tempX,"run")!= 0 && strcmp(tempX,"default")!= 0) {
         cerr << "ERROR: X argument should be a either create or run\n";
         return false;
@@ -408,8 +401,8 @@ bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& 
 
     execution_direction = string(tempX);
 
+
     // Get optional A argument
-    // float a;
     a = 1.2;
     if ((vamana_type == "stitched" && argc == MAX_ARGS) || (vamana_type != "stitched" && argc == MAX_ARGS - 2)) {
         const char *tempA;
@@ -432,6 +425,7 @@ bool get_arguments(int argc, const char* argv[], int& k, int& L, float& a, int& 
         }
     
     }
+    
 
     // Get optional Rstitched argument
     Rstitched = -1;
