@@ -474,13 +474,13 @@ pair< vector<vector<float>> , vector<float>> read_queries(const string& filename
     ifstream ifs(filename, ios::binary);
     assert(ifs.is_open());
 
-    cout << "Reading Queries: " << filename << endl;
+    // cout << "Reading Queries: " << filename << endl;
 
 
     // Get number of queries
     uint32_t N;
     ifs.read((char *)&N, sizeof(uint32_t));
-    cout << "# of queries: " << N << endl;
+    // cout << "# of queries: " << N << endl
 
 
     // Initialise buffer and map
@@ -514,7 +514,7 @@ pair< vector<vector<float>> , vector<float>> read_queries(const string& filename
 
     // Close file
     ifs.close();
-    cout << "Finish Reading Queries" << endl;
+    // cout << "Finish Reading Queries" << endl;
 
     return {v, f};
 }
@@ -526,13 +526,13 @@ vector<vector<gIndex>> read_groundtruth(string filename) {
     ifstream groundtruth(filename, ios::binary);
     assert(groundtruth.is_open());
 
-    cout << "Reading Data: " << filename << endl;
+    // cout << "Reading Data: " << filename << endl;
 
 
     // Get number of points
     uint32_t N;
     groundtruth.read((char *)&N, sizeof(uint32_t));
-    cout << "# of points: " << N << endl;
+    // cout << "# of points: " << N << endl;
 
     int num_dimensions = 1;
 
@@ -557,7 +557,7 @@ vector<vector<gIndex>> read_groundtruth(string filename) {
 
     // Close file
     groundtruth.close();
-    cout << "Finish Reading Data" << endl;
+    // cout << "Finish Reading Data" << endl;
 
 
     return gt_data;
@@ -622,7 +622,7 @@ void make_bin(const string& filename, const vector<vector<T>> vectors) {
 
     // Close file
     file.close();
-    cout << "Data written to " << filename << " successfully.\n";
+    // cout << "Data written to " << filename << " successfully.\n";
 }
 
 
@@ -661,7 +661,7 @@ void make_queries(const string& filename, const vector<vector<T>> vectors) {
 
     // Close file
     file.close();
-    cout << "Data written to " << filename << " successfully.\n";
+    // cout << "Data written to " << filename << " successfully.\n";
 }
 
 

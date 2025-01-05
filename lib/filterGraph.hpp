@@ -76,13 +76,13 @@ FilterGraph<T,F>::FilterGraph(const string& filename, int num_dimensions, bool i
     ifstream ifs(filename, ios::binary);
     assert(ifs.is_open());
 
-    cout << "Reading Data: " << filename << endl;
+    // cout << "Reading Data: " << filename << endl;
 
 
     // Get number of points
     uint32_t N;
     ifs.read((char *)&N, sizeof(uint32_t));
-    cout << "# of points: " << N << endl;
+    // cout << "# of points: " << N << endl;
 
 
     // Initialise buffer
@@ -108,7 +108,7 @@ FilterGraph<T,F>::FilterGraph(const string& filename, int num_dimensions, bool i
 
     // Close file
     ifs.close();
-    cout << "Finish Reading Data" << endl;
+    // cout << "Finish Reading Data" << endl;
 };
 
 // Add_vertex function for adding a vertex with a specific filter in the graph

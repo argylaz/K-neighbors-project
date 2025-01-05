@@ -33,6 +33,8 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
 /* Main method of the project that runs our vamana (from knn.hpp) on a graph (from graph.hpp)
    created from the databases given in fvec files */
 int main(int argc, char* argv[]) {
+    // Start measuring time
+    auto start_time = chrono::high_resolution_clock::now();
 
     int k, L, R, Rstitched;
     float a = 1.2;    // Default value 
@@ -40,15 +42,13 @@ int main(int argc, char* argv[]) {
     if ( !get_arguments(argc, (const char**)argv, k, L, a, R, Rstitched, data_set, base_name, query_name, groundtruth_name, vamana_type, execution_direction) ) {
         return -1;
     }
-
-
     
     string prefix = vamana_type + "_" + data_set + "_" + to_string(k) + "_" + to_string(L) + "_" + to_string(R) + "_" + to_string_trimmed(a);
     if (vamana_type == "stitched") prefix += "_" + to_string(Rstitched);
 
     vector<vector<gIndex>> groundtruth;
     vector<vector<float>> queries;
-    cout << k << " "<< L << " " << R << " " << Rstitched << " " << a << " " << data_set << " " << base_name << " " << query_name << " " << groundtruth_name << " " << vamana_type<<endl;
+    cout << k << " "<< L << " " << R << " " << Rstitched << " " << a << " " << data_set << " " << base_name << " " << query_name << " " << groundtruth_name << " " << vamana_type;
     // Simple Vamana Case
     if ( vamana_type == "simple" ) {
 
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
         Graph<vector<float>> *G = new Graph<vector<float>>(true);
         vec_to_graph<float>(base_name, *G);
 
-        cout << G->get_vertices_count() << " points loaded\n";
+        // cout << G->get_vertices_count() << " points loaded\n";
         
         // If the .bin graph file already exists we read it and recreate the graph, otherwise we have to make the graph and save it in the .bin file
         vector<float> medoid;
@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
             G->save_graph_to_bin(prefix);
         }        
         
-        cout << "Graph has " << G->get_edge_count() << " edges\n\n"; 
+        // cout << "Graph has " << G->get_edge_count() << " edges\n\n";
 
         // If the execution direction is create, terminate the program before calling GreedySearch for the queries  
         if( execution_direction == "create" ){
@@ -105,18 +105,18 @@ int main(int argc, char* argv[]) {
 
         // Reading Queries
         int num_queries = get_num_queries(query_name);
-        cout << "Num Queries: " << num_queries << endl;
+        // cout << "Num Queries: " << num_queries << endl;
         pair< vector<vector<float>>, vector<float> > queries_data = read_queries(query_name, num_queries, NUM_DIMENSIONS);
         queries = queries_data.first;
         vector<float> queries_filters = queries_data.second;
 
-        cout << "Queries Size " << queries_data.first.size() << endl;
+        // cout << "Queries Size " << queries_data.first.size() << endl;
         
 
         // Reading Base and creating Graph
         FilterGraph<vector<float>, float> *G = new FilterGraph<vector<float>, float>(base_name, NUM_DIMENSIONS);
 
-        cout << G->get_vertices_count() << " points loaded\n";
+        // cout << G->get_vertices_count() << " points loaded\n";
 
 
         vector<float> dummy;
@@ -163,8 +163,8 @@ int main(int argc, char* argv[]) {
             
         }
 
-        cout << "Medoid Map Size " << MedoidMap.size() << endl;
-        cout << "Graph has " << G->get_edge_count() << " edges\n\n";
+        // cout << "Medoid Map Size " << MedoidMap.size() << endl;
+        // cout << "Graph has " << G->get_edge_count() << " edges\n\n";
         
         
         results_Filtered_Greedy<vector<float>, float>(G, k, L, groundtruth, queries, queries_filters, MedoidMap);
@@ -174,7 +174,12 @@ int main(int argc, char* argv[]) {
         
     }
         
+    // End measuring time
+    auto end_time = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsed = end_time - start_time;
 
+    // Print elapsed time
+    cout << " " << elapsed.count();
     
     return 0;
 }
@@ -231,7 +236,7 @@ void results_Greedy(Graph<T> *G, int k, int L, vector<vector<gIndex>>& groundtru
     }
 
     total_recall = total_recall / count;
-    cout << "\nTotal Recall is " << total_recall * 100 <<"%\n" << endl;
+    cout << total_recall * 100 << endl; // Printing total recall
     
 
 }
@@ -245,7 +250,7 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
 
     size_t total_queries = queries.size();
 
-    cout << "Queries Size " << total_queries << endl;
+    // cout << "Queries Size " << total_queries << endl;
 
     // Calculate and print recall for given queries
     float total_recall_filtered = 0.0f;
@@ -324,24 +329,24 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
 
     
     total_recall_filtered = total_recall_filtered / count_filtered;
-    cout << "\nTotal Recall for filtered is " << total_recall_filtered * 100 <<"%\n" << endl;
-    cout << "From " << count_filtered << " filtered queries" << endl;
+    // cout << "\nTotal Recall for filtered is " << total_recall_filtered * 100 <<"%\n" << endl;
+    // cout << "From " << count_filtered << " filtered queries" << endl;
 
     total_recall_unfiltered = total_recall_unfiltered / count_unfiltered;
-    cout << "\nTotal Recall for unfiltered is " << total_recall_unfiltered * 100 <<"%\n" << endl;
-    cout << "From " << count_unfiltered << " unfiltered queries" << endl;
+    // cout << "\nTotal Recall for unfiltered is " << total_recall_unfiltered * 100 <<"%\n" << endl;
+    // cout << "From " << count_unfiltered << " unfiltered queries" << endl;
 
-    total_recall = (count_filtered * total_recall_filtered + count_unfiltered*total_recall_unfiltered) / (count_filtered + count_unfiltered);
-    cout << "\nTotal Recall is " << total_recall * 100 <<"%\n" << endl;
+    // total_recall = (count_filtered * total_recall_filtered + count_unfiltered*total_recall_unfiltered) / (count_filtered + count_unfiltered);
+    cout << " " << total_recall * 100 << endl;
     
-    cout << "Filters in the Graph\n";
+    // cout << "Filters in the Graph\n";
     set<F> F_ = G->get_filters_set();
     // for( F f : F_){
     //     cout << f << " "<<  G->get_filter_count(f) << endl;
     //     G->get_filter_count(f);
     // }
 
-    cout << "edges: "<< G->get_edge_count()<< endl;
+    // cout << "edges: "<< G->get_edge_count()<< endl;
 
 
 
