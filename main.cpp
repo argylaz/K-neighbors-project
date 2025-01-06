@@ -1,9 +1,12 @@
 #include <iostream>
 #include "lib/knn.hpp"
 
+
 #define NUM_DIMENSIONS 100 // The number of dimensions of each vector
 
 using namespace std;
+
+
 
 /* Returns the number of queries for the given query dataset ()*/
 int get_num_queries(string& query_name) {
@@ -48,7 +51,7 @@ int main(int argc, char* argv[]) {
 
     vector<vector<gIndex>> groundtruth;
     vector<vector<float>> queries;
-    cout << k << " "<< L << " " << R << " " << Rstitched << " " << a << " " << data_set << " " << base_name << " " << query_name << " " << groundtruth_name << " " << vamana_type;
+    cout << k << " "<< L << " " << R << " " << Rstitched << " " << a /*<< " " << data_set << " " << base_name << " " << query_name << " " << groundtruth_name << " " << vamana_type*/;
     // Simple Vamana Case
     if ( vamana_type == "simple" ) {
 
@@ -178,6 +181,7 @@ int main(int argc, char* argv[]) {
     auto end_time = chrono::high_resolution_clock::now();
     chrono::duration<double> elapsed = end_time - start_time;
 
+    measure_user_time();
     // Print elapsed time
     cout << " " << elapsed.count() << endl;
     
@@ -336,7 +340,7 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
     // cout << "\nTotal Recall for unfiltered is " << total_recall_unfiltered * 100 <<"%\n" << endl;
     // cout << "From " << count_unfiltered << " unfiltered queries" << endl;
 
-    // total_recall = (count_filtered * total_recall_filtered + count_unfiltered*total_recall_unfiltered) / (count_filtered + count_unfiltered);
+    total_recall = (count_filtered * total_recall_filtered + count_unfiltered*total_recall_unfiltered) / (count_filtered + count_unfiltered);
     cout << " " << total_recall * 100;
     
     // cout << "Filters in the Graph\n";

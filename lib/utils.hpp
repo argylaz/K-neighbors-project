@@ -1,6 +1,8 @@
 #include <cmath>
 #include <ctype.h>
 #include <string.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include "./graph.hpp"
 
@@ -63,6 +65,9 @@ bool isPositiveInteger(char *str);
 
 // Function that returns the float as string without excess decimal zeros
 string to_string_trimmed(float value);
+
+// Function that returns the user time of the calling function
+void measure_user_time(); 
 
 
 /*----------------------------------------------------Function Definitions-----------------------------------------------------------*/
@@ -285,6 +290,18 @@ string to_string_trimmed(float value) {
     return result;
 }
 
+void measure_user_time() {
+    struct rusage usage;
+
+    // Get resource usage for the calling process
+    if (getrusage(RUSAGE_SELF, &usage) == 0) {
+        struct timeval user_time = usage.ru_utime;
+
+        cout << " " << (long)user_time.tv_sec << "." << (long)user_time.tv_usec;
+    } else {
+        perror("getrusage failed");
+    }
+}
 
 /*---------------------------Utility functions and classes for the tests-----------------------------------*/
 
