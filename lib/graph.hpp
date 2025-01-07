@@ -376,7 +376,7 @@ bool Graph<T>::get_graph_from_bin(string file_prefix, T& medoid) {
     // Create/Open file filename_graph.bin
     ifstream file(filename, ios::binary);
     if (!file) {
-        cerr << "Could not find existing graph file to recreate with prefix " << file_prefix << endl;
+        // cerr << "Could not find existing graph file to recreate with prefix " << file_prefix << endl;
         return false;
     }
 
@@ -413,7 +413,7 @@ bool Graph<T>::save_graph_to_bin(string file_prefix, gIndex medoid_index ) {
     // Create/Open file filename_graph.bin
     ofstream file(filename, ios::binary);
     if (!file) {
-        cerr << "Error opening file for writing!" << endl;
+        // cerr << "Error opening file for writing!" << endl;
         return false;
     }
 

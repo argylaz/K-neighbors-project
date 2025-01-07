@@ -55,11 +55,11 @@ create_stitched:
 
 create_simple: clean
 	$(CC) $(CFLAGS) -o bin/main main.cpp
-	time ./bin/main  -f small -k 100 -L 120 -R 30 -a 1.2 -v simple -x create
+	time ./bin/main  -f small -k 100 -L 120 -R 40 -a 1.2 -v simple -x create
 
 create_filtered: clean
 	$(CC) $(CFLAGS) -o bin/main main.cpp
-	time ./bin/main  -f dummy -k 100 -L 150 -R 42 -a 1.2 -v filtered -x create
+	time ./bin/main  -f dummy -k 100 -L 150 -R 40 -a 1.2 -v filtered -x create
 
 
 create_stitched: clean
@@ -69,11 +69,11 @@ create_stitched: clean
 
 run_simple: clean
 	$(CC) $(CFLAGS) -o bin/main main.cpp
-	time ./bin/main  -f small -k 100 -L 120 -R 30 -a 1.2 -v simple -x run
+	time ./bin/main  -f small -k 100 -L 150 -R 40 -a 1.2 -v simple -x run
 
 run_filtered: clean
 	$(CC) $(CFLAGS) -o bin/main main.cpp
-	time ./bin/main  -f dummy -k 100 -L 150 -R 42 -a 1.2 -v filtered -x run
+	time ./bin/main  -f dummy -k 20 -L 20 -R 40 -a 1.2 -v filtered -x run
 
 run_stitched: clean
 	$(CC) $(CFLAGS) -o bin/main main.cpp
