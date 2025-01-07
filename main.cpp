@@ -55,13 +55,6 @@ int main(int argc, char* argv[]) {
     // Simple Vamana Case
     if ( vamana_type == "simple" ) {
 
-
-        // Reading Groundtruth
-        groundtruth = read_vecs<int>(groundtruth_name);
-
-        // Reading Queries        
-        queries = read_vecs<float>(query_name);
-
         // Reading Base and creating Graph
         Graph<vector<float>> *G = new Graph<vector<float>>(true);
         vec_to_graph<float>(base_name, *G);
@@ -79,15 +72,17 @@ int main(int argc, char* argv[]) {
         
         // cout << "Graph has " << G->get_edge_count() << " edges\n\n";
 
-        // If the execution direction is create, terminate the program before calling GreedySearch for the queries  
-        if( execution_direction == "create" ){
-            delete G;
-            return 0;
+        if (execution_direction == "run") {
+            
+            // Reading Groundtruth
+            groundtruth = read_vecs<int>(groundtruth_name);
+
+            // Reading Queries        
+            queries = read_vecs<float>(query_name);
+            
+            // Running Greedy search for the queries
+            results_Greedy<vector<float>>(G, k, L, groundtruth, queries, medoid);
         }
-
-        results_Greedy<vector<float>>(G, k, L, groundtruth, queries, medoid);
-
-        
         
         delete(G);
         
@@ -95,32 +90,10 @@ int main(int argc, char* argv[]) {
     // Stitched or Filtered Vamana Case
     else {  
 
-        // Reading Groundtruth
-        // Check whether the file has been provided or calculated in advance (exists in sift/ )
-        if (fopen(groundtruth_name.c_str(), "r")) {
-            groundtruth = read_groundtruth(groundtruth_name);
-        } else {
-            cerr << "The groundtruth file for the requested datasets has not been provided!" << endl;
-            cerr << "Results cannot be properly evaluated!" << endl;
-            cerr << "Calculate with make groundtruth or add groundtruth file to sift/.." << endl;
-            return -1;
-        }
-
-        // Reading Queries
-        int num_queries = get_num_queries(query_name);
-        // cout << "Num Queries: " << num_queries << endl;
-        pair< vector<vector<float>>, vector<float> > queries_data = read_queries(query_name, num_queries, NUM_DIMENSIONS);
-        queries = queries_data.first;
-        vector<float> queries_filters = queries_data.second;
-
-        // cout << "Queries Size " << queries_data.first.size() << endl;
-        
-
         // Reading Base and creating Graph
         FilterGraph<vector<float>, float> *G = new FilterGraph<vector<float>, float>(base_name, NUM_DIMENSIONS);
 
         // cout << G->get_vertices_count() << " points loaded\n";
-
 
         vector<float> dummy;
         map<float,gIndex> MedoidMap;
@@ -148,16 +121,6 @@ int main(int argc, char* argv[]) {
                 cerr << "ERROR: Can't save Medoid Map to _medoid_map.bin file\n";
             }
 
-
-            // If the execution direction is create, terminate the program before calling GreedySearch for the queries  
-            if( execution_direction == "create" ){
-                delete G;
-                return 0;
-            }
-
-            
-            
-            
         } else {
             // The .bin Medoid Map file already exists, so we read it
             if( !get_medoid_map_from_bin<float>(prefix, MedoidMap) ){
@@ -169,9 +132,30 @@ int main(int argc, char* argv[]) {
         // cout << "Medoid Map Size " << MedoidMap.size() << endl;
         // cout << "Graph has " << G->get_edge_count() << " edges\n\n";
         
-        
-        results_Filtered_Greedy<vector<float>, float>(G, k, L, groundtruth, queries, queries_filters, MedoidMap);
+        if (execution_direction == "run") {
 
+            // Reading Groundtruth
+            // Check whether the file has been provided or calculated in advance (exists in sift/ )
+            if (fopen(groundtruth_name.c_str(), "r")) {
+                groundtruth = read_groundtruth(groundtruth_name);
+            } else {
+                cerr << "The groundtruth file for the requested datasets has not been provided!" << endl;
+                cerr << "Results cannot be properly evaluated!" << endl;
+                cerr << "Calculate with make groundtruth or add groundtruth file to sift/.." << endl;
+                return -1;
+            }
+
+            // Reading Queries
+            int num_queries = get_num_queries(query_name);
+
+            // cout << "Num Queries: " << num_queries << endl;
+            auto queries_data = read_queries(query_name, num_queries, NUM_DIMENSIONS);
+            queries = queries_data.first;
+            vector<float> queries_filters = queries_data.second;
+            // cout << "Queries Size " << queries_data.first.size() << endl;
+
+            results_Filtered_Greedy<vector<float>, float>(G, k, L, groundtruth, queries, queries_filters, MedoidMap);
+        }
 
         delete(G);
         
@@ -180,7 +164,7 @@ int main(int argc, char* argv[]) {
     // End measuring time
     auto end_time = chrono::high_resolution_clock::now();
     chrono::duration<double> elapsed = end_time - start_time;
-
+    
     measure_user_time();
     // Print elapsed time
     cout << " " << elapsed.count() << endl;

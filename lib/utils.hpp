@@ -296,7 +296,6 @@ void measure_user_time() {
     // Get resource usage for the calling process
     if (getrusage(RUSAGE_SELF, &usage) == 0) {
         struct timeval user_time = usage.ru_utime;
-
         cout << " " << (long)user_time.tv_sec << "." << (long)user_time.tv_usec;
     } else {
         perror("getrusage failed");

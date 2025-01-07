@@ -16,6 +16,6 @@ for R in "${R_values[@]}"; do
   # Run the executable and process its output
   ./bin/main -f dummy -k 100 -L 150 -R "$R" -a 1.2 -v filtered -x run | while read -r K L R Rstitched a_val Recall UserTime; do
     # Append each line to the CSV file
-    echo "$K,$L,$R,$Rstitched,$a_val,$Recall,$Usertime,$ElapsedTime" >> "$csv_file"
+    echo "$K,$L,$R,$Rstitched,$a_val,$Recall,$UserTime,$ElapsedTime" >> "$csv_file"
   done
 done
