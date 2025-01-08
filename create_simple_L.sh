@@ -13,12 +13,15 @@ L_values=(20 40 50 70 100 120 150 200)
 
 # Loop over the values of 'a'
 for L in "${L_values[@]}"; do
-  # Run the executable and process its output
-  if [$L -le 100 ]
-    ./bin/main -f dummy -k "$L" -L "$L" -R 42 -a 1.2 -v filtered -x create | while read -r K L R Rstitched a_val UserTime ElapsedTime; do
+  # Determine the value of 'K' based on 'L'
+  if [[ $L -le 100 ]]; then
+    K=$L
   else
-    ./bin/main -f dummy -k 100 -L "$L" -R 42 -a 1.2 -v filtered -x create | while read -r K L R Rstitched a_val UserTime ElapsedTime; do
+    K=100
   fi
+
+  # Run the executable and process its output
+  ./bin/main -f small -k "$K" -L "$L" -R 42 -a 1.2 -v simple -x create | while read -r K L R Rstitched a_val UserTime ElapsedTime; do
     # Append each line to the CSV file
     echo "$K,$L,$R,$Rstitched,$a_val,$UserTime,$ElapsedTime" >> "$csv_file"
   done

@@ -114,6 +114,7 @@ pair<set<gIndex>, set<gIndex>> GreedySearch(Graph<T>& G, const T& start, const T
     // First we check that the input values are correct
     if (L < k) { // L >= k
         cerr << "\nSearch list size L must be greater than or equal to k!\n" << endl;
+        cerr << "L: " << L << " k: " << k << " Greedy" << endl;
         // Returns a pair with two empty sets
         return {{},{}};
     }
@@ -173,6 +174,7 @@ pair<set<gIndex>, set<gIndex>> FilteredGreedySearch(FilterGraph<T, F>& G, set<T>
     // First we check that the input values are correct
     if (L < k) { // L >= k
         cerr << "\nSearch list size L must be greater than or equal to k!\n" << endl;
+        cerr << "L: " << L << " k: " << k << " Filtered" <<  endl;
         // Returns a pair with two empty sets
         return {{},{}};
     }
