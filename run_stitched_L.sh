@@ -8,10 +8,10 @@ if [[ ! -f $csv_file ]]; then
   echo "K,L,R,Rstitched,a,Recall,UserTime,ElapsedTime" > "$csv_file"
 fi
 
-# Define the values of 'R' to test
+# Define the values of 'L' to test
 L_values=(20 40 50 70 100 120 150 200)
 
-# Loop over the values of 'a'
+# Loop over the values of 'L'
 for L in "${L_values[@]}"; do
   if [[ $L -le 100 ]]; then
     K=$L
