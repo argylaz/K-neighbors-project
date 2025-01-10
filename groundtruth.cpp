@@ -130,7 +130,6 @@ int main(void) {
 
         write_to_bin(groundtruth_file, k_nearests);
 
-
         k_nearests.clear();
     }
 

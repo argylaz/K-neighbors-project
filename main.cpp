@@ -179,7 +179,13 @@ int main(int argc, char* argv[]) {
 
 template <typename T>
 void results_Greedy(Graph<T> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<T>& queries, T medoid) {
-    
+    // Open results file for writing
+    ofstream results_file("results.txt", ios::app);
+    if (!results_file.is_open()) {
+        cerr << "Error: Unable to open results.txt file for writing.\n";
+        return;
+    }
+
     // Calculate and print recall for given queries
     float total_recall = 0.0f;
     int count = 0;
@@ -221,11 +227,16 @@ void results_Greedy(Graph<T> *G, int k, int L, vector<vector<gIndex>>& groundtru
         total_recall += recall;
         count++;
 
+        #pragma omp critical
+        {
+            results_file << "Query " << i+1 << ": Recall = " << recall * 100 << "%\n";
+        }
     }
 
     total_recall = total_recall / count;
     cout << " " <<  total_recall * 100; // Printing total recall
-    
+    results_file << "Total Recall = " << total_recall * 100 << "%\n";
+    results_file.close();
 
 }
 
@@ -235,6 +246,12 @@ void results_Greedy(Graph<T> *G, int k, int L, vector<vector<gIndex>>& groundtru
 
 template <typename T, typename F>
 void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<gIndex>>& groundtruth, vector<T>& queries, vector<F>& queries_filters, map<F, gIndex>& MedoidMap) {
+    // Open results file for writing
+    ofstream results_file("results.txt", ios::app);
+    if (!results_file.is_open()) {
+        cerr << "Error: Unable to open results.txt file for writing.\n";
+        return;
+    }
 
     size_t total_queries = queries.size();
 
@@ -246,6 +263,8 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
     float total_recall = 0.0f;
     int count_unfiltered = 0;
     int count_filtered = 0;
+
+    float total_specificity = 0.0f; // Used to calculate average specificity of the dataset
 
     // Parallel for
     #pragma omp parallel for reduction(+:total_recall_filtered, total_recall_unfiltered, count_filtered, count_unfiltered) schedule(dynamic)
@@ -293,11 +312,25 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
         set<gIndex> V_intersec;
         set_intersection(X.begin(), X.end(), T_.begin(), T_.end(), inserter(V_intersec, V_intersec.begin()));
 
-        // Calculate recall and add to total
+        // Calculate recall and specificity
         float recall = 0;     
         if( X.size() > 0 )
             recall = (float)V_intersec.size() / ((float) X.size());
         
+        float specificity;
+        if(queries_filters[i] == -1.0f){ // Specificity = 100% for unfiltered queries
+            specificity = 1.0f;
+        } else
+            specificity = (float)G->get_filter_count(queries_filters[i]) / ((float)G->get_vertices_count());
+        
+        total_specificity += specificity;
+
+        // Write to file
+        #pragma omp critical
+        {
+            results_file << "Query " << i+1 << ": Recall = " << recall * 100 << "%, Specificity = " << specificity * 100 << "%\n";
+        }
+
         // cout << "\nRecall is: " << recall << endl;
         if(queries_filters[i] == -1.0f){
             total_recall_unfiltered += recall;
@@ -307,10 +340,8 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
             total_recall_filtered += recall;
             count_filtered++;
         }
-        // count++;
 
-        // Calculate speciificity and print
-        float specificity = (float)G->get_filter_count(queries_filters[i]) / ((float)G->get_vertices_count());
+        // Calculate specificity and print
         // cout << "Specificity is: " << specificity << endl;
     }
 
@@ -326,6 +357,10 @@ void results_Filtered_Greedy(FilterGraph<T, F> *G, int k, int L, vector<vector<g
 
     total_recall = (count_filtered * total_recall_filtered + count_unfiltered*total_recall_unfiltered) / (count_filtered + count_unfiltered);
     cout << " " << total_recall * 100;
+    results_file << "Total Recall = " << total_recall * 100 << "%\n";
+
+    total_specificity = total_specificity / total_queries;
+    results_file << "Average Specificity = " << total_specificity * 100 << "%\n";
     
     // cout << "Filters in the Graph\n";
     set<F> F_ = G->get_filters_set();

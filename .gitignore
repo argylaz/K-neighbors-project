@@ -43,3 +43,6 @@
 
 /bin/test_graph.bin
 /bin/test_medoid_map.bin
+
+## Results file
+/results.txt
